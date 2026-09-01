@@ -7,9 +7,9 @@ export function CompanyCard({ company }: { company: Company }) {
   return (
     <Link
       href={`/company/${company.slug ?? company.id}`}
-      className="flex gap-4 rounded-xl border border-border bg-surface p-4 transition-shadow hover:shadow-md"
+      className="flex gap-4 border border-line bg-paper p-5 transition-colors hover:border-gold"
     >
-      <div className="size-16 shrink-0 overflow-hidden rounded-lg bg-accent-soft">
+      <div className="size-16 shrink-0 overflow-hidden bg-cream">
         {company.logo_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -19,22 +19,22 @@ export function CompanyCard({ company }: { company: Company }) {
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-xl font-semibold text-accent">
+          <div className="display flex h-full items-center justify-center text-xl text-gold-deep">
             {company.name.charAt(0)}
           </div>
         )}
       </div>
 
       <div className="min-w-0 flex-1">
-        <h3 className="truncate font-medium">{company.name}</h3>
+        <h3 className="truncate font-semibold">{company.name}</h3>
 
-        <div className="mt-0.5 text-sm text-muted">
+        <div className="mt-1 text-xs font-semibold uppercase tracking-widest text-text-muted">
           {company.work_type && WORK_TYPES[company.work_type]}
-          {company.district && <span> · {company.district} р-н</span>}
+          {company.district && <span> · {company.district}</span>}
         </div>
 
         {company.description && (
-          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted">
+          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-text-muted">
             {company.description}
           </p>
         )}

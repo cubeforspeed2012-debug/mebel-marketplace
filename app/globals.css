@@ -1,33 +1,90 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------
-   Дизайн-токены. Когда придёт готовый дизайн — меняются только
-   значения здесь, разметку страниц трогать не придётся.
+   Дизайн-система Mebel.
+   Тёмная зелёно-графитовая база, золотой акцент, кремовые секции —
+   по образцам мебельных каталогов и витрин.
    --------------------------------------------------------------- */
 :root {
-  --background: #faf8f5;   /* тёплый белый — мебель, дерево, свет */
-  --surface: #ffffff;
-  --foreground: #1c1917;
-  --muted: #78716c;
-  --border: #e7e2db;
-  --accent: #a8622a;       /* тёплая охра — акценты и кнопки */
-  --accent-hover: #8f5122;
-  --accent-soft: #f6ede4;
+  /* Основа */
+  --ink: #16211c;          /* глубокий тёмно-зелёный: шапка, первый экран, футер */
+  --ink-deep: #0f1815;     /* ещё темнее: подложки и футер */
+  --cream: #f3eee4;        /* кремовый: светлые секции */
+  --paper: #ffffff;        /* белый: карточки товаров */
+
+  /* Акцент */
+  --gold: #d9a441;         /* кнопки и подписи на тёмном */
+  --gold-deep: #9c7220;    /* тот же акцент, но читаемый на светлом */
+
+  /* Линии */
+  --line: #e2dacb;         /* волосяная линия на кремовом */
+  --line-dark: #2c3a33;    /* волосяная линия на тёмном */
+
+  /* Текст */
+  --text: #16211c;
+  --text-muted: #6e6b62;
+  --text-on-dark: #efe9dd;
+  --text-on-dark-muted: #a8b0a8;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-border: var(--border);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-soft: var(--accent-soft);
+  --color-ink: var(--ink);
+  --color-ink-deep: var(--ink-deep);
+  --color-cream: var(--cream);
+  --color-paper: var(--paper);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-line: var(--line);
+  --color-line-dark: var(--line-dark);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-on-dark: var(--text-on-dark);
+  --color-on-dark-muted: var(--text-on-dark-muted);
+
+  --font-display: var(--font-manrope);
   --font-sans: var(--font-inter);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--cream);
+  color: var(--text);
+}
+
+/* Заголовки — строгие, широкие, в верхнем регистре, как на витринных
+   каталогах мебели. Разрядка держит их спокойными на крупных кеглях. */
+.display {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Фирменная деталь: золотая волосяная черта — с мебельных плакатов.
+   Повторяется у заголовков секций и на первом экране. */
+.gold-rule::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 2px;
+  margin-top: 0.875rem;
+  background: var(--gold);
+}
+
+.gold-rule-center::after {
+  margin-inline: auto;
+}
+
+/* Видимый фокус для клавиатуры */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

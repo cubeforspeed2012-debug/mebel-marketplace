@@ -20,7 +20,7 @@ async function getCompanies(params: SearchParams) {
     let query = supabase.from('companies').select('*').eq('status', 'active')
 
     if (params.work_type && params.work_type in WORK_TYPES) {
-      // «Оба типа» подходит и под готовую, и под заказ.
+      // «Готовая и на заказ» подходит под оба запроса.
       query =
         params.work_type === 'both'
           ? query.eq('work_type', 'both')
@@ -52,6 +52,29 @@ function chipHref(current: SearchParams, key: keyof SearchParams, value: string)
   return query ? `/companies?${query}` : '/companies'
 }
 
+function Chip({
+  href,
+  active,
+  children,
+}: {
+  href: string
+  active: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <Link
+      href={href}
+      className={`border px-4 py-2 text-sm transition-colors ${
+        active
+          ? 'border-gold bg-gold font-semibold text-ink'
+          : 'border-line bg-paper text-text-muted hover:border-gold hover:text-gold-deep'
+      }`}
+    >
+      {children}
+    </Link>
+  )
+}
+
 export default async function CompaniesPage({
   searchParams,
 }: {
@@ -61,74 +84,74 @@ export default async function CompaniesPage({
   const companies = await getCompanies(params)
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="text-3xl font-semibold tracking-tight">Мебельные мастера Ташкента</h1>
-      <p className="mt-2 max-w-2xl leading-relaxed text-muted">
-        Фабрики, цеха и частные мастера города. Выбирайте по типу работы и району —
-        и звоните напрямую.
-      </p>
+    <>
+      <div className="border-b border-line-dark bg-ink">
+        <div className="mx-auto max-w-6xl px-4 py-12">
+          <h1 className="display gold-rule text-3xl text-on-dark">Мастера Ташкента</h1>
+          <p className="mt-6 max-w-xl leading-relaxed text-on-dark-muted">
+            Фабрики, цеха и частные мастера города. Выбирайте по типу работы и району —
+            и звоните напрямую.
+          </p>
+        </div>
+      </div>
 
-      <div className="mt-8 space-y-4">
-        <div>
-          <div className="mb-2 text-sm font-medium text-muted">Что делают</div>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(WORK_TYPES).map(([value, label]) => (
-              <Link
-                key={value}
-                href={chipHref(params, 'work_type', value)}
-                className={`rounded-full border px-4 py-2 text-sm transition-colors ${
-                  params.work_type === value
-                    ? 'border-accent bg-accent text-white'
-                    : 'border-border bg-surface hover:border-accent hover:text-accent'
-                }`}
-              >
-                {label}
-              </Link>
-            ))}
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <div className="space-y-5">
+          <div>
+            <div className="mb-2.5 text-xs font-semibold uppercase tracking-widest text-text-muted">
+              Что делают
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(WORK_TYPES).map(([value, label]) => (
+                <Chip
+                  key={value}
+                  href={chipHref(params, 'work_type', value)}
+                  active={params.work_type === value}
+                >
+                  {label}
+                </Chip>
+              ))}
+            </div>
           </div>
+
+          <details>
+            <summary className="cursor-pointer text-xs font-semibold uppercase tracking-widest text-text-muted hover:text-text">
+              Район {params.district && <span className="text-gold-deep">· {params.district}</span>}
+            </summary>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {DISTRICTS.map((district) => (
+                <Chip
+                  key={district}
+                  href={chipHref(params, 'district', district)}
+                  active={params.district === district}
+                >
+                  {district}
+                </Chip>
+              ))}
+            </div>
+          </details>
         </div>
 
-        <details>
-          <summary className="cursor-pointer text-sm font-medium text-muted hover:text-foreground">
-            Район {params.district && <span className="text-accent">· {params.district}</span>}
-          </summary>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {DISTRICTS.map((district) => (
+        <div className="mt-12">
+          {companies.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {companies.map((company) => (
+                <CompanyCard key={company.id} company={company} />
+              ))}
+            </div>
+          ) : (
+            <div className="border border-dashed border-line bg-paper p-14 text-center">
+              <p className="text-text-muted">Мастеров пока нет — площадка только запускается.</p>
               <Link
-                key={district}
-                href={chipHref(params, 'district', district)}
-                className={`rounded-full border px-4 py-2 text-sm transition-colors ${
-                  params.district === district
-                    ? 'border-accent bg-accent text-white'
-                    : 'border-border bg-surface hover:border-accent hover:text-accent'
-                }`}
+                href="/dashboard"
+                className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
               >
-                {district}
+                Стать первым мастером на площадке
               </Link>
-            ))}
-          </div>
-        </details>
+            </div>
+          )}
+        </div>
       </div>
-
-      <div className="mt-10">
-        {companies.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {companies.map((company) => (
-              <CompanyCard key={company.id} company={company} />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-xl border border-dashed border-border p-12 text-center">
-            <p className="text-muted">Мастеров пока нет — площадка только запускается.</p>
-            <Link
-              href="/dashboard"
-              className="mt-4 inline-block rounded-lg bg-accent px-5 py-2.5 font-medium text-white transition-colors hover:bg-accent-hover"
-            >
-              Стать первым мастером на площадке
-            </Link>
-          </div>
-        )}
-      </div>
-    </div>
+    </>
   )
 }

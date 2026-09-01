@@ -21,7 +21,6 @@ export async function generateMetadata({
   const { category, type } = await searchParams
   const categoryName = FALLBACK_CATEGORIES.find((c) => c.slug === category)?.name
   const typeName = type === 'custom_order' ? 'на заказ' : type === 'ready_made' ? 'готовая' : ''
-
   const title = [categoryName ?? 'Мебель', typeName, 'в Ташкенте'].filter(Boolean).join(' ')
 
   return {
@@ -51,22 +50,15 @@ async function getCatalog(params: SearchParams) {
       )
       .eq('status', 'active')
 
-    if (params.q) {
-      query = query.ilike('title', `%${params.q}%`)
-    }
-
-    if (params.type && params.type in PRODUCT_TYPES) {
-      query = query.eq('type', params.type)
-    }
+    if (params.q) query = query.ilike('title', `%${params.q}%`)
+    if (params.type && params.type in PRODUCT_TYPES) query = query.eq('type', params.type)
 
     if (params.category) {
       const matched = (categories ?? []).find((c) => c.slug === params.category)
       if (matched) query = query.eq('category_id', matched.id)
     }
 
-    if (params.district) {
-      query = query.eq('companies.district', params.district)
-    }
+    if (params.district) query = query.eq('companies.district', params.district)
 
     // Оплаченный буст поднимает товар наверх — так работает продвижение.
     const { data: products } = await query
@@ -83,7 +75,7 @@ async function getCatalog(params: SearchParams) {
   }
 }
 
-/** Ссылка-фильтр: сохраняет остальные выбранные фильтры, переключает свой. */
+/** Ссылка-фильтр: сохраняет остальные фильтры, переключает свой. */
 function filterHref(current: SearchParams, key: keyof SearchParams, value?: string) {
   const next = { ...current }
   if (!value || current[key] === value) delete next[key]
@@ -108,10 +100,10 @@ function FilterChip({
   return (
     <Link
       href={href}
-      className={`rounded-full border px-4 py-2 text-sm transition-colors ${
+      className={`border px-4 py-2 text-sm transition-colors ${
         active
-          ? 'border-accent bg-accent text-white'
-          : 'border-border bg-surface hover:border-accent hover:text-accent'
+          ? 'border-gold bg-gold font-semibold text-ink'
+          : 'border-line bg-paper text-text-muted hover:border-gold hover:text-gold-deep'
       }`}
     >
       {children}
@@ -132,101 +124,112 @@ export default async function CatalogPage({
     : FALLBACK_CATEGORIES
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="text-3xl font-semibold tracking-tight">Каталог мебели</h1>
+    <>
+      <div className="border-b border-line-dark bg-ink">
+        <div className="mx-auto max-w-6xl px-4 py-12">
+          <h1 className="display gold-rule text-3xl text-on-dark">Каталог мебели</h1>
 
-      <form action="/catalog" className="mt-6 flex max-w-xl gap-2">
-        <input
-          type="search"
-          name="q"
-          defaultValue={params.q ?? ''}
-          placeholder="Поиск по каталогу"
-          aria-label="Поиск по каталогу"
-          className="flex-1 rounded-lg border border-border bg-surface px-4 py-2.5 outline-none transition-colors focus:border-accent"
-        />
-        {params.category && <input type="hidden" name="category" value={params.category} />}
-        {params.type && <input type="hidden" name="type" value={params.type} />}
-        {params.district && <input type="hidden" name="district" value={params.district} />}
-        <button
-          type="submit"
-          className="rounded-lg bg-accent px-5 py-2.5 font-medium text-white transition-colors hover:bg-accent-hover"
-        >
-          Найти
-        </button>
-      </form>
-
-      {/* Фильтры */}
-      <div className="mt-8 space-y-4">
-        <div>
-          <div className="mb-2 text-sm font-medium text-muted">Категория</div>
-          <div className="flex flex-wrap gap-2">
-            {categoryList.map((category) => (
-              <FilterChip
-                key={category.slug}
-                href={filterHref(params, 'category', category.slug)}
-                active={params.category === category.slug}
-              >
-                {category.name}
-              </FilterChip>
-            ))}
-          </div>
+          <form action="/catalog" className="mt-8 flex max-w-lg gap-2">
+            <input
+              type="search"
+              name="q"
+              defaultValue={params.q ?? ''}
+              placeholder="Поиск по каталогу"
+              aria-label="Поиск по каталогу"
+              className="min-w-0 flex-1 border border-line-dark bg-ink-deep px-4 py-2.5 text-on-dark placeholder:text-on-dark-muted/70 outline-none transition-colors focus:border-gold"
+            />
+            {params.category && <input type="hidden" name="category" value={params.category} />}
+            {params.type && <input type="hidden" name="type" value={params.type} />}
+            {params.district && <input type="hidden" name="district" value={params.district} />}
+            <button
+              type="submit"
+              className="bg-gold px-6 py-2.5 font-semibold text-ink transition-colors hover:bg-on-dark"
+            >
+              Найти
+            </button>
+          </form>
         </div>
-
-        <div>
-          <div className="mb-2 text-sm font-medium text-muted">Тип</div>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(PRODUCT_TYPES).map(([value, label]) => (
-              <FilterChip
-                key={value}
-                href={filterHref(params, 'type', value)}
-                active={params.type === value}
-              >
-                {label}
-              </FilterChip>
-            ))}
-          </div>
-        </div>
-
-        <details className="group">
-          <summary className="cursor-pointer text-sm font-medium text-muted hover:text-foreground">
-            Район {params.district && <span className="text-accent">· {params.district}</span>}
-          </summary>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {DISTRICTS.map((district) => (
-              <FilterChip
-                key={district}
-                href={filterHref(params, 'district', district)}
-                active={params.district === district}
-              >
-                {district}
-              </FilterChip>
-            ))}
-          </div>
-        </details>
       </div>
 
-      {/* Результаты */}
-      <div className="mt-10">
-        {products.length > 0 ? (
-          <>
-            <div className="mb-5 text-sm text-muted">Найдено: {products.length}</div>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        {/* Фильтры */}
+        <div className="space-y-5">
+          <div>
+            <div className="mb-2.5 text-xs font-semibold uppercase tracking-widest text-text-muted">
+              Категория
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {categoryList.map((category) => (
+                <FilterChip
+                  key={category.slug}
+                  href={filterHref(params, 'category', category.slug)}
+                  active={params.category === category.slug}
+                >
+                  {category.name}
+                </FilterChip>
               ))}
             </div>
-          </>
-        ) : (
-          <div className="rounded-xl border border-dashed border-border p-12 text-center">
-            <p className="text-muted">
-              По этому запросу пока ничего нет.
-            </p>
-            <Link href="/catalog" className="mt-3 inline-block font-medium text-accent hover:underline">
-              Сбросить фильтры
-            </Link>
           </div>
-        )}
+
+          <div>
+            <div className="mb-2.5 text-xs font-semibold uppercase tracking-widest text-text-muted">
+              Тип
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(PRODUCT_TYPES).map(([value, label]) => (
+                <FilterChip
+                  key={value}
+                  href={filterHref(params, 'type', value)}
+                  active={params.type === value}
+                >
+                  {label}
+                </FilterChip>
+              ))}
+            </div>
+          </div>
+
+          <details>
+            <summary className="cursor-pointer text-xs font-semibold uppercase tracking-widest text-text-muted hover:text-text">
+              Район {params.district && <span className="text-gold-deep">· {params.district}</span>}
+            </summary>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {DISTRICTS.map((district) => (
+                <FilterChip
+                  key={district}
+                  href={filterHref(params, 'district', district)}
+                  active={params.district === district}
+                >
+                  {district}
+                </FilterChip>
+              ))}
+            </div>
+          </details>
+        </div>
+
+        {/* Результаты */}
+        <div className="mt-12">
+          {products.length > 0 ? (
+            <>
+              <div className="mb-5 text-sm text-text-muted">Найдено: {products.length}</div>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="border border-dashed border-line bg-paper p-14 text-center">
+              <p className="text-text-muted">По этому запросу пока ничего нет.</p>
+              <Link
+                href="/catalog"
+                className="mt-3 inline-block font-semibold text-gold-deep hover:underline"
+              >
+                Сбросить фильтры
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   )
 }

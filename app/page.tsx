@@ -50,82 +50,103 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Первый экран: одна понятная задача — найти мебель */}
-      <section className="border-b border-border bg-surface">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:py-24">
-          <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-            Вся мебель Ташкента <span className="text-accent">в одном месте</span>
-          </h1>
-          <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted">
-            Готовая мебель и мебель на заказ от мастеров и фабрик города.
-            Сравните работы, цены и звоните напрямую — без посредников и наценок.
-          </p>
+      {/* Первый экран. Тёмный, с мягким световым пятном и золотой рамкой —
+          как витрина мебельного салона: сначала свет, потом товар. */}
+      <section className="relative overflow-hidden bg-ink">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(70% 60% at 50% 20%, rgba(217,164,65,0.18) 0%, rgba(22,33,28,0) 70%)',
+          }}
+        />
 
-          <form action="/catalog" className="mt-8 flex max-w-xl gap-2">
-            <input
-              type="search"
-              name="q"
-              placeholder="Что ищете? Например: кухня на заказ"
-              aria-label="Поиск мебели"
-              className="flex-1 rounded-lg border border-border bg-background px-4 py-3 outline-none transition-colors focus:border-accent"
-            />
-            <button
-              type="submit"
-              className="rounded-lg bg-accent px-6 py-3 font-medium text-white transition-colors hover:bg-accent-hover"
-            >
-              Найти
-            </button>
-          </form>
+        <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16">
+          <div className="border border-gold/30 px-6 py-12 text-center sm:px-12 sm:py-16">
+            <div className="mb-5 text-xs font-semibold uppercase tracking-[0.3em] text-gold">
+              Ташкент
+            </div>
 
-          <div className="mt-6 flex flex-wrap gap-2">
-            {categoryLinks.map((category) => (
-              <Link
-                key={category.slug}
-                href={`/catalog?category=${category.slug}`}
-                className="rounded-full border border-border bg-background px-4 py-2 text-sm transition-colors hover:border-accent hover:text-accent"
+            <h1 className="display mx-auto max-w-3xl text-4xl leading-[1.1] text-on-dark sm:text-6xl">
+              Вся мебель города
+              <br />
+              <span className="text-gold">в одном месте</span>
+            </h1>
+
+            <p className="mx-auto mt-6 max-w-xl leading-relaxed text-on-dark-muted">
+              Готовая мебель и мебель на заказ от мастеров и фабрик Ташкента.
+              Сравните работы и цены — и звоните напрямую, без посредников.
+            </p>
+
+            <form action="/catalog" className="mx-auto mt-9 flex max-w-lg gap-2">
+              <input
+                type="search"
+                name="q"
+                placeholder="Например: кухня на заказ"
+                aria-label="Поиск мебели"
+                className="min-w-0 flex-1 border border-line-dark bg-ink-deep px-4 py-3 text-on-dark placeholder:text-on-dark-muted/70 outline-none transition-colors focus:border-gold"
+              />
+              <button
+                type="submit"
+                className="bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-on-dark"
               >
-                {category.name}
-              </Link>
-            ))}
+                Найти
+              </button>
+            </form>
+
+            <div className="mt-7 flex flex-wrap justify-center gap-2">
+              {categoryLinks.map((category) => (
+                <Link
+                  key={category.slug}
+                  href={`/catalog?category=${category.slug}`}
+                  className="border border-line-dark px-4 py-2 text-sm text-on-dark-muted transition-colors hover:border-gold hover:text-gold"
+                >
+                  {category.name}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Две дороги: готовое или на заказ — это главный выбор покупателя мебели */}
-      <section className="mx-auto grid max-w-6xl gap-4 px-4 py-12 sm:grid-cols-2">
-        <Link
-          href="/catalog?type=ready_made"
-          className="rounded-xl border border-border bg-surface p-6 transition-shadow hover:shadow-md"
-        >
-          <h2 className="text-xl font-semibold">Готовая мебель</h2>
-          <p className="mt-2 leading-relaxed text-muted">
-            То, что можно купить и забрать сейчас. Цены и фото — сразу в каталоге.
-          </p>
-          <span className="mt-4 inline-block font-medium text-accent">
-            Смотреть каталог →
-          </span>
-        </Link>
+      {/* Главная развилка покупателя мебели: взять готовое или заказать своё */}
+      <section className="mx-auto max-w-6xl px-4 py-16">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Link
+            href="/catalog?type=ready_made"
+            className="group border border-line bg-paper p-8 transition-colors hover:border-gold"
+          >
+            <h2 className="display gold-rule text-xl">Готовая мебель</h2>
+            <p className="mt-5 leading-relaxed text-text-muted">
+              То, что можно купить и забрать сейчас. Фото и цены — сразу в каталоге.
+            </p>
+            <span className="mt-6 inline-block font-semibold text-gold-deep">
+              Смотреть каталог →
+            </span>
+          </Link>
 
-        <Link
-          href="/catalog?type=custom_order"
-          className="rounded-xl border border-border bg-surface p-6 transition-shadow hover:shadow-md"
-        >
-          <h2 className="text-xl font-semibold">Мебель на заказ</h2>
-          <p className="mt-2 leading-relaxed text-muted">
-            Своя идея, свои размеры. Найдите мастера, который делает именно то,
-            что вам нужно.
-          </p>
-          <span className="mt-4 inline-block font-medium text-accent">
-            Найти мастера →
-          </span>
-        </Link>
+          <Link
+            href="/catalog?type=custom_order"
+            className="group border border-line bg-paper p-8 transition-colors hover:border-gold"
+          >
+            <h2 className="display gold-rule text-xl">Мебель на заказ</h2>
+            <p className="mt-5 leading-relaxed text-text-muted">
+              Своя идея, свои размеры. Найдите мастера, который делает именно то,
+              что вам нужно.
+            </p>
+            <span className="mt-6 inline-block font-semibold text-gold-deep">
+              Найти мастера →
+            </span>
+          </Link>
+        </div>
       </section>
 
       {/* Свежие работы */}
-      <section className="mx-auto max-w-6xl px-4 pb-12">
-        <div className="mb-6 flex items-end justify-between">
-          <h2 className="text-2xl font-semibold">Новые работы</h2>
-          <Link href="/catalog" className="text-sm font-medium text-accent hover:underline">
+      <section className="mx-auto max-w-6xl px-4 pb-16">
+        <div className="mb-8 flex items-end justify-between">
+          <h2 className="display gold-rule text-2xl">Новые работы</h2>
+          <Link href="/catalog" className="text-sm font-semibold text-gold-deep hover:underline">
             Весь каталог →
           </Link>
         </div>
@@ -137,13 +158,11 @@ export default async function HomePage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-border p-10 text-center">
-            <p className="text-muted">
-              Каталог пока пуст — мы только запускаемся.
-            </p>
+          <div className="border border-dashed border-line bg-paper p-12 text-center">
+            <p className="text-text-muted">Каталог пока пуст — площадка только запускается.</p>
             <Link
               href="/dashboard"
-              className="mt-4 inline-block rounded-lg bg-accent px-5 py-2.5 font-medium text-white transition-colors hover:bg-accent-hover"
+              className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
             >
               Разместить свою мебель первым
             </Link>
@@ -151,22 +170,24 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* Приглашение для мебельщиков — вторая половина маркетплейса */}
-      <section className="mx-auto max-w-6xl px-4 pb-16">
-        <div className="rounded-2xl bg-foreground px-6 py-12 text-background sm:px-12">
-          <h2 className="max-w-2xl text-2xl font-semibold sm:text-3xl">
-            Делаете мебель? Вас найдут здесь
-          </h2>
-          <p className="mt-3 max-w-xl leading-relaxed opacity-80">
-            Разместите работы, укажите телефон — и получайте звонки от клиентов,
-            которые ищут именно вашу мебель. Регистрация бесплатная.
-          </p>
-          <Link
-            href="/dashboard"
-            className="mt-6 inline-block rounded-lg bg-accent px-6 py-3 font-medium text-white transition-colors hover:bg-accent-hover"
-          >
-            Разместить мебель
-          </Link>
+      {/* Вторая половина площадки — сами мебельщики */}
+      <section className="bg-ink">
+        <div className="mx-auto max-w-6xl px-4 py-20">
+          <div className="max-w-2xl">
+            <h2 className="display gold-rule text-2xl text-on-dark sm:text-3xl">
+              Делаете мебель? Вас найдут здесь
+            </h2>
+            <p className="mt-6 max-w-xl leading-relaxed text-on-dark-muted">
+              Разместите свои работы и телефон — и получайте звонки от клиентов,
+              которые ищут именно вашу мебель. Регистрация бесплатная.
+            </p>
+            <Link
+              href="/dashboard"
+              className="mt-8 inline-block bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-on-dark"
+            >
+              Разместить мебель
+            </Link>
+          </div>
         </div>
       </section>
     </>
