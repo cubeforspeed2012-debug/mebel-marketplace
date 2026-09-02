@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { signOut } from '@/app/auth/actions'
+import { RoleSwitcher } from '@/components/role-switcher'
 import { getSellerContext } from '@/lib/session'
 import { DashboardNav } from './dashboard-nav'
 
@@ -30,6 +31,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
+          {profile?.role === 'admin' && <RoleSwitcher current="/dashboard" />}
+
           {company?.status === 'pending' && (
             <span className="border border-gold px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-gold-deep">
               На проверке
@@ -41,14 +44,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
               className="text-sm font-semibold text-gold-deep hover:underline"
             >
               Моя страница →
-            </Link>
-          )}
-          {profile?.role === 'admin' && (
-            <Link
-              href="/admin"
-              className="border border-line px-4 py-2 text-sm transition-colors hover:border-gold"
-            >
-              Управление площадкой
             </Link>
           )}
           <form action={signOut}>

@@ -25,7 +25,7 @@ export function RequestResetForm() {
   const [state, action, pending] = useActionState(requestReset, EMPTY)
 
   return (
-    <form action={action} className="border border-line bg-paper p-8">
+    <form action={action} className="rounded-[var(--radius)] border border-line bg-paper p-8">
       <label className="block">
         <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
           Почта, на которую регистрировались
@@ -35,7 +35,7 @@ export function RequestResetForm() {
           type="email"
           required
           placeholder="mebel@mail.uz"
-          className="w-full border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+          className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
         />
       </label>
 
@@ -44,7 +44,7 @@ export function RequestResetForm() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 w-full bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold disabled:opacity-60"
+        className="mt-6 w-full bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep disabled:opacity-60"
       >
         {pending ? 'Отправляем…' : 'Прислать ссылку'}
       </button>
@@ -64,11 +64,11 @@ export function NewPasswordForm() {
 
   if (state.message) {
     return (
-      <div className="border border-line bg-paper p-8 text-center">
+      <div className="rounded-[var(--radius)] border border-line bg-paper p-8 text-center">
         <p>{state.message}</p>
         <Link
           href="/auth"
-          className="mt-6 inline-block bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+          className="mt-6 inline-block bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
         >
           Войти
         </Link>
@@ -77,7 +77,7 @@ export function NewPasswordForm() {
   }
 
   return (
-    <form action={action} className="border border-line bg-paper p-8">
+    <form action={action} className="rounded-[var(--radius)] border border-line bg-paper p-8">
       <label className="block">
         <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
           Новый пароль
@@ -88,7 +88,7 @@ export function NewPasswordForm() {
           required
           autoComplete="new-password"
           placeholder="минимум 6 символов"
-          className="w-full border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+          className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
         />
       </label>
 
@@ -101,7 +101,7 @@ export function NewPasswordForm() {
           type="password"
           required
           autoComplete="new-password"
-          className="w-full border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+          className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
         />
       </label>
 
@@ -110,7 +110,7 @@ export function NewPasswordForm() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 w-full bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold disabled:opacity-60"
+        className="mt-6 w-full bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep disabled:opacity-60"
       >
         {pending ? 'Сохраняем…' : 'Сохранить пароль'}
       </button>

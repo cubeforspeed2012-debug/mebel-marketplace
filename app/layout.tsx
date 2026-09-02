@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter, Manrope } from 'next/font/google'
 import Link from 'next/link'
+import { Suspense } from 'react'
+import { TabBar } from '@/components/tab-bar'
 import './globals.css'
 
 const inter = Inter({
@@ -32,26 +34,38 @@ const NAV = [
 
 function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-line-dark bg-ink-deep">
+    <header className="sticky top-0 z-40 border-b border-line-dark bg-ink">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-4">
         <Link href="/" className="display text-lg text-on-dark">
           Mebel<span className="text-gold">.</span>
         </Link>
 
-        <nav className="hidden items-center gap-6 text-sm text-on-dark-muted sm:flex">
+        <nav className="hidden items-center gap-6 text-sm text-on-dark-muted md:flex">
           {NAV.map((item) => (
-            <Link key={item.label} href={item.href} className="transition-colors hover:text-gold">
+            <Link
+              key={item.label}
+              href={item.href}
+              className="transition-colors duration-200 hover:text-on-dark"
+            >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <Link
-          href="/dashboard"
-          className="ml-auto rounded-full bg-gold px-5 py-2 text-sm font-semibold text-ink transition-colors hover:bg-on-dark"
-        >
-          Разместить мебель
-        </Link>
+        <div className="ml-auto flex items-center gap-2">
+          <Link
+            href="/auth"
+            className="hidden rounded-[var(--radius)] px-4 py-2 text-sm text-on-dark-muted transition-colors hover:text-on-dark sm:block"
+          >
+            Войти
+          </Link>
+          <Link
+            href="/dashboard"
+            className="press rounded-[var(--radius)] bg-gold px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-gold-deep"
+          >
+            Разместить мебель
+          </Link>
+        </div>
       </div>
     </header>
   )
@@ -59,7 +73,7 @@ function Header() {
 
 function Footer() {
   return (
-    <footer className="bg-ink-deep text-on-dark-muted">
+    <footer className="border-t border-line-dark bg-ink text-on-dark-muted">
       <div className="mx-auto max-w-6xl px-4 py-14">
         <div className="grid gap-10 sm:grid-cols-[2fr_1fr_1fr]">
           <div>
@@ -73,9 +87,7 @@ function Footer() {
           </div>
 
           <div>
-            <div className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">
-              Покупателям
-            </div>
+            <div className="eyebrow mb-3 text-on-dark">Покупателям</div>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/catalog" className="transition-colors hover:text-on-dark">
@@ -101,9 +113,7 @@ function Footer() {
           </div>
 
           <div>
-            <div className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">
-              Мастерам
-            </div>
+            <div className="eyebrow mb-3 text-on-dark">Мастерам</div>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/dashboard" className="transition-colors hover:text-on-dark">
@@ -132,8 +142,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ru" className={`${inter.variable} ${manrope.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
         <Header />
-        <main className="flex-1">{children}</main>
+        <main className="animate-page flex-1">{children}</main>
         <Footer />
+
+        {/* Нижнее меню на телефоне */}
+        <Suspense fallback={null}>
+          <TabBar />
+        </Suspense>
       </body>
     </html>
   )

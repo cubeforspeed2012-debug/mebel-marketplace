@@ -13,7 +13,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
   const [logo, setLogo] = useState<string | null>(company?.logo_url ?? null)
 
   return (
-    <form action={action} className="space-y-6 border border-line bg-paper p-6">
+    <form action={action} className="space-y-6 rounded-[var(--radius)] border border-line bg-paper p-6">
       <input type="hidden" name="logo_url" value={logo ?? ''} />
 
       <ImageUpload value={logo} onChange={setLogo} label="Логотип мастерской" />
@@ -27,7 +27,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
           required
           defaultValue={company?.name ?? ''}
           placeholder="Например: Rich Kitchen"
-          className="w-full border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+          className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
         />
       </label>
 
@@ -41,7 +41,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
           type="tel"
           defaultValue={company?.phone_public ?? ''}
           placeholder="+998 90 123-45-67"
-          className="w-full border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+          className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
         />
         <span className="mt-1 block text-xs text-text-muted">
           Этот номер увидят покупатели — на него пойдут звонки
@@ -62,7 +62,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
                 defaultChecked={(company?.work_type ?? 'both') === value}
                 className="peer sr-only"
               />
-              <span className="block border border-line px-4 py-2 text-sm transition-colors peer-checked:border-gold peer-checked:bg-gold peer-checked:font-semibold peer-checked:text-ink">
+              <span className="block border border-line px-4 py-2 text-sm transition-colors peer-checked:border-gold peer-checked:bg-gold peer-checked:font-semibold peer-checked:text-white">
                 {label}
               </span>
             </label>
@@ -79,7 +79,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
           rows={4}
           defaultValue={company?.description ?? ''}
           placeholder="Сколько лет работаете, что делаете лучше всего, какие материалы используете"
-          className="w-full border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+          className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
         />
       </label>
 
@@ -91,7 +91,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
           <select
             name="district"
             defaultValue={company?.district ?? ''}
-            className="w-full border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
           >
             <option value="">Не указан</option>
             {DISTRICTS.map((district) => (
@@ -110,7 +110,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
             name="address"
             defaultValue={company?.address ?? ''}
             placeholder="Необязательно"
-            className="w-full border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
           />
         </label>
 
@@ -122,7 +122,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
             name="instagram"
             defaultValue={company?.instagram ?? ''}
             placeholder="username"
-            className="w-full border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
           />
         </label>
 
@@ -134,7 +134,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
             name="telegram"
             defaultValue={company?.telegram ?? ''}
             placeholder="username"
-            className="w-full border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
           />
         </label>
       </div>
@@ -151,7 +151,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
       <button
         type="submit"
         disabled={pending}
-        className="bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold disabled:opacity-60"
+        className="bg-gold px-7 py-3 font-semibold text-white transition-colors hover:bg-gold-deep disabled:opacity-60"
       >
         {pending ? 'Сохраняем…' : company ? 'Сохранить' : 'Создать мастерскую'}
       </button>

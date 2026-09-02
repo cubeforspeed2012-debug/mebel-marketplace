@@ -40,7 +40,7 @@ export function DashboardNav({ newOrders = 0 }: { newOrders?: number }) {
 
             {/* Счётчик новых заявок — самое важное в кабинете */}
             {item.href === '/dashboard/orders' && newOrders > 0 && (
-              <span className="min-w-5 bg-gold px-1.5 py-0.5 text-center text-xs font-semibold text-ink">
+              <span className="min-w-5 bg-gold px-1.5 py-0.5 text-center text-xs font-semibold text-white">
                 {newOrders}
               </span>
             )}

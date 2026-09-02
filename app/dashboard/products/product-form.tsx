@@ -24,7 +24,7 @@ export function ProductForm({
   )
 
   return (
-    <form action={action} className="space-y-6 border border-line bg-paper p-6">
+    <form action={action} className="space-y-6 rounded-[var(--radius)] border border-line bg-paper p-6">
       {product && <input type="hidden" name="id" value={product.id} />}
       <input type="hidden" name="images" value={JSON.stringify(images)} />
 
@@ -39,7 +39,7 @@ export function ProductForm({
           required
           defaultValue={product?.title ?? ''}
           placeholder="Например: Кухня из массива дуба"
-          className="w-full border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+          className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
         />
       </label>
 
@@ -51,7 +51,7 @@ export function ProductForm({
           <select
             name="category_id"
             defaultValue={product?.category_id ?? ''}
-            className="w-full border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
           >
             <option value="">Не выбрана</option>
             {categories.map((category) => (
@@ -76,7 +76,7 @@ export function ProductForm({
                   defaultChecked={(product?.type ?? 'ready_made') === value}
                   className="peer sr-only"
                 />
-                <span className="block border border-line px-4 py-2.5 text-center text-sm transition-colors peer-checked:border-gold peer-checked:bg-gold peer-checked:font-semibold peer-checked:text-ink">
+                <span className="block border border-line px-4 py-2.5 text-center text-sm transition-colors peer-checked:border-gold peer-checked:bg-gold peer-checked:font-semibold peer-checked:text-white">
                   {label}
                 </span>
               </label>
@@ -93,7 +93,7 @@ export function ProductForm({
             inputMode="numeric"
             defaultValue={product?.price ?? ''}
             placeholder="12000000"
-            className="w-full border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
           />
           <label className="mt-2 flex items-center gap-2 text-sm">
             <input
@@ -113,7 +113,7 @@ export function ProductForm({
           <select
             name="status"
             defaultValue={product?.status ?? 'active'}
-            className="w-full border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
           >
             <option value="active">Показывать</option>
             <option value="hidden">Спрятать</option>
@@ -131,7 +131,7 @@ export function ProductForm({
           rows={5}
           defaultValue={product?.description ?? ''}
           placeholder="Материалы, размеры, сроки изготовления, что входит в цену"
-          className="w-full border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+          className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
         />
       </label>
 
@@ -145,7 +145,7 @@ export function ProductForm({
         <button
           type="submit"
           disabled={pending}
-          className="bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold disabled:opacity-60"
+          className="bg-gold px-7 py-3 font-semibold text-white transition-colors hover:bg-gold-deep disabled:opacity-60"
         >
           {pending ? 'Сохраняем…' : 'Сохранить'}
         </button>

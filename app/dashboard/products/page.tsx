@@ -20,13 +20,13 @@ export default async function ProductsPage({
     return (
       <div>
         <h2 className="display gold-rule text-xl">Моя мебель</h2>
-        <div className="mt-7 border border-dashed border-line bg-paper p-10 text-center">
+        <div className="mt-7 rounded-[var(--radius)] border border-dashed border-line bg-paper p-10 text-center">
           <p className="text-text-muted">
             Сначала заполните профиль мастерской — без него мебель некуда прикрепить.
           </p>
           <Link
             href="/dashboard/company"
-            className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+            className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
           >
             Заполнить профиль
           </Link>
@@ -49,7 +49,7 @@ export default async function ProductsPage({
         <h2 className="display gold-rule text-xl">Моя мебель</h2>
         <Link
           href="/dashboard/products/new"
-          className="bg-gold px-6 py-2.5 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+          className="bg-gold px-6 py-2.5 font-semibold text-white transition-colors hover:bg-gold-deep"
         >
           Добавить мебель
         </Link>
@@ -61,7 +61,7 @@ export default async function ProductsPage({
 
       <div className="mt-7 space-y-3">
         {products.length === 0 && (
-          <div className="border border-dashed border-line bg-paper p-10 text-center">
+          <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-10 text-center">
             <p className="text-text-muted">
               Пока пусто. Добавьте первую работу — с фото её найдут в каталоге.
             </p>
@@ -76,7 +76,7 @@ export default async function ProductsPage({
           return (
             <div
               key={product.id}
-              className="flex flex-wrap items-center gap-4 border border-line bg-paper p-4"
+              className="flex flex-wrap items-center gap-4 rounded-[var(--radius)] border border-line bg-paper p-4"
             >
               <div className="size-16 shrink-0 overflow-hidden bg-cream">
                 {cover ? (
@@ -100,7 +100,7 @@ export default async function ProductsPage({
               <span
                 className={`px-3 py-1 text-xs font-semibold uppercase tracking-widest ${
                   product.status === 'active'
-                    ? 'bg-gold text-ink'
+                    ? 'bg-gold text-white'
                     : 'border border-line text-text-muted'
                 }`}
               >

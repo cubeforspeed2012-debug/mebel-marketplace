@@ -35,7 +35,7 @@ function Field({
         autoComplete={
           type === 'password' ? 'current-password' : name === 'email' ? 'email' : 'on'
         }
-        className="w-full border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
+        className="w-full rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
       />
       {hint && <span className="mt-1 block text-xs text-text-muted">{hint}</span>}
     </label>
@@ -59,13 +59,13 @@ export function AuthForm({
   const pending = isLogin ? signingIn : signingUp
 
   return (
-    <div className="mx-auto w-full max-w-md border border-line bg-paper p-8">
+    <div className="mx-auto w-full max-w-md rounded-[var(--radius)] border border-line bg-paper p-8">
       <div className="mb-7 flex border border-line">
         <button
           type="button"
           onClick={() => setMode('in')}
           className={`flex-1 px-4 py-2.5 text-sm font-semibold transition-colors ${
-            isLogin ? 'bg-gold text-ink' : 'text-text-muted hover:text-text'
+            isLogin ? 'bg-gold text-white' : 'text-text-muted hover:text-text'
           }`}
         >
           Вход
@@ -74,7 +74,7 @@ export function AuthForm({
           type="button"
           onClick={() => setMode('up')}
           className={`flex-1 px-4 py-2.5 text-sm font-semibold transition-colors ${
-            !isLogin ? 'bg-gold text-ink' : 'text-text-muted hover:text-text'
+            !isLogin ? 'bg-gold text-white' : 'text-text-muted hover:text-text'
           }`}
         >
           Регистрация
@@ -96,7 +96,7 @@ export function AuthForm({
           <button
             type="submit"
             disabled={pending}
-            className="w-full bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold disabled:opacity-60"
+            className="w-full bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep disabled:opacity-60"
           >
             {pending ? 'Входим…' : 'Войти'}
           </button>
@@ -143,7 +143,7 @@ export function AuthForm({
           <button
             type="submit"
             disabled={pending}
-            className="w-full bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold disabled:opacity-60"
+            className="w-full bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep disabled:opacity-60"
           >
             {pending ? 'Создаём…' : 'Создать кабинет'}
           </button>

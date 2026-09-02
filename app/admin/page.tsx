@@ -44,7 +44,7 @@ type Overview = {
 
 function Metric({ label, value, hint }: { label: string; value: number | string; hint?: string }) {
   return (
-    <div className="border border-line bg-paper p-5">
+    <div className="rounded-[var(--radius)] border border-line bg-paper p-5">
       <div className="text-xs font-semibold uppercase tracking-widest text-text-muted">
         {label}
       </div>
@@ -136,7 +136,7 @@ export default async function AdminPage({
                   <input type="hidden" name="id" value={promo.id} />
                   <button
                     type="submit"
-                    className="bg-gold px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+                    className="bg-gold px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-deep"
                   >
                     Оплата получена — запустить
                   </button>
@@ -163,7 +163,7 @@ export default async function AdminPage({
             href="/admin"
             className={`border px-4 py-2 text-sm transition-colors ${
               !filter
-                ? 'border-gold bg-gold font-semibold text-ink'
+                ? 'border-gold bg-gold font-semibold text-white'
                 : 'border-line bg-paper text-text-muted hover:border-gold'
             }`}
           >
@@ -175,7 +175,7 @@ export default async function AdminPage({
               href={`/admin?status=${value}`}
               className={`border px-4 py-2 text-sm transition-colors ${
                 filter === value
-                  ? 'border-gold bg-gold font-semibold text-ink'
+                  ? 'border-gold bg-gold font-semibold text-white'
                   : 'border-line bg-paper text-text-muted hover:border-gold'
               }`}
             >
@@ -185,11 +185,11 @@ export default async function AdminPage({
         </div>
 
         {companies.length === 0 ? (
-          <div className="border border-dashed border-line bg-paper p-12 text-center text-text-muted">
+          <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-12 text-center text-text-muted">
             Мастерских пока нет.
           </div>
         ) : (
-          <div className="overflow-x-auto border border-line bg-paper">
+          <div className="overflow-x-auto rounded-[var(--radius)] border border-line bg-paper">
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead className="border-b border-line text-xs font-semibold uppercase tracking-widest text-text-muted">
                 <tr>
@@ -222,7 +222,7 @@ export default async function AdminPage({
                       <span
                         className={`px-2.5 py-1 text-xs font-semibold uppercase tracking-widest ${
                           company.status === 'active'
-                            ? 'bg-gold text-ink'
+                            ? 'bg-gold text-white'
                             : company.status === 'blocked'
                               ? 'bg-neutral-300 text-neutral-700'
                               : 'border border-gold text-gold-deep'
@@ -237,7 +237,7 @@ export default async function AdminPage({
                     <td className="px-4 py-3 text-right">
                       {company.orders_count}
                       {company.new_orders > 0 && (
-                        <span className="ml-1.5 bg-gold px-1.5 text-xs font-semibold text-ink">
+                        <span className="ml-1.5 bg-gold px-1.5 text-xs font-semibold text-white">
                           {company.new_orders}
                         </span>
                       )}

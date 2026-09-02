@@ -16,7 +16,7 @@ export function NewOrderForm() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="bg-gold px-6 py-2.5 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+        className="bg-gold px-6 py-2.5 font-semibold text-white transition-colors hover:bg-gold-deep"
       >
         Добавить заказ
       </button>
@@ -24,7 +24,7 @@ export function NewOrderForm() {
   }
 
   return (
-    <form action={action} className="w-full border border-line bg-paper p-5">
+    <form action={action} className="w-full rounded-[var(--radius)] border border-line bg-paper p-5">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-semibold">Новый заказ</h3>
         <button
@@ -44,7 +44,7 @@ export function NewOrderForm() {
           <input
             name="full_name"
             required
-            className="w-full border border-line px-4 py-2.5 outline-none focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none focus:border-gold"
           />
         </label>
 
@@ -57,7 +57,7 @@ export function NewOrderForm() {
             type="tel"
             required
             placeholder="+998 90 123-45-67"
-            className="w-full border border-line px-4 py-2.5 outline-none focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none focus:border-gold"
           />
         </label>
 
@@ -68,7 +68,7 @@ export function NewOrderForm() {
           <input
             name="title"
             placeholder="Кухня на заказ"
-            className="w-full border border-line px-4 py-2.5 outline-none focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none focus:border-gold"
           />
         </label>
 
@@ -79,7 +79,7 @@ export function NewOrderForm() {
           <select
             name="source"
             defaultValue="phone"
-            className="w-full border border-line bg-paper px-4 py-2.5 outline-none focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none focus:border-gold"
           >
             {Object.entries(ORDER_SOURCES).map(([value, label]) => (
               <option key={value} value={value}>
@@ -97,7 +97,7 @@ export function NewOrderForm() {
             name="comment"
             rows={2}
             placeholder="Размеры, пожелания, договорённости"
-            className="w-full border border-line px-4 py-2.5 outline-none focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none focus:border-gold"
           />
         </label>
       </div>
@@ -119,7 +119,7 @@ export function NewOrderForm() {
                 defaultChecked={value === 'custom'}
                 className="peer sr-only"
               />
-              <span className="block border border-line px-4 py-2 text-sm transition-colors peer-checked:border-gold peer-checked:bg-gold peer-checked:font-semibold peer-checked:text-ink">
+              <span className="block border border-line px-4 py-2 text-sm transition-colors peer-checked:border-gold peer-checked:bg-gold peer-checked:font-semibold peer-checked:text-white">
                 {label}
               </span>
             </label>
@@ -133,7 +133,7 @@ export function NewOrderForm() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-5 bg-gold px-6 py-2.5 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold disabled:opacity-60"
+        className="mt-5 bg-gold px-6 py-2.5 font-semibold text-white transition-colors hover:bg-gold-deep disabled:opacity-60"
       >
         {pending ? 'Добавляем…' : 'Добавить'}
       </button>

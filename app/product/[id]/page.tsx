@@ -64,7 +64,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr]">
         {/* Фото работы */}
         <div className="space-y-3">
-          <div className="aspect-4/3 overflow-hidden border border-line bg-paper">
+          <div className="aspect-4/3 overflow-hidden rounded-[var(--radius)] border border-line bg-paper">
             {images[0] ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={images[0].url} alt={product.title} className="h-full w-full object-cover" />
@@ -78,7 +78,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           {images.length > 1 && (
             <div className="grid grid-cols-4 gap-3">
               {images.slice(1, 9).map((image) => (
-                <div key={image.id} className="aspect-square overflow-hidden border border-line bg-paper">
+                <div key={image.id} className="aspect-square overflow-hidden rounded-[var(--radius)] border border-line bg-paper">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={image.url}
@@ -125,7 +125,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           )}
 
           {company && (
-            <div className="mt-8 border border-line bg-paper p-6">
+            <div className="mt-8 rounded-[var(--radius)] border border-line bg-paper p-6">
               <div className="text-xs font-semibold uppercase tracking-widest text-text-muted">
                 Мастер
               </div>
@@ -143,7 +143,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               {company.phone_public && (
                 <a
                   href={telHref(company.phone_public)}
-                  className="mt-5 block bg-gold px-6 py-3 text-center font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+                  className="mt-5 block bg-gold px-6 py-3 text-center font-semibold text-white transition-colors hover:bg-gold-deep"
                 >
                   Позвонить {formatPhone(company.phone_public)}
                 </a>

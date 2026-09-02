@@ -4,7 +4,6 @@ import { FALLBACK_CATEGORIES } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import type { Category, ProductCard as ProductCardType } from '@/lib/types'
 
-// Главная обновляется раз в 5 минут — быстро для посетителей, свежо для каталога.
 export const revalidate = 300
 
 async function getHomeData() {
@@ -37,7 +36,6 @@ async function getHomeData() {
       products: (productsResult.data ?? []) as unknown as ProductCardType[],
     }
   } catch {
-    // База спит или недоступна — страница всё равно должна открыться.
     return { categories: [] as Category[], products: [] as ProductCardType[] }
   }
 }
@@ -50,57 +48,43 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Первый экран. Тёмный, с мягким световым пятном и золотой рамкой —
-          как витрина мебельного салона: сначала свет, потом товар. */}
-      <section className="relative overflow-hidden bg-ink">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(70% 60% at 50% 20%, rgba(217,164,65,0.18) 0%, rgba(22,33,28,0) 70%)',
-          }}
-        />
+      {/* Первый экран — светлый, как приборная панель: сразу поиск и категории */}
+      <section className="border-b border-line bg-cream">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
+          <div className="rounded-[var(--radius)] border border-line bg-paper p-8 sm:p-12">
+            <div className="eyebrow">Ташкент</div>
 
-        <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16">
-          <div className="border border-gold/30 px-6 py-12 text-center sm:px-12 sm:py-16">
-            <div className="mb-5 text-xs font-semibold uppercase tracking-[0.3em] text-gold">
-              Ташкент
-            </div>
-
-            <h1 className="display mx-auto max-w-3xl text-4xl leading-[1.1] text-on-dark sm:text-6xl">
-              Вся мебель города
-              <br />
-              <span className="text-gold">в одном месте</span>
+            <h1 className="display mt-4 max-w-3xl text-4xl leading-[1.08] text-ink sm:text-5xl">
+              Вся мебель города <span className="text-gold">в одном месте</span>
             </h1>
 
-            <p className="mx-auto mt-6 max-w-xl leading-relaxed text-on-dark-muted">
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-text-muted">
               Готовая мебель и мебель на заказ от мастеров и фабрик Ташкента.
               Сравните работы и цены — и звоните напрямую, без посредников.
             </p>
 
-            <form action="/catalog" className="mx-auto mt-9 flex max-w-lg gap-2">
+            <form action="/catalog" className="mt-8 flex max-w-lg gap-2">
               <input
                 type="search"
                 name="q"
                 placeholder="Например: кухня на заказ"
                 aria-label="Поиск мебели"
-                className="min-w-0 flex-1 border border-line-dark bg-ink-deep px-4 py-3 text-on-dark placeholder:text-on-dark-muted/70 outline-none transition-colors focus:border-gold"
+                className="min-w-0 flex-1 rounded-[var(--radius)] border border-line bg-paper px-4 py-3 outline-none transition-colors duration-200 focus:border-gold"
               />
               <button
                 type="submit"
-                className="bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-on-dark"
+                className="press rounded-[var(--radius)] bg-gold px-7 py-3 font-semibold text-white transition-colors duration-200 hover:bg-gold-deep"
               >
                 Найти
               </button>
             </form>
 
-            <div className="mt-7 flex flex-wrap justify-center gap-2">
+            <div className="stagger mt-6 flex flex-wrap gap-2">
               {categoryLinks.map((category) => (
                 <Link
                   key={category.slug}
                   href={`/catalog?category=${category.slug}`}
-                  className="border border-line-dark px-4 py-2 text-sm text-on-dark-muted transition-colors hover:border-gold hover:text-gold"
+                  className="press rounded-[var(--radius)] border border-line px-4 py-2 text-sm text-text-muted transition-colors duration-200 hover:border-gold hover:text-gold"
                 >
                   {category.name}
                 </Link>
@@ -110,59 +94,57 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Главная развилка покупателя мебели: взять готовое или заказать своё */}
-      <section className="mx-auto max-w-6xl px-4 py-16">
-        <div className="grid gap-5 sm:grid-cols-2">
+      {/* Главная развилка покупателя */}
+      <section className="mx-auto max-w-6xl px-4 py-14">
+        <div className="stagger grid gap-4 sm:grid-cols-2">
           <Link
             href="/catalog?type=ready_made"
-            className="group border border-line bg-paper p-8 transition-colors hover:border-gold"
+            className="lift rounded-[var(--radius)] border border-line bg-paper p-8"
           >
-            <h2 className="display gold-rule text-xl">Готовая мебель</h2>
+            <h2 className="display gold-rule text-xl text-ink">Готовая мебель</h2>
             <p className="mt-5 leading-relaxed text-text-muted">
               То, что можно купить и забрать сейчас. Фото и цены — сразу в каталоге.
             </p>
-            <span className="mt-6 inline-block font-semibold text-gold-deep">
+            <span className="mt-6 inline-block font-semibold text-gold">
               Смотреть каталог →
             </span>
           </Link>
 
           <Link
             href="/catalog?type=custom_order"
-            className="group border border-line bg-paper p-8 transition-colors hover:border-gold"
+            className="lift rounded-[var(--radius)] border border-line bg-paper p-8"
           >
-            <h2 className="display gold-rule text-xl">Мебель на заказ</h2>
+            <h2 className="display gold-rule text-xl text-ink">Мебель на заказ</h2>
             <p className="mt-5 leading-relaxed text-text-muted">
               Своя идея, свои размеры. Найдите мастера, который делает именно то,
               что вам нужно.
             </p>
-            <span className="mt-6 inline-block font-semibold text-gold-deep">
-              Найти мастера →
-            </span>
+            <span className="mt-6 inline-block font-semibold text-gold">Найти мастера →</span>
           </Link>
         </div>
       </section>
 
       {/* Свежие работы */}
-      <section className="mx-auto max-w-6xl px-4 pb-16">
-        <div className="mb-8 flex items-end justify-between">
-          <h2 className="display gold-rule text-2xl">Новые работы</h2>
-          <Link href="/catalog" className="text-sm font-semibold text-gold-deep hover:underline">
+      <section className="mx-auto max-w-6xl px-4 pb-14">
+        <div className="mb-7 flex items-end justify-between">
+          <h2 className="display gold-rule text-2xl text-ink">Новые работы</h2>
+          <Link href="/catalog" className="text-sm font-semibold text-gold hover:underline">
             Весь каталог →
           </Link>
         </div>
 
         {products.length > 0 ? (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         ) : (
-          <div className="border border-dashed border-line bg-paper p-12 text-center">
+          <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-12 text-center">
             <p className="text-text-muted">Каталог пока пуст — площадка только запускается.</p>
             <Link
               href="/dashboard"
-              className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+              className="press mt-5 inline-block rounded-[var(--radius)] bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
             >
               Разместить свою мебель первым
             </Link>
@@ -170,22 +152,20 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* Две стороны площадки: кто покупает и кто делает */}
+      {/* Две стороны площадки */}
       <section className="bg-ink">
-        <div className="mx-auto max-w-6xl px-4 py-20">
-          <div className="grid gap-10 sm:grid-cols-2">
-            <div className="border border-gold/30 p-8">
-              <div className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-gold">
-                Покупателям
-              </div>
-              <h2 className="display text-xl text-on-dark sm:text-2xl">Купить мебель</h2>
-              <p className="mt-5 leading-relaxed text-on-dark-muted">
+        <div className="mx-auto max-w-6xl px-4 py-16">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="rounded-[var(--radius)] border border-line-dark p-8">
+              <div className="eyebrow text-gold">Покупателям</div>
+              <h2 className="display mt-3 text-xl text-on-dark sm:text-2xl">Купить мебель</h2>
+              <p className="mt-4 leading-relaxed text-on-dark-muted">
                 Заведите кабинет — и все ваши заявки мастерам будут в одном месте.
-                Не забудете, кому писали, о чём договорились и кто уже ответил.
+                Не забудете, кому писали и кто уже ответил.
               </p>
               <Link
                 href="/auth?role=buyer"
-                className="mt-7 inline-block bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-on-dark"
+                className="press mt-6 inline-block rounded-[var(--radius)] bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
               >
                 Создать кабинет покупателя
               </Link>
@@ -198,20 +178,18 @@ export default async function HomePage() {
               </p>
             </div>
 
-            <div className="border border-gold/30 p-8">
-              <div className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-gold">
-                Мастерам
-              </div>
-              <h2 className="display text-xl text-on-dark sm:text-2xl">
+            <div className="rounded-[var(--radius)] border border-line-dark p-8">
+              <div className="eyebrow text-gold">Мастерам</div>
+              <h2 className="display mt-3 text-xl text-on-dark sm:text-2xl">
                 Делаете мебель? Вас найдут здесь
               </h2>
-              <p className="mt-5 leading-relaxed text-on-dark-muted">
+              <p className="mt-4 leading-relaxed text-on-dark-muted">
                 Разместите свои работы и телефон — и получайте звонки от клиентов,
                 которые ищут именно вашу мебель. Регистрация бесплатная.
               </p>
               <Link
                 href="/auth"
-                className="mt-7 inline-block bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-on-dark"
+                className="press mt-6 inline-block rounded-[var(--radius)] bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
               >
                 Разместить мебель
               </Link>

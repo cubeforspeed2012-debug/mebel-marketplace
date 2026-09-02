@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { signOut } from '@/app/auth/actions'
+import { RoleSwitcher } from '@/components/role-switcher'
 import { requireAdmin } from '@/lib/session'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -15,10 +16,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <h1 className="display mt-1 text-xl">{profile?.full_name ?? 'Администратор'}</h1>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <RoleSwitcher current="/admin" />
           <Link
             href="/"
-            className="border border-line px-4 py-2 text-sm transition-colors hover:border-gold"
+            className="rounded-[var(--radius)] border border-line px-4 py-2 text-sm transition-colors hover:border-gold"
           >
             На сайт
           </Link>

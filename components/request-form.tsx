@@ -23,7 +23,9 @@ export function RequestForm({
 
   if (state.message) {
     return (
-      <div className="border border-gold bg-gold/10 px-4 py-3 text-sm">{state.message}</div>
+      <div className="animate-fade rounded-[var(--radius)] border border-status-done bg-status-done/10 px-4 py-3 text-sm">
+        {state.message}
+      </div>
     )
   }
 
@@ -32,11 +34,9 @@ export function RequestForm({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={
-          compact
-            ? 'w-full border border-line px-6 py-3 text-center font-semibold transition-colors hover:border-gold hover:text-gold-deep'
-            : 'border border-line-dark px-7 py-3 font-semibold text-on-dark transition-colors hover:border-gold hover:text-gold'
-        }
+        className={`press rounded-[var(--radius)] border border-line font-semibold transition-colors hover:border-gold hover:text-gold ${
+          compact ? 'w-full px-6 py-3 text-center' : 'px-7 py-3'
+        }`}
       >
         Написать заявку
       </button>
@@ -44,7 +44,7 @@ export function RequestForm({
   }
 
   return (
-    <form action={action} className="w-full max-w-md border border-line bg-paper p-5 text-text">
+    <form action={action} className="w-full max-w-md rounded-[var(--radius)] border border-line bg-paper p-5 text-text">
       <input type="hidden" name="company_id" value={companyId} />
       {productId && <input type="hidden" name="product_id" value={productId} />}
 
@@ -77,7 +77,7 @@ export function RequestForm({
           <input
             name="name"
             required
-            className="w-full border border-line px-4 py-2.5 outline-none focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none focus:border-gold"
           />
         </label>
 
@@ -90,7 +90,7 @@ export function RequestForm({
             type="tel"
             required
             placeholder="+998 90 123-45-67"
-            className="w-full border border-line px-4 py-2.5 outline-none focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none focus:border-gold"
           />
         </label>
 
@@ -102,7 +102,7 @@ export function RequestForm({
             name="message"
             rows={3}
             placeholder="Например: кухня 3 метра, фасады МДФ, нужен замер"
-            className="w-full border border-line px-4 py-2.5 outline-none focus:border-gold"
+            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none focus:border-gold"
           />
         </label>
       </div>
@@ -112,7 +112,7 @@ export function RequestForm({
       <button
         type="submit"
         disabled={pending}
-        className="mt-5 w-full bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold disabled:opacity-60"
+        className="mt-5 w-full bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep disabled:opacity-60"
       >
         {pending ? 'Отправляем…' : 'Отправить заявку'}
       </button>

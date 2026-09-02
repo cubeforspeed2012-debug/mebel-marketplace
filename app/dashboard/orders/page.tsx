@@ -29,13 +29,13 @@ export default async function OrdersPage({
     return (
       <div>
         <h2 className="display gold-rule text-xl">Заявки и заказы</h2>
-        <div className="mt-7 border border-dashed border-line bg-paper p-10 text-center">
+        <div className="mt-7 rounded-[var(--radius)] border border-dashed border-line bg-paper p-10 text-center">
           <p className="text-text-muted">
             Заявки приходят на страницу мастерской. Сначала создайте её.
           </p>
           <Link
             href="/dashboard/company"
-            className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+            className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
           >
             Заполнить профиль
           </Link>
@@ -73,7 +73,7 @@ export default async function OrdersPage({
           href="/dashboard/orders"
           className={`border px-4 py-2 text-sm transition-colors ${
             !filter
-              ? 'border-gold bg-gold font-semibold text-ink'
+              ? 'border-gold bg-gold font-semibold text-white'
               : 'border-line bg-paper text-text-muted hover:border-gold'
           }`}
         >
@@ -85,7 +85,7 @@ export default async function OrdersPage({
             href={`/dashboard/orders?status=${value}`}
             className={`border px-4 py-2 text-sm transition-colors ${
               filter === value
-                ? 'border-gold bg-gold font-semibold text-ink'
+                ? 'border-gold bg-gold font-semibold text-white'
                 : 'border-line bg-paper text-text-muted hover:border-gold'
             }`}
           >
@@ -99,7 +99,7 @@ export default async function OrdersPage({
 
       <div className="mt-7 space-y-4">
         {orders.length === 0 && (
-          <div className="border border-dashed border-line bg-paper p-10 text-center">
+          <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-10 text-center">
             <p className="text-text-muted">
               Заявок пока нет. Они появятся здесь, как только покупатель оставит её
               на вашей странице — или добавьте заказ вручную.
@@ -108,7 +108,7 @@ export default async function OrdersPage({
         )}
 
         {orders.map((order) => (
-          <details key={order.id} className="border border-line bg-paper">
+          <details key={order.id} className="rounded-[var(--radius)] border border-line bg-paper">
             <summary className="flex cursor-pointer flex-wrap items-center gap-3 p-4">
               <span
                 className={`px-3 py-1 text-xs font-semibold uppercase tracking-widest ${
@@ -137,7 +137,7 @@ export default async function OrdersPage({
               {order.clients?.phone && (
                 <a
                   href={telHref(order.clients.phone)}
-                  className="bg-gold px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+                  className="bg-gold px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-gold-deep"
                 >
                   Позвонить
                 </a>
@@ -169,7 +169,7 @@ export default async function OrdersPage({
                         disabled={order.status === value}
                         className={`border px-3 py-1.5 text-sm transition-colors ${
                           order.status === value
-                            ? 'border-gold bg-gold font-semibold text-ink'
+                            ? 'border-gold bg-gold font-semibold text-white'
                             : 'border-line hover:border-gold'
                         }`}
                       >
@@ -192,7 +192,7 @@ export default async function OrdersPage({
                     name="total_price"
                     inputMode="numeric"
                     defaultValue={order.total_price ?? ''}
-                    className="w-full border border-line px-4 py-2.5 outline-none focus:border-gold"
+                    className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none focus:border-gold"
                   />
                   {order.total_price ? (
                     <span className="mt-1 block text-xs text-text-muted">
@@ -209,7 +209,7 @@ export default async function OrdersPage({
                     name="measurement_visit_date"
                     type="date"
                     defaultValue={order.measurement_visit_date ?? ''}
-                    className="w-full border border-line px-4 py-2.5 outline-none focus:border-gold"
+                    className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none focus:border-gold"
                   />
                 </label>
 
@@ -221,7 +221,7 @@ export default async function OrdersPage({
                     name="comment"
                     rows={3}
                     defaultValue={order.comment ?? ''}
-                    className="w-full border border-line px-4 py-2.5 outline-none focus:border-gold"
+                    className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none focus:border-gold"
                   />
                 </label>
 

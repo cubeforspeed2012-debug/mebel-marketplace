@@ -36,7 +36,7 @@ export default async function DashboardPage() {
   // Профиль не создан — первым делом отправляем его заполнять.
   if (!company) {
     return (
-      <div className="border border-line bg-paper p-8">
+      <div className="rounded-[var(--radius)] border border-line bg-paper p-8">
         <h2 className="display gold-rule text-xl">Начнём</h2>
         <p className="mt-5 max-w-xl leading-relaxed text-text-muted">
           Чтобы вас нашли покупатели, заполните профиль мастерской: название, телефон,
@@ -44,7 +44,7 @@ export default async function DashboardPage() {
         </p>
         <Link
           href="/dashboard/company"
-          className="mt-6 inline-block bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+          className="mt-6 inline-block bg-gold px-7 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
         >
           Заполнить профиль мастерской
         </Link>
@@ -91,7 +91,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Воронка одним взглядом */}
-      <div className="border border-line bg-paper p-6">
+      <div className="rounded-[var(--radius)] border border-line bg-paper p-6">
         <h3 className="display gold-rule text-lg">Воронка</h3>
         <div className="mt-6 space-y-3">
           {(Object.keys(ORDER_STATUSES) as OrderStatus[]).map((status) => {
@@ -120,7 +120,7 @@ export default async function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
           href="/dashboard/products/new"
-          className="border border-line bg-paper p-6 transition-colors hover:border-gold"
+          className="rounded-[var(--radius)] border border-line bg-paper p-6 transition-colors hover:border-gold"
         >
           <div className="font-semibold">Добавить мебель</div>
           <p className="mt-2 text-sm leading-relaxed text-text-muted">
@@ -130,7 +130,7 @@ export default async function DashboardPage() {
 
         <Link
           href="/dashboard/promotion"
-          className="border border-line bg-paper p-6 transition-colors hover:border-gold"
+          className="rounded-[var(--radius)] border border-line bg-paper p-6 transition-colors hover:border-gold"
         >
           <div className="font-semibold">Поднять в каталоге</div>
           <p className="mt-2 text-sm leading-relaxed text-text-muted">

@@ -20,11 +20,11 @@ export default async function PromotionPage() {
     return (
       <div>
         <h2 className="display gold-rule text-xl">Продвижение</h2>
-        <div className="mt-7 border border-dashed border-line bg-paper p-10 text-center">
+        <div className="mt-7 rounded-[var(--radius)] border border-dashed border-line bg-paper p-10 text-center">
           <p className="text-text-muted">Сначала создайте профиль мастерской.</p>
           <Link
             href="/dashboard/company"
-            className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+            className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
           >
             Заполнить профиль
           </Link>
@@ -71,7 +71,7 @@ export default async function PromotionPage() {
       {promotions.length > 0 && (
         <div>
           <h3 className="display gold-rule text-lg">История продвижения</h3>
-          <div className="mt-6 overflow-x-auto border border-line bg-paper">
+          <div className="mt-6 overflow-x-auto rounded-[var(--radius)] border border-line bg-paper">
             <table className="w-full min-w-[480px] text-left text-sm">
               <thead className="border-b border-line text-xs font-semibold uppercase tracking-widest text-text-muted">
                 <tr>

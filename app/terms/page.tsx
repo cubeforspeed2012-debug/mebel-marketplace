@@ -55,10 +55,10 @@ const SECTIONS = [
 export default function TermsPage() {
   return (
     <>
-      <div className="border-b border-line-dark bg-ink">
-        <div className="mx-auto max-w-3xl px-4 py-12">
-          <h1 className="display gold-rule text-3xl text-on-dark">Условия</h1>
-          <p className="mt-6 leading-relaxed text-on-dark-muted">
+      <div className="border-b border-line bg-paper">
+        <div className="mx-auto max-w-3xl px-4 py-10">
+          <h1 className="display gold-rule text-3xl text-ink">Условия</h1>
+          <p className="mt-6 leading-relaxed text-text-muted">
             Коротко и без юридического тумана: кто за что отвечает на площадке.
           </p>
         </div>
@@ -80,7 +80,7 @@ export default function TermsPage() {
           ))}
         </div>
 
-        <div className="mt-12 border border-line bg-paper p-6">
+        <div className="mt-12 rounded-[var(--radius)] border border-line bg-paper p-6">
           <p className="leading-relaxed">
             Пользуясь площадкой, вы соглашаетесь с этими условиями. Вопросы и жалобы на
             мастеров — через{' '}

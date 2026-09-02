@@ -10,7 +10,7 @@ export function BoostForm({ products }: { products: { id: number; title: string 
   const [state, action, pending] = useActionState(requestBoost, EMPTY)
 
   return (
-    <form action={action} className="border border-line bg-paper p-6">
+    <form action={action} className="rounded-[var(--radius)] border border-line bg-paper p-6">
       <fieldset>
         <legend className="mb-3 text-xs font-semibold uppercase tracking-widest text-text-muted">
           Тариф
@@ -42,7 +42,7 @@ export function BoostForm({ products }: { products: { id: number; title: string 
         </span>
         <select
           name="product_id"
-          className="w-full border border-line bg-paper px-4 py-2.5 outline-none focus:border-gold sm:max-w-md"
+          className="w-full rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none focus:border-gold sm:max-w-md"
         >
           <option value="">Всю мастерскую</option>
           {products.map((product) => (
@@ -65,7 +65,7 @@ export function BoostForm({ products }: { products: { id: number; title: string 
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold disabled:opacity-60"
+        className="mt-6 bg-gold px-7 py-3 font-semibold text-white transition-colors hover:bg-gold-deep disabled:opacity-60"
       >
         {pending ? 'Отправляем…' : 'Заказать продвижение'}
       </button>

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { signOut } from '@/app/auth/actions'
+import { RoleSwitcher } from '@/components/role-switcher'
 import { formatPhone, telHref } from '@/lib/constants'
 import { ORDER_STATUSES, STATUS_STYLES, type OrderStatus } from '@/lib/orders'
 import { createClient } from '@/lib/supabase/server'
@@ -51,10 +52,11 @@ export default async function AccountPage() {
           <h1 className="display mt-1 text-xl">{profile?.full_name ?? 'Покупатель'}</h1>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {profile?.role === 'admin' && <RoleSwitcher current="/account" />}
           <Link
             href="/catalog"
-            className="bg-gold px-5 py-2 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+            className="press rounded-[var(--radius)] bg-gold px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-gold-deep"
           >
             В каталог
           </Link>
@@ -73,21 +75,21 @@ export default async function AccountPage() {
 
       <div className="mt-7 space-y-3">
         {orders.length === 0 ? (
-          <div className="border border-dashed border-line bg-paper p-12 text-center">
+          <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-12 text-center">
             <p className="text-text-muted">
               Заявок пока нет. Найдите мебель в каталоге и оставьте заявку мастеру —
               она появится здесь.
             </p>
             <Link
               href="/catalog"
-              className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+              className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
             >
               Смотреть каталог
             </Link>
           </div>
         ) : (
           orders.map((order) => (
-            <div key={order.id} className="border border-line bg-paper p-5">
+            <div key={order.id} className="rounded-[var(--radius)] border border-line bg-paper p-5">
               <div className="flex flex-wrap items-center gap-3">
                 <span
                   className={`px-3 py-1 text-xs font-semibold uppercase tracking-widest ${

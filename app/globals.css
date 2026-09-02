@@ -1,30 +1,37 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------
-   Дизайн-система Mebel.
-   Тёмная зелёно-графитовая база, золотой акцент, кремовые секции —
-   по образцам мебельных каталогов и витрин.
+   Дизайн-система Mebel — строгая B2B-палитра из брифа.
+   Холодный светлый интерфейс, тёмная навигация, приглушённый акцент.
    --------------------------------------------------------------- */
 :root {
   /* Основа */
-  --ink: #16211c;          /* глубокий тёмно-зелёный: шапка, первый экран, футер */
-  --ink-deep: #0f1815;     /* ещё темнее: подложки и футер */
-  --cream: #f3eee4;        /* кремовый: светлые секции */
-  --paper: #ffffff;        /* белый: карточки товаров */
+  --ink: #0f172a;          /* глубокий сланец: навигация, шапка, футер */
+  --ink-deep: #0b1220;     /* ещё глубже: подложки */
+  --cream: #f1f5f9;        /* холодный серый: фон системы */
+  --paper: #ffffff;        /* белый: карточки и модальные окна */
 
   /* Акцент */
-  --gold: #d9a441;         /* кнопки и подписи на тёмном */
-  --gold-deep: #9c7220;    /* тот же акцент, но читаемый на светлом */
+  --gold: #837362;         /* пепельный дуб: кнопки и акценты */
+  --gold-deep: #6b5b4c;    /* тот же акцент темнее: наведение */
 
   /* Линии */
-  --line: #e2dacb;         /* волосяная линия на кремовом */
-  --line-dark: #2c3a33;    /* волосяная линия на тёмном */
+  --line: #cbd5e1;         /* границы таблиц и полей */
+  --line-dark: #1e293b;    /* границы на тёмном */
 
   /* Текст */
-  --text: #16211c;
-  --text-muted: #6e6b62;
-  --text-on-dark: #efe9dd;
-  --text-on-dark-muted: #a8b0a8;
+  --text: #334155;
+  --text-muted: #64748b;
+  --text-on-dark: #ffffff;
+  --text-on-dark-muted: #94a3b8;
+
+  /* Состояния заказов — приглушённые, без неона */
+  --status-done: #15803d;
+  --status-process: #b45309;
+  --status-error: #b91c1c;
+
+  /* Инженерный вид: минимальное скругление, тонкие рамки */
+  --radius: 6px;
 }
 
 @theme inline {
@@ -40,7 +47,11 @@
   --color-text-muted: var(--text-muted);
   --color-on-dark: var(--text-on-dark);
   --color-on-dark-muted: var(--text-on-dark-muted);
+  --color-status-done: var(--status-done);
+  --color-status-process: var(--status-process);
+  --color-status-error: var(--status-error);
 
+  --radius-card: var(--radius);
   --font-display: var(--font-manrope);
   --font-sans: var(--font-inter);
 }
@@ -50,28 +61,117 @@ body {
   color: var(--text);
 }
 
-/* Заголовки — строгие, широкие, в верхнем регистре, как на витринных
-   каталогах мебели. Разрядка держит их спокойными на крупных кеглях. */
+/* Заголовки — плотные и уверенные. Без верхнего регистра:
+   строгий корпоративный софт читается спокойнее. */
 .display {
   font-family: var(--font-manrope), system-ui, sans-serif;
   font-weight: 800;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  letter-spacing: -0.02em;
 }
 
-/* Фирменная деталь: золотая волосяная черта — с мебельных плакатов.
-   Повторяется у заголовков секций и на первом экране. */
+/* Мелкие подписи разделов — наоборот, капсом с разрядкой */
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Акцентная черта у заголовка раздела */
 .gold-rule::after {
   content: "";
   display: block;
-  width: 3rem;
+  width: 2.5rem;
   height: 2px;
-  margin-top: 0.875rem;
+  margin-top: 0.75rem;
   background: var(--gold);
 }
 
-.gold-rule-center::after {
-  margin-inline: auto;
+/* ---------------------------------------------------------------
+   Стеклянная панель — нижнее меню на телефоне и всплывающие блоки.
+   --------------------------------------------------------------- */
+.glass {
+  background: color-mix(in srgb, var(--paper) 72%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 0.04),
+    0 8px 24px rgb(15 23 42 / 0.08);
+}
+
+.glass-dark {
+  background: color-mix(in srgb, var(--ink) 72%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
+}
+
+/* ---------------------------------------------------------------
+   Движение. Плавность как в iOS: короткие переходы с мягким выходом.
+   --------------------------------------------------------------- */
+:root {
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Появление страницы: контент мягко всплывает снизу */
+.animate-page {
+  animation: fade-up 0.42s var(--ease-ios) both;
+}
+
+.animate-fade {
+  animation: fade-in 0.3s var(--ease-ios) both;
+}
+
+/* Карточки в сетке появляются друг за другом */
+.stagger > * {
+  animation: fade-up 0.42s var(--ease-ios) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.stagger > *:nth-child(2) { animation-delay: 0.06s; }
+.stagger > *:nth-child(3) { animation-delay: 0.1s; }
+.stagger > *:nth-child(4) { animation-delay: 0.14s; }
+.stagger > *:nth-child(5) { animation-delay: 0.18s; }
+.stagger > *:nth-child(6) { animation-delay: 0.22s; }
+.stagger > *:nth-child(7) { animation-delay: 0.26s; }
+.stagger > *:nth-child(8) { animation-delay: 0.3s; }
+
+/* Карточка чуть приподнимается под курсором */
+.lift {
+  transition:
+    transform 0.25s var(--ease-ios),
+    box-shadow 0.25s var(--ease-ios),
+    border-color 0.25s var(--ease-ios);
+}
+.lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgb(15 23 42 / 0.08);
+}
+
+/* Нажатие — лёгкое утопление, как на телефоне */
+.press {
+  transition: transform 0.12s var(--ease-ios);
+}
+.press:active {
+  transform: scale(0.97);
 }
 
 /* Видимый фокус для клавиатуры */
@@ -80,11 +180,20 @@ body {
   outline-offset: 2px;
 }
 
+/* Уважаем настройку «меньше движения» */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Нижнее меню перекрывает контент — оставляем под него место */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: 5.5rem;
   }
 }

@@ -3,8 +3,8 @@ import { formatPrice, PRODUCT_TYPES } from '@/lib/constants'
 import type { ProductCard as ProductCardType } from '@/lib/types'
 
 /**
- * Карточка товара — построена как страница мебельного каталога:
- * фото на белом, под ним спецификация — что это, сколько стоит, кто делает.
+ * Карточка товара — как страница мебельного каталога:
+ * фото на белом, под ним спецификация: что это, сколько, кто делает.
  */
 export function ProductCard({ product }: { product: ProductCardType }) {
   const image = product.product_images?.[0]?.url
@@ -14,7 +14,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
   return (
     <Link
       href={`/product/${product.id}`}
-      className="group flex flex-col border border-line bg-paper transition-colors hover:border-gold"
+      className="lift group flex flex-col overflow-hidden rounded-[var(--radius)] border border-line bg-paper hover:border-gold"
     >
       <div className="relative aspect-4/3 overflow-hidden bg-cream">
         {image ? (
@@ -23,7 +23,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
             src={image}
             alt={product.title}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-text-muted">
@@ -32,22 +32,20 @@ export function ProductCard({ product }: { product: ProductCardType }) {
         )}
 
         {isBoosted && (
-          <span className="absolute left-0 top-4 bg-gold px-3 py-1 text-xs font-semibold uppercase tracking-widest text-ink">
+          <span className="absolute left-3 top-3 rounded-[var(--radius)] bg-ink px-2.5 py-1 text-[0.6875rem] font-semibold uppercase tracking-widest text-on-dark">
             Топ
           </span>
         )}
       </div>
 
       <div className="flex flex-1 flex-col border-t border-line p-4">
-        {product.type && (
-          <div className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-text-muted">
-            {PRODUCT_TYPES[product.type]}
-          </div>
-        )}
+        {product.type && <div className="eyebrow">{PRODUCT_TYPES[product.type]}</div>}
 
-        <h3 className="line-clamp-2 font-semibold leading-snug">{product.title}</h3>
+        <h3 className="mt-1.5 line-clamp-2 font-semibold leading-snug text-ink">
+          {product.title}
+        </h3>
 
-        <div className="mt-2 font-display text-lg font-bold text-gold-deep">
+        <div className="display mt-2 text-lg text-gold">
           {formatPrice(product.price, product.price_from)}
         </div>
 

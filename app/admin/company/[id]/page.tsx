@@ -39,7 +39,7 @@ type Detail = {
 
 function Metric({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="border border-line bg-paper p-5">
+    <div className="rounded-[var(--radius)] border border-line bg-paper p-5">
       <div className="text-xs font-semibold uppercase tracking-widest text-text-muted">
         {label}
       </div>
@@ -78,7 +78,7 @@ export default async function AdminCompanyPage({
       </Link>
 
       {/* Кто это */}
-      <section className="flex flex-wrap items-start gap-5 border border-line bg-paper p-6">
+      <section className="flex flex-wrap items-start gap-5 rounded-[var(--radius)] border border-line bg-paper p-6">
         <div className="size-20 shrink-0 overflow-hidden bg-cream">
           {company.logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -131,7 +131,7 @@ export default async function AdminCompanyPage({
           <span
             className={`px-3 py-1 text-xs font-semibold uppercase tracking-widest ${
               company.status === 'active'
-                ? 'bg-gold text-ink'
+                ? 'bg-gold text-white'
                 : company.status === 'blocked'
                   ? 'bg-neutral-300 text-neutral-700'
                   : 'border border-gold text-gold-deep'
@@ -182,7 +182,7 @@ export default async function AdminCompanyPage({
             Заявок пока не было.
           </p>
         ) : (
-          <div className="space-y-3 border border-line bg-paper p-6">
+          <div className="space-y-3 rounded-[var(--radius)] border border-line bg-paper p-6">
             {funnel.map(([status, count]) => {
               const share = company.orders_total
                 ? Math.round((count / company.orders_total) * 100)
@@ -232,7 +232,7 @@ export default async function AdminCompanyPage({
               <input type="hidden" name="status" value="active" />
               <button
                 type="submit"
-                className="bg-gold px-6 py-2.5 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+                className="bg-gold px-6 py-2.5 font-semibold text-white transition-colors hover:bg-gold-deep"
               >
                 Одобрить и показать в каталоге
               </button>

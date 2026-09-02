@@ -75,9 +75,9 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
   return (
     <>
       {/* Шапка профиля — тёмная, как витрина салона */}
-      <div className="border-b border-line-dark bg-ink">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-12 sm:flex-row sm:items-start">
-          <div className="size-24 shrink-0 overflow-hidden border border-line-dark bg-ink-deep">
+      <div className="border-b border-line bg-paper">
+        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-start">
+          <div className="size-24 shrink-0 overflow-hidden rounded-[var(--radius)] border border-line bg-cream">
             {company.logo_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={company.logo_url} alt={company.name} className="h-full w-full object-cover" />
@@ -89,26 +89,26 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
           </div>
 
           <div className="min-w-0 flex-1">
-            <h1 className="display text-3xl text-on-dark">{company.name}</h1>
+            <h1 className="display text-3xl text-ink">{company.name}</h1>
 
-            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold uppercase tracking-widest text-on-dark-muted">
+            <div className="eyebrow mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
               {company.work_type && <span>{WORK_TYPES[company.work_type]}</span>}
               {company.district && <span>· {company.district} район</span>}
               {company.phone_verified && (
-                <span className="border border-gold px-2 py-0.5 text-gold">
+                <span className="rounded-[var(--radius)] border border-status-done px-2 py-0.5 text-status-done">
                   Телефон подтверждён
                 </span>
               )}
             </div>
 
             {company.description && (
-              <p className="mt-5 max-w-2xl leading-relaxed text-on-dark-muted">
+              <p className="mt-5 max-w-2xl leading-relaxed text-text-muted">
                 {company.description}
               </p>
             )}
 
             {company.address && (
-              <p className="mt-3 text-sm text-on-dark-muted">Адрес: {company.address}</p>
+              <p className="mt-3 text-sm text-text-muted">Адрес: {company.address}</p>
             )}
 
             {/* Главное действие — звонок. Так покупают мебель в Ташкенте. */}
@@ -116,7 +116,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
               {company.phone_public && (
                 <a
                   href={telHref(company.phone_public)}
-                  className="bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-on-dark"
+                  className="press rounded-[var(--radius)] bg-gold px-7 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
                 >
                   Позвонить {formatPhone(company.phone_public)}
                 </a>
@@ -126,7 +126,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
                   href={`https://t.me/${company.telegram.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border border-line-dark px-7 py-3 font-semibold text-on-dark transition-colors hover:border-gold hover:text-gold"
+                  className="press rounded-[var(--radius)] border border-line px-7 py-3 font-semibold transition-colors hover:border-gold hover:text-gold"
                 >
                   Telegram
                 </a>
@@ -136,7 +136,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
                   href={`https://instagram.com/${company.instagram.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border border-line-dark px-7 py-3 font-semibold text-on-dark transition-colors hover:border-gold hover:text-gold"
+                  className="press rounded-[var(--radius)] border border-line px-7 py-3 font-semibold transition-colors hover:border-gold hover:text-gold"
                 >
                   Instagram
                 </a>
@@ -163,7 +163,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
             ))}
           </div>
         ) : (
-          <p className="border border-dashed border-line bg-paper p-12 text-center text-text-muted">
+          <p className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-12 text-center text-text-muted">
             Мастер пока не добавил работы.
           </p>
         )}

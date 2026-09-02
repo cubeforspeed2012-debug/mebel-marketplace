@@ -100,10 +100,10 @@ function FilterChip({
   return (
     <Link
       href={href}
-      className={`border px-4 py-2 text-sm transition-colors ${
+      className={`press rounded-[var(--radius)] border px-4 py-2 text-sm transition-colors duration-200 ${
         active
-          ? 'border-gold bg-gold font-semibold text-ink'
-          : 'border-line bg-paper text-text-muted hover:border-gold hover:text-gold-deep'
+          ? 'border-ink bg-ink font-semibold text-on-dark'
+          : 'border-line bg-paper text-text-muted hover:border-gold hover:text-gold'
       }`}
     >
       {children}
@@ -125,25 +125,25 @@ export default async function CatalogPage({
 
   return (
     <>
-      <div className="border-b border-line-dark bg-ink">
-        <div className="mx-auto max-w-6xl px-4 py-12">
-          <h1 className="display gold-rule text-3xl text-on-dark">Каталог мебели</h1>
+      <div className="border-b border-line bg-paper">
+        <div className="mx-auto max-w-6xl px-4 py-10">
+          <h1 className="display gold-rule text-3xl text-ink">Каталог мебели</h1>
 
-          <form action="/catalog" className="mt-8 flex max-w-lg gap-2">
+          <form action="/catalog" className="mt-7 flex max-w-lg gap-2">
             <input
               type="search"
               name="q"
               defaultValue={params.q ?? ''}
               placeholder="Поиск по каталогу"
               aria-label="Поиск по каталогу"
-              className="min-w-0 flex-1 border border-line-dark bg-ink-deep px-4 py-2.5 text-on-dark placeholder:text-on-dark-muted/70 outline-none transition-colors focus:border-gold"
+              className="min-w-0 flex-1 rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
             />
             {params.category && <input type="hidden" name="category" value={params.category} />}
             {params.type && <input type="hidden" name="type" value={params.type} />}
             {params.district && <input type="hidden" name="district" value={params.district} />}
             <button
               type="submit"
-              className="bg-gold px-6 py-2.5 font-semibold text-ink transition-colors hover:bg-on-dark"
+              className="press rounded-[var(--radius)] bg-gold px-6 py-2.5 font-semibold text-white transition-colors hover:bg-gold-deep"
             >
               Найти
             </button>
@@ -211,18 +211,18 @@ export default async function CatalogPage({
           {products.length > 0 ? (
             <>
               <div className="mb-5 text-sm text-text-muted">Найдено: {products.length}</div>
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             </>
           ) : (
-            <div className="border border-dashed border-line bg-paper p-14 text-center">
+            <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-14 text-center">
               <p className="text-text-muted">По этому запросу пока ничего нет.</p>
               <Link
                 href="/catalog"
-                className="mt-3 inline-block font-semibold text-gold-deep hover:underline"
+                className="mt-3 inline-block font-semibold text-gold hover:underline"
               >
                 Сбросить фильтры
               </Link>

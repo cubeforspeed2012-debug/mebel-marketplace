@@ -64,10 +64,10 @@ function Chip({
   return (
     <Link
       href={href}
-      className={`border px-4 py-2 text-sm transition-colors ${
+      className={`press rounded-[var(--radius)] border px-4 py-2 text-sm transition-colors duration-200 ${
         active
-          ? 'border-gold bg-gold font-semibold text-ink'
-          : 'border-line bg-paper text-text-muted hover:border-gold hover:text-gold-deep'
+          ? 'border-ink bg-ink font-semibold text-on-dark'
+          : 'border-line bg-paper text-text-muted hover:border-gold hover:text-gold'
       }`}
     >
       {children}
@@ -85,10 +85,10 @@ export default async function CompaniesPage({
 
   return (
     <>
-      <div className="border-b border-line-dark bg-ink">
-        <div className="mx-auto max-w-6xl px-4 py-12">
-          <h1 className="display gold-rule text-3xl text-on-dark">Мастера Ташкента</h1>
-          <p className="mt-6 max-w-xl leading-relaxed text-on-dark-muted">
+      <div className="border-b border-line bg-paper">
+        <div className="mx-auto max-w-6xl px-4 py-10">
+          <h1 className="display gold-rule text-3xl text-ink">Мастера Ташкента</h1>
+          <p className="mt-6 max-w-xl leading-relaxed text-text-muted">
             Фабрики, цеха и частные мастера города. Выбирайте по типу работы и району —
             и звоните напрямую.
           </p>
@@ -134,17 +134,17 @@ export default async function CompaniesPage({
 
         <div className="mt-12">
           {companies.length > 0 ? (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="stagger grid gap-4 sm:grid-cols-2">
               {companies.map((company) => (
                 <CompanyCard key={company.id} company={company} />
               ))}
             </div>
           ) : (
-            <div className="border border-dashed border-line bg-paper p-14 text-center">
+            <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-14 text-center">
               <p className="text-text-muted">Мастеров пока нет — площадка только запускается.</p>
               <Link
                 href="/dashboard"
-                className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
+                className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
               >
                 Стать первым мастером на площадке
               </Link>
