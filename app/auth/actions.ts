@@ -35,10 +35,25 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
   // Сетевые сбои ловим здесь: redirect ниже бросает своё исключение,
   // и оно не должно попасть в этот catch.
   let failure: string | null = null
+  let destination = next
+
   try {
     const supabase = await createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) failure = readableError(error.message)
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) {
+      failure = readableError(error.message)
+    } else if (data.user && next === '/dashboard') {
+      // Вход один для всех, а дальше каждого ведём в его кабинет:
+      // администратора — в управление площадкой, покупателя — к заявкам.
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .maybeSingle()
+
+      if (profile?.role === 'admin') destination = '/admin'
+      else if (profile?.role === 'buyer') destination = '/account'
+    }
   } catch (e) {
     failure = readableError(e instanceof Error ? e.message : 'network')
   }
@@ -46,7 +61,7 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
   if (failure) return { error: failure }
 
   revalidatePath('/', 'layout')
-  redirect(next)
+  redirect(destination)
 }
 
 export async function signUp(_prev: AuthState, formData: FormData): Promise<AuthState> {

@@ -27,30 +27,22 @@ function GoogleMark() {
   )
 }
 
-function AppleMark() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-5" aria-hidden fill="currentColor">
-      <path d="M17.05 12.5c-.03-2.5 2.04-3.7 2.13-3.76-1.16-1.7-2.97-1.93-3.61-1.96-1.54-.15-3 .9-3.78.9-.78 0-1.98-.88-3.25-.86-1.67.03-3.21.97-4.07 2.46-1.73 3-.44 7.45 1.25 9.89.83 1.2 1.81 2.53 3.1 2.48 1.25-.05 1.72-.8 3.23-.8 1.5 0 1.93.8 3.25.78 1.34-.02 2.19-1.21 3.01-2.41.95-1.38 1.34-2.72 1.36-2.79-.03-.01-2.6-1-2.62-3.93ZM14.6 4.6c.69-.83 1.15-1.99 1.02-3.14-.99.04-2.18.66-2.89 1.49-.64.73-1.19 1.9-1.04 3.03 1.1.08 2.22-.56 2.91-1.38Z" />
-    </svg>
-  )
-}
-
 /**
- * Вход через Google и Apple. Провайдеры включаются в панели Supabase —
- * если провайдер не настроен, показываем понятную подсказку, а не ошибку.
+ * Вход через Google. Провайдер включается в панели Supabase —
+ * если он не настроен, показываем понятную подсказку, а не ошибку.
  */
 export function OAuthButtons({ next = '/dashboard' }: { next?: string }) {
   const [error, setError] = useState<string | null>(null)
-  const [busy, setBusy] = useState<'google' | 'apple' | null>(null)
+  const [busy, setBusy] = useState(false)
 
-  async function signIn(provider: 'google' | 'apple') {
+  async function signInWithGoogle() {
     setError(null)
-    setBusy(provider)
+    setBusy(true)
 
     try {
       const supabase = createClient()
       const { error: authError } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
         },
@@ -59,15 +51,15 @@ export function OAuthButtons({ next = '/dashboard' }: { next?: string }) {
       if (authError) {
         setError(
           /not enabled|unsupported|provider/i.test(authError.message)
-            ? `Вход через ${provider === 'google' ? 'Google' : 'Apple'} ещё не подключён`
+            ? 'Вход через Google ещё не подключён'
             : authError.message,
         )
-        setBusy(null)
+        setBusy(false)
       }
-      // При успехе браузер уходит на страницу провайдера — состояние не сбрасываем.
+      // При успехе браузер уходит на страницу Google — состояние не сбрасываем.
     } catch {
       setError('Не удалось открыть окно входа. Попробуйте ещё раз')
-      setBusy(null)
+      setBusy(false)
     }
   }
 
@@ -79,27 +71,15 @@ export function OAuthButtons({ next = '/dashboard' }: { next?: string }) {
         <span className="h-px flex-1 bg-line" />
       </div>
 
-      <div className="grid gap-2">
-        <button
-          type="button"
-          onClick={() => signIn('google')}
-          disabled={busy !== null}
-          className="flex items-center justify-center gap-3 border border-line px-5 py-2.5 font-medium transition-colors hover:border-gold disabled:opacity-60"
-        >
-          <GoogleMark />
-          {busy === 'google' ? 'Открываем…' : 'Продолжить с Google'}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => signIn('apple')}
-          disabled={busy !== null}
-          className="flex items-center justify-center gap-3 border border-line px-5 py-2.5 font-medium transition-colors hover:border-gold disabled:opacity-60"
-        >
-          <AppleMark />
-          {busy === 'apple' ? 'Открываем…' : 'Продолжить с Apple'}
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={signInWithGoogle}
+        disabled={busy}
+        className="flex w-full items-center justify-center gap-3 border border-line px-5 py-2.5 font-medium transition-colors hover:border-gold disabled:opacity-60"
+      >
+        <GoogleMark />
+        {busy ? 'Открываем…' : 'Продолжить с Google'}
+      </button>
 
       {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
     </div>
