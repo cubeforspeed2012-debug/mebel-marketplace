@@ -23,7 +23,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-[#8b93a7]">
+      <span className="mb-2 block text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-text-muted">
         {label}
       </span>
       <input
@@ -32,9 +32,9 @@ function Field({
         required
         placeholder={placeholder}
         autoComplete={type === 'password' ? 'current-password' : name === 'email' ? 'email' : 'on'}
-        className="w-full rounded-2xl border border-white/5 bg-[#161d31] px-5 py-3.5 text-white outline-none transition-shadow duration-200 placeholder:text-[#5b6478] focus:shadow-[0_0_0_2px_rgba(200,164,92,0.6)]"
+        className="w-full rounded-2xl border border-line bg-cream px-5 py-3.5 text-text outline-none transition-shadow duration-200 placeholder:text-text-muted focus:shadow-[0_0_0_2px_var(--gold)]"
       />
-      {hint && <span className="mt-1.5 block text-xs text-[#6f7891]">{hint}</span>}
+      {hint && <span className="mt-1.5 block text-xs text-text-muted">{hint}</span>}
     </label>
   )
 }
@@ -55,9 +55,9 @@ export function AuthForm({
   const pending = isLogin ? signingIn : signingUp
 
   return (
-    <div className="rounded-[28px] border border-white/[0.06] bg-[#171e30] p-7 shadow-[0_24px_60px_rgba(0,0,0,0.55)] sm:p-9">
+    <div className="rounded-[28px] border border-line bg-paper p-7 shadow-[0_18px_50px_rgba(59,51,43,0.10)] sm:p-9">
       {/* Переключатель: утопленная дорожка, приподнятая активная половина */}
-      <div className="mb-8 flex rounded-2xl bg-[#141b2d] p-1.5 shadow-[inset_3px_3px_8px_rgba(0,0,0,0.6),inset_-2px_-2px_6px_rgba(255,255,255,0.03)]">
+      <div className="mb-8 flex rounded-2xl bg-cream p-1.5">
         {(
           [
             ['in', 'Вход'],
@@ -70,8 +70,8 @@ export function AuthForm({
             onClick={() => setMode(value)}
             className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
               mode === value
-                ? 'bg-[#1f2840] text-white shadow-[3px_3px_10px_rgba(0,0,0,0.45),-2px_-2px_8px_rgba(255,255,255,0.03)]'
-                : 'text-[#8b93a7] hover:text-white'
+                ? 'bg-gold text-white shadow-[0_6px_16px_rgba(138,112,83,0.4)]'
+                : 'text-text-muted hover:text-ink'
             }`}
           >
             {label}
@@ -82,11 +82,11 @@ export function AuthForm({
       {isLogin ? (
         <form action={signInAction} className="space-y-5">
           <input type="hidden" name="next" value={next} />
-          <Field label="Почта" name="email" type="email" placeholder="mebel@mail.uz" />
-          <Field label="Пароль" name="password" type="password" placeholder="••••••" />
+          <Field label="Почта" name="email" type="email" placeholder="" />
+          <Field label="Пароль" name="password" type="password" placeholder="" />
 
           {state.error && (
-            <p className="rounded-xl bg-[#2a1a1f] px-4 py-3 text-sm text-[#e08a8a]">
+            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {state.error}
             </p>
           )}
@@ -94,16 +94,16 @@ export function AuthForm({
           <button
             type="submit"
             disabled={pending}
-            className="press w-full rounded-2xl bg-[#1b2338] py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white shadow-[4px_4px_12px_rgba(0,0,0,0.5),-3px_-3px_10px_rgba(255,255,255,0.03)] transition-opacity duration-200 disabled:opacity-60"
+            className="press w-full rounded-2xl bg-gold py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white shadow-[0_8px_22px_rgba(138,112,83,0.45)] hover:bg-gold-deep transition-opacity duration-200 disabled:opacity-60"
           >
             {pending ? 'Входим…' : 'Войти'}
           </button>
 
           <div className="flex items-center justify-between text-sm">
-            <Link href="/auth/code" className="text-[#c8a45c] hover:underline">
+            <Link href="/auth/code" className="text-gold hover:underline">
               Войти по коду
             </Link>
-            <Link href="/auth/reset" className="text-[#8b93a7] hover:text-white">
+            <Link href="/auth/reset" className="text-text-muted hover:text-text">
               Забыли пароль?
             </Link>
           </div>
@@ -112,28 +112,28 @@ export function AuthForm({
         <form action={signUpAction} className="space-y-5">
           <input type="hidden" name="role" value={role} />
 
-          <Field label="Ваше имя" name="full_name" placeholder="Бобур" />
+          <Field label="Ваше имя" name="full_name" placeholder="" />
           <Field
             label="Телефон"
             name="phone"
             type="tel"
-            placeholder="+998 90 123-45-67"
+            placeholder=""
             hint={
               role === 'buyer'
                 ? 'По нему мастер свяжется с вами по заявке'
                 : 'По нему с вами будут связываться клиенты'
             }
           />
-          <Field label="Почта" name="email" type="email" placeholder="mebel@mail.uz" />
-          <Field label="Пароль" name="password" type="password" placeholder="минимум 6 символов" />
+          <Field label="Почта" name="email" type="email" placeholder="" />
+          <Field label="Пароль" name="password" type="password" placeholder="" />
 
           {state.error && (
-            <p className="rounded-xl bg-[#2a1a1f] px-4 py-3 text-sm text-[#e08a8a]">
+            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {state.error}
             </p>
           )}
           {state.message && (
-            <p className="rounded-xl bg-[#16223a] px-4 py-3 text-sm text-[#a9b4cc]">
+            <p className="rounded-xl border border-line bg-cream px-4 py-3 text-sm text-text">
               {state.message}
             </p>
           )}
@@ -141,12 +141,12 @@ export function AuthForm({
           <button
             type="submit"
             disabled={pending}
-            className="press w-full rounded-2xl bg-[#1b2338] py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white shadow-[4px_4px_12px_rgba(0,0,0,0.5),-3px_-3px_10px_rgba(255,255,255,0.03)] transition-opacity duration-200 disabled:opacity-60"
+            className="press w-full rounded-2xl bg-gold py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white shadow-[0_8px_22px_rgba(138,112,83,0.45)] hover:bg-gold-deep transition-opacity duration-200 disabled:opacity-60"
           >
             {pending ? 'Создаём…' : 'Создать кабинет'}
           </button>
 
-          <p className="text-center text-xs leading-relaxed text-[#6f7891]">
+          <p className="text-center text-xs leading-relaxed text-text-muted">
             {role === 'buyer'
               ? 'Регистрация бесплатная. Все заявки мастерам — в одном месте.'
               : 'Регистрация бесплатная. Дальше заполните профиль мастерской.'}
@@ -154,7 +154,7 @@ export function AuthForm({
         </form>
       )}
 
-      <div className="mt-8 [&_button]:rounded-2xl [&_button]:border-white/10 [&_button]:bg-[#1b2338] [&_button]:text-white [&_span]:bg-white/10">
+      <div className="mt-8 [&_button]:rounded-2xl [&_button]:border-line [&_button]:bg-paper [&_button]:text-text [&_span]:bg-line">
         <OAuthButtons next={next} />
       </div>
     </div>

@@ -14,8 +14,10 @@ const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : us
 
 /**
  * Стеклянная навигация: активная «таблетка» не перепрыгивает, а перетекает —
- * передний край уходит вперёд, задний отстаёт, и капсула на лету растягивается.
- * Это и создаёт ощущение жидкого стекла.
+ * передний край уходит вперёд, задний отстаёт, капсула на лету растягивается.
+ *
+ * Важно: капсула едет сразу по нажатию, не дожидаясь загрузки страницы.
+ * Иначе меню «залипает» на секунду и кажется, что оно тормозит.
  */
 export function LiquidTabs({
   items,
@@ -30,14 +32,23 @@ export function LiquidTabs({
   const pillRef = useRef<HTMLSpanElement>(null)
   const itemRefs = useRef<(HTMLAnchorElement | null)[]>([])
   const previous = useRef<DOMRect | null>(null)
-  const [ready, setReady] = useState(false)
+  const firstRender = useRef(true)
+
+  // Куда пользователь нажал прямо сейчас — до того, как страница успела смениться
+  const [optimistic, setOptimistic] = useState<number | null>(null)
+  const shown = optimistic ?? activeIndex
+
+  // Страница догрузилась — снимаем опережающую подсветку
+  useEffect(() => {
+    if (optimistic !== null && optimistic === activeIndex) setOptimistic(null)
+  }, [activeIndex, optimistic])
 
   useIsomorphicLayoutEffect(() => {
     const list = listRef.current
     const pill = pillRef.current
-    const target = itemRefs.current[activeIndex]
+    const target = itemRefs.current[shown]
 
-    if (!list || !pill || !target || activeIndex < 0) {
+    if (!list || !pill || !target || shown < 0) {
       if (pill) pill.style.opacity = '0'
       return
     }
@@ -45,7 +56,6 @@ export function LiquidTabs({
     const listBox = list.getBoundingClientRect()
     const box = target.getBoundingClientRect()
 
-    // Ставим таблетку на новое место
     pill.style.opacity = '1'
     pill.style.left = `${box.left - listBox.left}px`
     pill.style.width = `${box.width}px`
@@ -55,20 +65,19 @@ export function LiquidTabs({
     const from = previous.current
     previous.current = box
 
-    // Первый рендер — без анимации, просто встаём на место
-    if (!from || !ready) {
-      setReady(true)
+    // Первый показ — просто встаём на место, без перелёта
+    if (!from || firstRender.current) {
+      firstRender.current = false
       return
     }
 
     const dx = from.left - box.left
     if (Math.abs(dx) < 1) return
 
-    // Чем дальше прыжок, тем сильнее растяжение — но не бесконечно
-    const stretch = 1 + Math.min(Math.abs(dx) / 220, 0.32)
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // Чем длиннее прыжок, тем сильнее растяжение — но в разумных пределах
+    const stretch = 1 + Math.min(Math.abs(dx) / 220, 0.3)
     const startScale = from.width / box.width
-
-    const motion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     pill.animate(
       [
@@ -77,12 +86,12 @@ export function LiquidTabs({
         { transform: 'translateX(0) scaleX(1)' },
       ],
       {
-        duration: motion ? 1 : 520,
+        duration: reduced ? 1 : 420,
         easing: 'cubic-bezier(0.32, 0.72, 0, 1)',
         fill: 'none',
       },
     )
-  }, [activeIndex, items.length, ready])
+  }, [shown, items.length])
 
   const bar = variant === 'bar'
 
@@ -91,35 +100,35 @@ export function LiquidTabs({
       ref={listRef}
       className={`relative flex ${bar ? 'w-full items-center' : 'items-center gap-1'}`}
     >
-      {/* Сама капсула — живёт под содержимым и перетекает между разделами */}
+      {/* Капсула живёт под содержимым и перетекает между разделами */}
       <span
         ref={pillRef}
         aria-hidden
-        className={`pointer-events-none absolute left-0 top-0 rounded-full opacity-0 transition-[left,width,top,height] duration-[520ms] ${
-          bar
-            ? 'bg-gold shadow-[0_6px_18px_rgba(138,112,83,0.4)]'
-            : 'bg-white/12 backdrop-blur-sm'
+        className={`pointer-events-none absolute left-0 top-0 rounded-full opacity-0 ${
+          bar ? 'bg-gold shadow-[0_6px_18px_rgba(138,112,83,0.4)]' : 'bg-white/12'
         }`}
-        style={{ transitionTimingFunction: 'var(--ease-ios)', transformOrigin: 'center' }}
+        style={{ transformOrigin: 'center', willChange: 'transform' }}
       />
 
       {items.map((item, index) => {
-        const active = index === activeIndex
+        const active = index === shown
 
         return (
           <Link
             key={item.href + item.label}
             href={item.href}
+            prefetch
+            onClick={() => setOptimistic(index)}
             ref={(el) => {
               itemRefs.current[index] = el
             }}
             aria-current={active ? 'page' : undefined}
             className={
               bar
-                ? `press relative z-10 flex flex-1 flex-col items-center gap-1 rounded-full px-1 py-2 text-[0.625rem] font-medium transition-colors duration-300 ${
+                ? `press relative z-10 flex flex-1 flex-col items-center gap-1 rounded-full px-1 py-2 text-[0.625rem] font-medium transition-colors duration-200 ${
                     active ? 'text-white' : 'text-text-muted'
                   }`
-                : `relative z-10 rounded-full px-4 py-2 text-sm transition-colors duration-300 ${
+                : `relative z-10 rounded-full px-4 py-2 text-sm transition-colors duration-200 ${
                     active ? 'text-on-dark' : 'text-on-dark-muted hover:text-on-dark'
                   }`
             }
