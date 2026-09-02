@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Manrope } from 'next/font/google'
 import Link from 'next/link'
 import { Suspense } from 'react'
+import { HeaderNav } from '@/components/header-nav'
 import { TabBar } from '@/components/tab-bar'
 import './globals.css'
 
@@ -16,6 +17,12 @@ const manrope = Manrope({
   weight: ['600', '700', '800'],
 })
 
+// Тема светлая — иначе браузер с «тёмным режимом» перекрашивает сайт сам
+export const viewport = {
+  colorScheme: 'light' as const,
+  themeColor: '#2b2520',
+}
+
 export const metadata: Metadata = {
   title: {
     default: 'Mebel — мебель на заказ и готовая мебель в Ташкенте',
@@ -26,12 +33,6 @@ export const metadata: Metadata = {
   keywords: ['мебель Ташкент', 'мебель на заказ', 'кухни на заказ', 'mebel Toshkent'],
 }
 
-const NAV = [
-  { href: '/catalog', label: 'Каталог' },
-  { href: '/catalog?type=custom_order', label: 'На заказ' },
-  { href: '/companies', label: 'Мастера' },
-]
-
 function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-line-dark bg-ink">
@@ -40,17 +41,9 @@ function Header() {
           Mebel<span className="text-gold">.</span>
         </Link>
 
-        <nav className="hidden items-center gap-6 text-sm text-on-dark-muted md:flex">
-          {NAV.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="transition-colors duration-200 hover:text-on-dark"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <Suspense fallback={null}>
+          <HeaderNav />
+        </Suspense>
 
         <div className="ml-auto flex items-center gap-2">
           <Link

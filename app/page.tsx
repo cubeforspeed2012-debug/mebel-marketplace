@@ -48,32 +48,47 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Первый экран — светлый, как приборная панель: сразу поиск и категории */}
-      <section className="border-b border-line bg-cream">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
-          <div className="rounded-[var(--radius)] border border-line bg-paper p-8 sm:p-12">
+      {/* Первый экран: тёплый песочный свет, крупная типографика, поиск в центре внимания */}
+      <section
+        className="relative overflow-hidden border-b border-line"
+        style={{
+          background:
+            'radial-gradient(120% 80% at 15% 0%, #fffdf9 0%, #f7f2ea 45%, #efe6d8 100%)',
+        }}
+      >
+        {/* Мягкое тёплое пятно света — как от лампы в шоуруме */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-24 -top-24 size-[420px] rounded-full opacity-60 blur-3xl"
+          style={{ background: 'radial-gradient(circle, #e8dccb 0%, transparent 70%)' }}
+        />
+
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+          <div>
             <div className="eyebrow">Ташкент</div>
 
-            <h1 className="display mt-4 max-w-3xl text-4xl leading-[1.08] text-ink sm:text-5xl">
-              Вся мебель города <span className="text-gold">в одном месте</span>
+            <h1 className="display mt-4 text-[2.6rem] leading-[1.05] text-ink sm:text-6xl">
+              Вся мебель города
+              <br />
+              <span className="text-gold">в одном месте</span>
             </h1>
 
-            <p className="mt-5 max-w-xl text-lg leading-relaxed text-text-muted">
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-text-muted">
               Готовая мебель и мебель на заказ от мастеров и фабрик Ташкента.
               Сравните работы и цены — и звоните напрямую, без посредников.
             </p>
 
-            <form action="/catalog" className="mt-8 flex max-w-lg gap-2">
+            <form action="/catalog" className="mt-9 flex max-w-lg gap-2">
               <input
                 type="search"
                 name="q"
                 placeholder="Например: кухня на заказ"
                 aria-label="Поиск мебели"
-                className="min-w-0 flex-1 rounded-[var(--radius)] border border-line bg-paper px-4 py-3 outline-none transition-colors duration-200 focus:border-gold"
+                className="min-w-0 flex-1 rounded-full border border-line bg-paper px-6 py-4 shadow-[0_2px_10px_rgba(59,51,43,0.06)] outline-none transition-shadow duration-200 focus:shadow-[0_0_0_2px_var(--gold)]"
               />
               <button
                 type="submit"
-                className="press rounded-[var(--radius)] bg-gold px-7 py-3 font-semibold text-white transition-colors duration-200 hover:bg-gold-deep"
+                className="press rounded-full bg-gold px-8 py-4 font-semibold text-white shadow-[0_6px_18px_rgba(138,112,83,0.35)] transition-colors duration-200 hover:bg-gold-deep"
               >
                 Найти
               </button>
@@ -84,12 +99,29 @@ export default async function HomePage() {
                 <Link
                   key={category.slug}
                   href={`/catalog?category=${category.slug}`}
-                  className="press rounded-[var(--radius)] border border-line px-4 py-2 text-sm text-text-muted transition-colors duration-200 hover:border-gold hover:text-gold"
+                  className="press rounded-full border border-line bg-paper/70 px-5 py-2.5 text-sm text-text-muted transition-colors duration-200 hover:border-gold hover:text-gold"
                 >
                   {category.name}
                 </Link>
               ))}
             </div>
+          </div>
+
+          {/* Что даёт площадка — три коротких обещания */}
+          <div className="stagger grid gap-3">
+            {[
+              ['Мастера города', 'Фабрики и частные цеха в одном каталоге'],
+              ['Прямой звонок', 'Без посредников и наценки за знакомство'],
+              ['Своя идея', 'Мебель на заказ по вашим размерам'],
+            ].map(([title, text]) => (
+              <div
+                key={title}
+                className="lift rounded-2xl border border-line bg-paper/80 p-5 backdrop-blur-sm"
+              >
+                <div className="font-semibold text-ink">{title}</div>
+                <div className="mt-1 text-sm leading-relaxed text-text-muted">{text}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
