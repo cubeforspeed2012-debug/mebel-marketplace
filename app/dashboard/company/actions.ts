@@ -84,8 +84,14 @@ export async function saveCompany(_prev: FormState, formData: FormData): Promise
 
   if (error) return { error: error.message }
 
-  // Роль в профиле — продавец: он теперь ведёт мастерскую
-  await supabase.from('profiles').update({ role: 'seller' }).eq('id', user.id)
+  // Роль в профиле — продавец: он теперь ведёт мастерскую.
+  // Администратора не трогаем: иначе владелец площадки, заведя свою
+  // мастерскую, потерял бы доступ к управлению.
+  await supabase
+    .from('profiles')
+    .update({ role: 'seller' })
+    .eq('id', user.id)
+    .neq('role', 'admin')
 
   revalidatePath('/dashboard')
   return {
