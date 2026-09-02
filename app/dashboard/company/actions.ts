@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { normalizePhone } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 
 export type FormState = { error?: string; message?: string }
@@ -39,7 +40,8 @@ export async function saveCompany(_prev: FormState, formData: FormData): Promise
 
   const fields = {
     name,
-    phone_public: phone,
+    // Номер приводим к +998… — иначе кнопка «Позвонить» не наберёт
+    phone_public: normalizePhone(phone) ?? phone,
     description: String(formData.get('description') ?? '').trim() || null,
     district: String(formData.get('district') ?? '') || null,
     address: String(formData.get('address') ?? '').trim() || null,

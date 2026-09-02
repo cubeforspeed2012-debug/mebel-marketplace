@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { formatPhone, formatPrice } from '@/lib/constants'
+import { formatPhone, formatPrice, telHref } from '@/lib/constants'
 import { ORDER_SOURCES, ORDER_STATUSES, STATUS_STYLES, type OrderStatus } from '@/lib/orders'
 import { getSellerContext } from '@/lib/session'
 import type { OrderWithClient } from '@/lib/types'
@@ -136,7 +136,7 @@ export default async function OrdersPage({
 
               {order.clients?.phone && (
                 <a
-                  href={`tel:+${order.clients.phone}`}
+                  href={telHref(order.clients.phone)}
                   className="bg-gold px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
                 >
                   Позвонить

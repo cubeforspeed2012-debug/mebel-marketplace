@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { signOut } from '@/app/auth/actions'
-import { formatPhone } from '@/lib/constants'
+import { formatPhone, telHref } from '@/lib/constants'
 import { ORDER_STATUSES, STATUS_STYLES, type OrderStatus } from '@/lib/orders'
 import { createClient } from '@/lib/supabase/server'
 
@@ -110,7 +110,7 @@ export default async function AccountPage() {
 
                 {order.companies?.phone_public && (
                   <a
-                    href={`tel:${order.companies.phone_public.replace(/\s/g, '')}`}
+                    href={telHref(order.companies.phone_public)}
                     className="border border-line px-4 py-2 text-sm transition-colors hover:border-gold"
                   >
                     {formatPhone(order.companies.phone_public)}

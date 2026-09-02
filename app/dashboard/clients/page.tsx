@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { formatPhone } from '@/lib/constants'
+import { formatPhone, telHref } from '@/lib/constants'
 import { ORDER_SOURCES } from '@/lib/orders'
 import { getSellerContext } from '@/lib/session'
 import type { Client } from '@/lib/types'
@@ -76,7 +76,7 @@ export default async function ClientsPage() {
                   <td className="px-4 py-3 text-right">
                     {client.phone && (
                       <a
-                        href={`tel:+${client.phone}`}
+                        href={telHref(client.phone)}
                         className="bg-gold px-4 py-2 text-xs font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
                       >
                         Позвонить

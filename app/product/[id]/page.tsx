@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { RequestForm } from '@/components/request-form'
-import { formatPhone, formatPrice, PRODUCT_TYPES, WORK_TYPES } from '@/lib/constants'
+import { formatPhone, formatPrice, PRODUCT_TYPES, telHref, WORK_TYPES } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import type { ProductCard as ProductCardType } from '@/lib/types'
 
@@ -138,7 +138,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
               {company.phone_public && (
                 <a
-                  href={`tel:${company.phone_public.replace(/\s/g, '')}`}
+                  href={telHref(company.phone_public)}
                   className="mt-5 block bg-gold px-6 py-3 text-center font-semibold text-ink transition-colors hover:bg-ink hover:text-gold"
                 >
                   Позвонить {formatPhone(company.phone_public)}

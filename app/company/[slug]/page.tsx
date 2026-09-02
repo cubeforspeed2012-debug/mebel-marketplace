@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ProductCard } from '@/components/product-card'
 import { RequestForm } from '@/components/request-form'
-import { formatPhone, WORK_TYPES } from '@/lib/constants'
+import { formatPhone, telHref, WORK_TYPES } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import type { Company, ProductCard as ProductCardType } from '@/lib/types'
 
@@ -111,7 +111,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
             <div className="mt-7 flex flex-wrap gap-3">
               {company.phone_public && (
                 <a
-                  href={`tel:${company.phone_public.replace(/\s/g, '')}`}
+                  href={telHref(company.phone_public)}
                   className="bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-on-dark"
                 >
                   Позвонить {formatPhone(company.phone_public)}
