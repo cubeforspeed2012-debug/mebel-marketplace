@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { formatPhone, formatPrice, WORK_TYPES } from '@/lib/constants'
 import { requireAdmin } from '@/lib/session'
 import { confirmPromotion } from './actions'
+import { ViewsChart } from './views-chart'
 
 export const metadata = { title: 'Управление площадкой' }
 
@@ -44,7 +45,7 @@ type Overview = {
 
 function Metric({ label, value, hint }: { label: string; value: number | string; hint?: string }) {
   return (
-    <div className="rounded-[var(--radius)] border border-line bg-paper p-5">
+    <div className="lift rounded-2xl border border-line bg-paper p-5">
       <div className="text-xs font-semibold uppercase tracking-widest text-text-muted">
         {label}
       </div>
@@ -62,7 +63,9 @@ export default async function AdminPage({
   const { status: filter } = await searchParams
   const { supabase } = await requireAdmin()
 
-  const [overviewResult, companiesResult, promotionsResult] = await Promise.all([
+  const since = new Date(Date.now() - 13 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+
+  const [overviewResult, companiesResult, promotionsResult, visitsResult] = await Promise.all([
     supabase.rpc('admin_overview'),
     supabase.rpc('admin_company_stats'),
     supabase
@@ -71,12 +74,24 @@ export default async function AdminPage({
       .eq('status', 'pending')
       .order('created_at', { ascending: false })
       .limit(50),
+    supabase.from('site_visits').select('day, views').gte('day', since).order('day'),
   ])
 
   const overview = (overviewResult.data?.[0] ?? null) as Overview | null
   const allCompanies = (companiesResult.data ?? []) as CompanyStats[]
   const companies = filter ? allCompanies.filter((c) => c.status === filter) : allCompanies
   const promotions = promotionsResult.data ?? []
+
+  // Дни без посещений в базе не хранятся — дорисуем нулями, иначе график «рвётся»
+  const visitsByDay = new Map(
+    (visitsResult.data ?? []).map((v) => [v.day as string, v.views as number]),
+  )
+  const days = Array.from({ length: 14 }, (_, i) => {
+    const date = new Date(Date.now() - (13 - i) * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10)
+    return { day: date, views: visitsByDay.get(date) ?? 0 }
+  })
 
   return (
     <div className="space-y-10">
@@ -105,6 +120,10 @@ export default async function AdminPage({
             value={overview?.products_total ?? 0}
             hint={`Клиентов у мастеров: ${overview?.clients_total ?? 0}`}
           />
+        </div>
+
+        <div className="mt-4">
+          <ViewsChart days={days} />
         </div>
 
         <p className="mt-3 text-xs leading-relaxed text-text-muted">
