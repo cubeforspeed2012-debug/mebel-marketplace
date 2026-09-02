@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useActionState, useState } from 'react'
+import { OAuthButtons } from '@/components/oauth-buttons'
 import { signIn, signUp, type AuthState } from './actions'
 
 const EMPTY: AuthState = {}
@@ -154,6 +155,10 @@ export function AuthForm({
           </p>
         </form>
       )}
+
+      <div className="mt-7">
+        <OAuthButtons next={next} />
+      </div>
     </div>
   )
 }

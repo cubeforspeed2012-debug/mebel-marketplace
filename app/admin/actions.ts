@@ -19,6 +19,7 @@ export async function setCompanyStatus(formData: FormData) {
     .eq('id', id)
 
   revalidatePath('/admin')
+  revalidatePath(`/admin/company/${id}`)
   revalidatePath('/catalog')
   revalidatePath('/companies')
 }

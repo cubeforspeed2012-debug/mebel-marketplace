@@ -5,6 +5,7 @@ import { RequestForm } from '@/components/request-form'
 import { formatPhone, telHref, WORK_TYPES } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import type { Company, ProductCard as ProductCardType } from '@/lib/types'
+import { bumpViews } from '@/lib/views'
 
 export const revalidate = 300
 
@@ -67,6 +68,9 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
   if (!data) notFound()
 
   const { company, products } = data
+
+  // Считаем просмотр — мастер видит его у себя, площадка в статистике
+  await bumpViews('company', company.id)
 
   return (
     <>

@@ -4,6 +4,7 @@ import { RequestForm } from '@/components/request-form'
 import { formatPhone, formatPrice, PRODUCT_TYPES, telHref, WORK_TYPES } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import type { ProductCard as ProductCardType } from '@/lib/types'
+import { bumpViews } from '@/lib/views'
 
 export const revalidate = 300
 
@@ -54,6 +55,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
   const images = [...(product.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order)
   const company = product.companies
+
+  // Считаем просмотр товара — попадёт в статистику мастера и площадки
+  await bumpViews('product', product.id)
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
