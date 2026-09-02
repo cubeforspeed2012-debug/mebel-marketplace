@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useActionState, useState } from 'react'
 import { signIn, signUp, type AuthState } from './actions'
 
@@ -91,6 +92,12 @@ export function AuthForm({ next }: { next: string }) {
           >
             {pending ? 'Входим…' : 'Войти'}
           </button>
+
+          <p className="text-center text-sm">
+            <Link href="/auth/reset" className="text-text-muted hover:text-gold-deep">
+              Забыли пароль?
+            </Link>
+          </p>
         </form>
       ) : (
         <form action={signUpAction} className="space-y-4">

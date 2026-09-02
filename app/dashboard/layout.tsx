@@ -9,6 +9,7 @@ const NAV = [
   { href: '/dashboard/products', label: 'Моя мебель' },
   { href: '/dashboard/company', label: 'Профиль мастерской' },
   { href: '/dashboard/promotion', label: 'Продвижение' },
+  { href: '/auth/new-password', label: 'Сменить пароль' },
 ]
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
