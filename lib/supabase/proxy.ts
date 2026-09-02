@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 /** Страницы, куда пускаем только после входа. */
-const PROTECTED = ['/dashboard', '/admin']
+const PROTECTED = ['/dashboard', '/admin', '/account']
 
 /**
  * Продлевает сессию на каждом запросе и закрывает кабинет от неавторизованных.

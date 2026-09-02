@@ -55,8 +55,18 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
   const fullName = String(formData.get('full_name') ?? '').trim()
   const phone = String(formData.get('phone') ?? '').trim()
 
+  // Кто регистрируется: мастер (ведёт мастерскую) или покупатель (ищет мебель).
+  const role = formData.get('role') === 'buyer' ? 'buyer' : 'seller'
+
   if (!fullName) return { error: 'Укажите имя' }
-  if (!phone) return { error: 'Укажите телефон — по нему с вами свяжутся клиенты' }
+  if (!phone) {
+    return {
+      error:
+        role === 'buyer'
+          ? 'Укажите телефон — по нему мастер свяжется с вами'
+          : 'Укажите телефон — по нему с вами свяжутся клиенты',
+    }
+  }
   if (password.length < 6) return { error: 'Пароль слишком короткий — минимум 6 символов' }
 
   let failure: string | null = null
@@ -67,7 +77,7 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName, phone, role: 'seller' } },
+      options: { data: { full_name: fullName, phone, role } },
     })
     if (error) failure = readableError(error.message)
     hasSession = Boolean(data?.session)
@@ -83,7 +93,8 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard/company')
+  // Мастера ведём заполнять мастерскую, покупателя — сразу в каталог.
+  redirect(role === 'buyer' ? '/catalog' : '/dashboard/company')
 }
 
 export async function signOut() {

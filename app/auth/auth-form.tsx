@@ -41,8 +41,15 @@ function Field({
   )
 }
 
-export function AuthForm({ next }: { next: string }) {
-  const [mode, setMode] = useState<'in' | 'up'>('in')
+export function AuthForm({
+  next,
+  role = 'seller',
+}: {
+  next: string
+  role?: 'seller' | 'buyer'
+}) {
+  // Покупатель приходит с кнопки «Купить мебель» — ему сразу нужна регистрация.
+  const [mode, setMode] = useState<'in' | 'up'>(role === 'buyer' ? 'up' : 'in')
   const [signInState, signInAction, signingIn] = useActionState(signIn, EMPTY)
   const [signUpState, signUpAction, signingUp] = useActionState(signUp, EMPTY)
 
@@ -101,13 +108,19 @@ export function AuthForm({ next }: { next: string }) {
         </form>
       ) : (
         <form action={signUpAction} className="space-y-4">
+          <input type="hidden" name="role" value={role} />
+
           <Field label="Ваше имя" name="full_name" placeholder="Бобур" />
           <Field
             label="Телефон"
             name="phone"
             type="tel"
             placeholder="+998 90 123-45-67"
-            hint="По нему с вами будут связываться клиенты"
+            hint={
+              role === 'buyer'
+                ? 'По нему мастер свяжется с вами по заявке'
+                : 'По нему с вами будут связываться клиенты'
+            }
           />
           <Field label="Почта" name="email" type="email" placeholder="mebel@mail.uz" />
           <Field
@@ -135,8 +148,9 @@ export function AuthForm({ next }: { next: string }) {
           </button>
 
           <p className="text-xs leading-relaxed text-text-muted">
-            Регистрация бесплатная. После неё заполните профиль мастерской — и вас
-            увидят в каталоге.
+            {role === 'buyer'
+              ? 'Регистрация бесплатная. Ваши заявки мастерам будут собираться в одном месте — не потеряете, к кому обращались.'
+              : 'Регистрация бесплатная. После неё заполните профиль мастерской — и вас увидят в каталоге.'}
           </p>
         </form>
       )}

@@ -88,6 +88,11 @@ function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/auth?role=buyer" className="transition-colors hover:text-on-dark">
+                  Личный кабинет
+                </Link>
+              </li>
+              <li>
                 <Link href="/terms" className="transition-colors hover:text-on-dark">
                   Условия
                 </Link>

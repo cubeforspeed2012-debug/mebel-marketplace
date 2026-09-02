@@ -1,31 +1,35 @@
 import Link from 'next/link'
 import { signOut } from '@/app/auth/actions'
 import { getSellerContext } from '@/lib/session'
-
-const NAV = [
-  { href: '/dashboard', label: 'Обзор' },
-  { href: '/dashboard/orders', label: 'Заявки и заказы' },
-  { href: '/dashboard/clients', label: 'Клиенты' },
-  { href: '/dashboard/products', label: 'Моя мебель' },
-  { href: '/dashboard/company', label: 'Профиль мастерской' },
-  { href: '/dashboard/promotion', label: 'Продвижение' },
-  { href: '/auth/new-password', label: 'Сменить пароль' },
-]
+import { DashboardNav } from './dashboard-nav'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { company, profile } = await getSellerContext()
+  const { supabase, company, profile } = await getSellerContext()
+
+  // Счётчик новых заявок — показываем прямо в меню, чтобы не пропустить клиента.
+  let newOrders = 0
+  if (company) {
+    const { count } = await supabase
+      .from('orders')
+      .select('id', { count: 'exact', head: true })
+      .eq('company_id', company.id)
+      .eq('status', 'new')
+    newOrders = count ?? 0
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-5">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-5">
         <div>
           <div className="text-xs font-semibold uppercase tracking-widest text-text-muted">
             Кабинет мастера
           </div>
-          <h1 className="display mt-1 text-xl">{company?.name ?? profile?.full_name ?? 'Новый мастер'}</h1>
+          <h1 className="display mt-1 text-xl">
+            {company?.name ?? profile?.full_name ?? 'Новый мастер'}
+          </h1>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {company?.status === 'pending' && (
             <span className="border border-gold px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-gold-deep">
               На проверке
@@ -39,6 +43,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
               Моя страница →
             </Link>
           )}
+          {profile?.role === 'admin' && (
+            <Link
+              href="/admin"
+              className="border border-line px-4 py-2 text-sm transition-colors hover:border-gold"
+            >
+              Управление площадкой
+            </Link>
+          )}
           <form action={signOut}>
             <button
               type="submit"
@@ -50,19 +62,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
-        <nav className="flex flex-wrap gap-1 lg:flex-col">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="border border-transparent px-3 py-2 text-sm transition-colors hover:border-line hover:bg-paper"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
+      <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
+        <DashboardNav newOrders={newOrders} />
         <div className="min-w-0">{children}</div>
       </div>
     </div>

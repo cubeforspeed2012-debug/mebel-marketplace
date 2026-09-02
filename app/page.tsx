@@ -170,23 +170,52 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* Вторая половина площадки — сами мебельщики */}
+      {/* Две стороны площадки: кто покупает и кто делает */}
       <section className="bg-ink">
         <div className="mx-auto max-w-6xl px-4 py-20">
-          <div className="max-w-2xl">
-            <h2 className="display gold-rule text-2xl text-on-dark sm:text-3xl">
-              Делаете мебель? Вас найдут здесь
-            </h2>
-            <p className="mt-6 max-w-xl leading-relaxed text-on-dark-muted">
-              Разместите свои работы и телефон — и получайте звонки от клиентов,
-              которые ищут именно вашу мебель. Регистрация бесплатная.
-            </p>
-            <Link
-              href="/dashboard"
-              className="mt-8 inline-block bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-on-dark"
-            >
-              Разместить мебель
-            </Link>
+          <div className="grid gap-10 sm:grid-cols-2">
+            <div className="border border-gold/30 p-8">
+              <div className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-gold">
+                Покупателям
+              </div>
+              <h2 className="display text-xl text-on-dark sm:text-2xl">Купить мебель</h2>
+              <p className="mt-5 leading-relaxed text-on-dark-muted">
+                Заведите кабинет — и все ваши заявки мастерам будут в одном месте.
+                Не забудете, кому писали, о чём договорились и кто уже ответил.
+              </p>
+              <Link
+                href="/auth?role=buyer"
+                className="mt-7 inline-block bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-on-dark"
+              >
+                Создать кабинет покупателя
+              </Link>
+              <p className="mt-4 text-sm text-on-dark-muted">
+                Или просто{' '}
+                <Link href="/catalog" className="text-gold hover:underline">
+                  смотрите каталог
+                </Link>{' '}
+                — звонить мастеру можно и без регистрации.
+              </p>
+            </div>
+
+            <div className="border border-gold/30 p-8">
+              <div className="mb-4 text-xs font-semibold uppercase tracking-[0.25em] text-gold">
+                Мастерам
+              </div>
+              <h2 className="display text-xl text-on-dark sm:text-2xl">
+                Делаете мебель? Вас найдут здесь
+              </h2>
+              <p className="mt-5 leading-relaxed text-on-dark-muted">
+                Разместите свои работы и телефон — и получайте звонки от клиентов,
+                которые ищут именно вашу мебель. Регистрация бесплатная.
+              </p>
+              <Link
+                href="/auth"
+                className="mt-7 inline-block bg-gold px-7 py-3 font-semibold text-ink transition-colors hover:bg-on-dark"
+              >
+                Разместить мебель
+              </Link>
+            </div>
           </div>
         </div>
       </section>
