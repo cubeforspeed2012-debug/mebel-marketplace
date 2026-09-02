@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ProductCard } from '@/components/product-card'
+import { RequestForm } from '@/components/request-form'
 import { formatPhone, WORK_TYPES } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import type { Company, ProductCard as ProductCardType } from '@/lib/types'
@@ -136,6 +137,11 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
                   Instagram
                 </a>
               )}
+            </div>
+
+            {/* Не дозвонились — можно оставить заявку, мастер перезвонит */}
+            <div className="mt-4">
+              <RequestForm companyId={company.id} />
             </div>
           </div>
         </div>

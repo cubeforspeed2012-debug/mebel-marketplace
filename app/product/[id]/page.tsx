@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { RequestForm } from '@/components/request-form'
 import { formatPhone, formatPrice, PRODUCT_TYPES, WORK_TYPES } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import type { ProductCard as ProductCardType } from '@/lib/types'
@@ -143,8 +144,20 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                   Позвонить {formatPhone(company.phone_public)}
                 </a>
               )}
+
+              <div className="mt-3">
+                <RequestForm companyId={company.id} productId={product.id} compact />
+              </div>
             </div>
           )}
+
+          <p className="mt-6 text-xs leading-relaxed text-text-muted">
+            Mebel — витрина мастеров. Договор, оплата, сроки и качество — между вами и
+            мастером напрямую; площадка в сделке не участвует.{' '}
+            <Link href="/terms" className="underline hover:text-gold-deep">
+              Условия
+            </Link>
+          </p>
         </div>
       </div>
 

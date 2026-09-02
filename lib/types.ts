@@ -1,4 +1,5 @@
 import type { ProductType, WorkType } from './constants'
+import type { OrderSource, OrderStatus } from './orders'
 
 export type Category = {
   id: number
@@ -26,9 +27,46 @@ export type Company = {
   work_type: WorkType | null
   status: 'pending' | 'active' | 'blocked'
   phone_verified: boolean
+  telegram_chat_id: string | null
+  moderation_note: string | null
   boosted_until: string | null
   views_count: number
   created_at: string
+}
+
+/** Клиент мебельщика — его собственная база, другим не видна. */
+export type Client = {
+  id: number
+  company_id: number
+  full_name: string
+  phone: string | null
+  source: string | null
+  notes: string | null
+  created_at: string
+}
+
+/** Заказ = карточка в воронке CRM. Рождается из заявки с сайта или заводится вручную. */
+export type Order = {
+  id: number
+  client_id: number
+  company_id: number
+  product_id: number | null
+  type: 'ready_made' | 'custom'
+  status: OrderStatus
+  title: string | null
+  comment: string | null
+  source: OrderSource | string
+  total_price: number | null
+  prepayment_amount: number | null
+  measurement_visit_date: string | null
+  created_at: string
+  updated_at: string
+}
+
+/** Заказ вместе с клиентом — то, что видно в списке заявок. */
+export type OrderWithClient = Order & {
+  clients: Pick<Client, 'id' | 'full_name' | 'phone'> | null
+  products: Pick<Product, 'id' | 'title'> | null
 }
 
 export type ProductImage = {

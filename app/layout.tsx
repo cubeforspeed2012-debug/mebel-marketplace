@@ -87,6 +87,11 @@ function Footer() {
                   Все мастера
                 </Link>
               </li>
+              <li>
+                <Link href="/terms" className="transition-colors hover:text-on-dark">
+                  Условия
+                </Link>
+              </li>
             </ul>
           </div>
 
