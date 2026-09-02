@@ -1,9 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mebel",
+  // Имя обязано совпадать с проектом в панели Cloudflare,
+  // иначе сборка развернёт сайт под другим именем.
+  "name": "mebel-marketplace",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Публичный адрес вида mebel-marketplace.<аккаунт>.workers.dev
+  "workers_dev": true,
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
