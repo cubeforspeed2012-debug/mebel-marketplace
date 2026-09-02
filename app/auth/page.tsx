@@ -14,12 +14,20 @@ export default async function AuthPage({
 }) {
   const { next } = await searchParams
 
-  // Уже вошёл — сразу в кабинет.
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (user) redirect(next ?? '/dashboard')
+  // Уже вошёл — сразу в кабинет. Если база недоступна, показываем форму:
+  // страница входа должна открываться всегда.
+  let signedIn = false
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    signedIn = Boolean(user)
+  } catch {
+    signedIn = false
+  }
+
+  if (signedIn) redirect(next ?? '/dashboard')
 
   return (
     <div className="bg-ink py-16">

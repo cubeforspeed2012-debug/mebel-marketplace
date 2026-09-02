@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# Кроме этих двух: в них только публичные ключи, нужные при сборке.
+# Секретные ключи сюда не кладём — им место в Secrets Cloudflare.
+!.env.example
+!.env.production
 
 # vercel
 .vercel

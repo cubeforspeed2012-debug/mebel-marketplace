@@ -11,9 +11,23 @@ const PROTECTED = ['/dashboard', '/admin']
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
 
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  // Ключей нет — не роняем весь сайт. Каталог покажется, кабинет попросит войти.
+  if (!url || !key) {
+    const path = request.nextUrl.pathname
+    if (PROTECTED.some((prefix) => path.startsWith(prefix))) {
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/auth'
+      return NextResponse.redirect(redirectUrl)
+    }
+    return response
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url,
+    key,
     {
       cookies: {
         getAll() {

@@ -8,6 +8,20 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   // Публичный адрес вида mebel-marketplace.<аккаунт>.workers.dev
   "workers_dev": true,
+
+  // Ключи Supabase держим здесь, а не в панели: переменные, добавленные
+  // руками в панели, стираются при каждой сборке (wrangler deploy
+  // перезаписывает окружение конфигом), и сайт падает.
+  //
+  // Оба значения публичные — они и так уходят в браузер каждому посетителю.
+  // Данные защищены правилами доступа внутри самой базы, а не секретностью
+  // этого ключа. Секретные ключи (service_role, токен Telegram) сюда не
+  // кладём — только через Settings → Variables and Secrets как Secret.
+  "vars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://haxmubqjipkwgmeagezm.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_N9aZTyHKQY3D32SsDNibeg_7gB8ESB7"
+  },
+
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
