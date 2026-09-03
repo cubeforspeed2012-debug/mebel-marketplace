@@ -1,41 +1,57 @@
 import Link from 'next/link'
 import { signOut } from '@/app/auth/actions'
-import { RoleSwitcher } from '@/components/role-switcher'
 import { requireAdmin } from '@/lib/session'
+import { AdminRail } from './admin-shell'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { profile } = await requireAdmin()
 
-  return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-5">
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-widest text-gold-deep">
-            Управление площадкой
-          </div>
-          <h1 className="display mt-1 text-xl">{profile?.full_name ?? 'Администратор'}</h1>
-        </div>
+  const today = new Date().toLocaleDateString('ru-RU', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'long',
+  })
 
-        <div className="flex flex-wrap items-center gap-3">
-          <RoleSwitcher current="/admin" />
-          <Link
-            href="/"
-            className="rounded-[var(--radius)] border border-line px-4 py-2 text-sm transition-colors hover:border-gold"
-          >
-            На сайт
-          </Link>
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="border border-line px-4 py-2 text-sm text-text-muted transition-colors hover:border-gold hover:text-text"
-            >
-              Выйти
-            </button>
-          </form>
+  return (
+    <div className="min-h-screen bg-[#0f0f0f] p-3 sm:p-5">
+      <div className="mx-auto flex max-w-[1400px] gap-4">
+        <AdminRail />
+
+        <div className="min-w-0 flex-1 rounded-3xl bg-[#171717] p-5 sm:p-7">
+          {/* Верхняя строка: дата, выход, профиль */}
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="text-sm text-[#8f8f8f]">Сегодня, {today}</div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/"
+                className="press rounded-full bg-[#232323] px-4 py-2 text-sm text-[#d6d6d6] transition-colors hover:bg-[#2c2c2c]"
+              >
+                На сайт
+              </Link>
+              <Link
+                href="/dashboard"
+                className="press rounded-full bg-[#232323] px-4 py-2 text-sm text-[#d6d6d6] transition-colors hover:bg-[#2c2c2c]"
+              >
+                Кабинет мастера
+              </Link>
+              <form action={signOut}>
+                <button
+                  type="submit"
+                  className="press rounded-full bg-[#232323] px-4 py-2 text-sm text-[#8f8f8f] transition-colors hover:bg-[#2c2c2c] hover:text-white"
+                >
+                  Выйти
+                </button>
+              </form>
+              <span className="flex size-10 items-center justify-center rounded-full bg-gold text-sm font-semibold text-white">
+                {(profile?.full_name ?? 'A').charAt(0)}
+              </span>
+            </div>
+          </div>
+
+          {children}
         </div>
       </div>
-
-      {children}
     </div>
   )
 }
