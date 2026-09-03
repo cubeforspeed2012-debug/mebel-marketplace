@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 /* Лента иконок слева — как в панелях управления: узкая, всегда на виду */
 
@@ -13,6 +13,16 @@ const RAIL = [
       <>
         <circle cx="12" cy="12" r="8.5" />
         <path d="M12 3.5v8.5h8.5" />
+      </>
+    ),
+  },
+  {
+    href: '/admin/users',
+    label: 'Аккаунты',
+    icon: (
+      <>
+        <circle cx="12" cy="8" r="3.4" />
+        <path d="M5 19.5c0-3.4 3.1-5.6 7-5.6s7 2.2 7 5.6" />
       </>
     ),
   },
@@ -63,6 +73,7 @@ const RAIL = [
 
 export function AdminRail() {
   const pathname = usePathname()
+  const search = useSearchParams()
 
   return (
     <nav
@@ -78,7 +89,13 @@ export function AdminRail() {
       </Link>
 
       {RAIL.map((item) => {
-        const active = item.href === '/admin' && pathname === '/admin'
+        // «На проверке» — та же страница сводки, но с фильтром: сверяем и адрес, и фильтр
+        const [base, query] = item.href.split('?')
+        const pending = search.get('status') === 'pending'
+        const active =
+          base === '/admin'
+            ? pathname === '/admin' && (query ? pending : !pending)
+            : pathname === base || pathname.startsWith(`${base}/`)
 
         return (
           <Link

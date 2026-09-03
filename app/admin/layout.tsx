@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { signOut } from '@/app/auth/actions'
 import { requireAdmin } from '@/lib/session'
 import { AdminRail } from './admin-shell'
@@ -15,7 +16,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-screen bg-[#0f0f0f] p-3 sm:p-5">
       <div className="mx-auto flex max-w-[1400px] gap-4">
-        <AdminRail />
+        <Suspense fallback={<div className="hidden w-[68px] shrink-0 rounded-3xl bg-[#171717] lg:block" />}>
+          <AdminRail />
+        </Suspense>
 
         <div className="min-w-0 flex-1 rounded-3xl bg-[#171717] p-5 sm:p-7">
           {/* Верхняя строка: дата, выход, профиль */}

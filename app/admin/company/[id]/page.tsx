@@ -71,9 +71,17 @@ export default async function AdminCompanyPage({
 
   return (
     <div className="space-y-6">
-      <Link href="/admin" className="inline-block text-sm text-[#8f8f8f] hover:text-white">
-        ← Все мастерские
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link href="/admin" className="text-sm text-[#8f8f8f] hover:text-white">
+          ← Все мастерские
+        </Link>
+        <Link
+          href="/admin/users"
+          className="press rounded-full bg-[#2a2a2a] px-4 py-2 text-xs text-[#d6d6d6] transition-colors hover:bg-white hover:text-[#171717]"
+        >
+          Аккаунт владельца
+        </Link>
+      </div>
 
       {/* Кто это */}
       <section className="flex flex-wrap items-start gap-5 rounded-3xl bg-[#1f1f1f] p-6">

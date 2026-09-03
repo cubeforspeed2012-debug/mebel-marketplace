@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/session'
 
 /** Одобрить, заблокировать или вернуть мастерскую на проверку. */
@@ -66,4 +67,36 @@ export async function confirmPromotion(formData: FormData) {
 
   revalidatePath('/admin')
   revalidatePath('/catalog')
+}
+
+/** Заблокировать или разблокировать аккаунт. Заблокированный войти не может. */
+export async function setUserBlocked(formData: FormData) {
+  const { supabase } = await requireAdmin()
+
+  const userId = String(formData.get('user_id') ?? '')
+  const blocked = String(formData.get('blocked') ?? '') === '1'
+  if (!userId) return
+
+  const { error } = await supabase.rpc('admin_set_user_blocked', {
+    p_user: userId,
+    p_blocked: blocked,
+  })
+
+  redirect(error ? `/admin/users?error=${encodeURIComponent(error.message)}` : '/admin/users?ok=block')
+}
+
+/** Удалить аккаунт вместе с мастерской. Действие необратимое. */
+export async function deleteUser(formData: FormData) {
+  const { supabase } = await requireAdmin()
+
+  const userId = String(formData.get('user_id') ?? '')
+  if (!userId) return
+
+  const { error } = await supabase.rpc('admin_delete_user', { p_user: userId })
+
+  revalidatePath('/admin')
+  revalidatePath('/companies')
+  revalidatePath('/catalog')
+
+  redirect(error ? `/admin/users?error=${encodeURIComponent(error.message)}` : '/admin/users?ok=delete')
 }
