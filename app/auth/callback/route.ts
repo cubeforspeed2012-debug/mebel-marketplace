@@ -13,8 +13,27 @@ export async function GET(request: NextRequest) {
   if (code) {
     try {
       const supabase = await createClient()
-      const { error } = await supabase.auth.exchangeCodeForSession(code)
-      if (!error) return NextResponse.redirect(`${origin}${next}`)
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+
+      if (!error) {
+        // Через Google имя приходит из аккаунта Google, а телефона нет.
+        // Пока человек не представился сам — ведём его знакомиться.
+        if (data.user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('onboarded')
+            .eq('id', data.user.id)
+            .maybeSingle()
+
+          if (profile && !profile.onboarded) {
+            return NextResponse.redirect(
+              `${origin}/welcome?next=${encodeURIComponent(next)}`,
+            )
+          }
+        }
+
+        return NextResponse.redirect(`${origin}${next}`)
+      }
     } catch {
       // Ссылка просрочена или уже использована — покажем вход с подсказкой.
     }

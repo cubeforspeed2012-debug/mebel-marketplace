@@ -20,9 +20,12 @@ export async function getSellerContext() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, role, full_name, phone')
+    .select('id, role, full_name, phone, onboarded')
     .eq('id', user.id)
     .maybeSingle()
+
+  // Вошёл через Google и ещё не представился — сначала знакомство
+  if (profile && !profile.onboarded) redirect('/welcome?next=/dashboard')
 
   return {
     supabase,

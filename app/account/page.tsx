@@ -27,9 +27,11 @@ export default async function AccountPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, role')
+    .select('full_name, role, onboarded')
     .eq('id', user.id)
     .maybeSingle()
+
+  if (profile && !profile.onboarded) redirect('/welcome?next=/account')
 
   // Мастера ведём в его кабинет — там другой набор дел.
   if (profile?.role === 'seller') redirect('/dashboard')
