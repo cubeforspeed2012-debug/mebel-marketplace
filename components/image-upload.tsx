@@ -110,7 +110,7 @@ export function ImageUpload({
             <button
               type="button"
               onClick={() => onChange(null)}
-              className="text-left text-sm text-text-muted transition-colors hover:text-red-700"
+              className="text-left text-sm text-text-muted transition-colors hover:text-status-error"
             >
               Удалить
             </button>
@@ -120,7 +120,7 @@ export function ImageUpload({
         </div>
       </div>
 
-      {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="mt-2 text-sm text-status-error">{error}</p>}
     </div>
   )
 }

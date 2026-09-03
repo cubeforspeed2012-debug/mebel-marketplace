@@ -127,7 +127,7 @@ export function NewOrderForm() {
         </div>
       </fieldset>
 
-      {state.error && <p className="mt-4 text-sm text-red-700">{state.error}</p>}
+      {state.error && <p className="mt-4 text-sm text-status-error">{state.error}</p>}
       {state.message && <p className="mt-4 text-sm text-gold-deep">{state.message}</p>}
 
       <button

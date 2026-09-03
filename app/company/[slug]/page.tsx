@@ -89,7 +89,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
           </div>
 
           <div className="min-w-0 flex-1">
-            <h1 className="display text-3xl text-ink">{company.name}</h1>
+            <h1 className="display text-3xl text-text">{company.name}</h1>
 
             <div className="eyebrow mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
               {company.work_type && <span>{WORK_TYPES[company.work_type]}</span>}

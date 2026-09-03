@@ -41,7 +41,7 @@ export function ProductCard({ product }: { product: ProductCardType }) {
       <div className="flex flex-1 flex-col border-t border-line p-4">
         {product.type && <div className="eyebrow">{PRODUCT_TYPES[product.type]}</div>}
 
-        <h3 className="mt-1.5 line-clamp-2 font-semibold leading-snug text-ink">
+        <h3 className="mt-1.5 line-clamp-2 font-semibold leading-snug text-text">
           {product.title}
         </h3>
 

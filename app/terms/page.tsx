@@ -57,7 +57,7 @@ export default function TermsPage() {
     <>
       <div className="border-b border-line bg-paper">
         <div className="mx-auto max-w-3xl px-4 py-10">
-          <h1 className="display gold-rule text-3xl text-ink">Условия</h1>
+          <h1 className="display gold-rule text-3xl text-text">Условия</h1>
           <p className="mt-6 leading-relaxed text-text-muted">
             Коротко и без юридического тумана: кто за что отвечает на площадке.
           </p>

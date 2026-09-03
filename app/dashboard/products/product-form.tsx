@@ -136,7 +136,7 @@ export function ProductForm({
       </label>
 
       {state.error && (
-        <p className="border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="border border-[#b91c1c]/40 bg-[#b91c1c]/15 px-3 py-2 text-sm text-status-error">
           {state.error}
         </p>
       )}

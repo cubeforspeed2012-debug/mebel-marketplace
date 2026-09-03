@@ -134,7 +134,7 @@ export default async function ProductsPage({
                   <input type="hidden" name="id" value={product.id} />
                   <button
                     type="submit"
-                    className="border border-line px-4 py-2 text-sm text-text-muted transition-colors hover:border-red-400 hover:text-red-700"
+                    className="border border-line px-4 py-2 text-sm text-text-muted transition-colors hover:border-[#b91c1c] hover:text-status-error"
                   >
                     Удалить
                   </button>

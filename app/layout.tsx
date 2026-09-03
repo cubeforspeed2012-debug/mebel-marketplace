@@ -19,8 +19,8 @@ const manrope = Manrope({
 
 // Тема светлая — иначе браузер с «тёмным режимом» перекрашивает сайт сам
 export const viewport = {
-  colorScheme: 'light' as const,
-  themeColor: '#2b2520',
+  colorScheme: 'dark' as const,
+  themeColor: '#0f0f0f',
 }
 
 export const metadata: Metadata = {

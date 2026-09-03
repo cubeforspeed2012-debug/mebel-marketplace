@@ -16,7 +16,7 @@ export default async function CompanyPage() {
       </p>
 
       {company?.status === 'blocked' && (
-        <p className="mb-6 border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p className="mb-6 border border-[#b91c1c]/40 bg-[#b91c1c]/15 px-4 py-3 text-sm text-status-error">
           Мастерская заблокирована.{' '}
           {company.moderation_note ?? 'Свяжитесь с поддержкой площадки.'}
         </p>

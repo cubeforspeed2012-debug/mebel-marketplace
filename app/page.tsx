@@ -53,21 +53,21 @@ export default async function HomePage() {
         className="relative overflow-hidden border-b border-line"
         style={{
           background:
-            'radial-gradient(120% 80% at 15% 0%, #fffdf9 0%, #f7f2ea 45%, #efe6d8 100%)',
+            'radial-gradient(120% 80% at 15% 0%, #262626 0%, #181818 45%, #101010 100%)',
         }}
       >
         {/* Мягкое тёплое пятно света — как от лампы в шоуруме */}
         <div
           aria-hidden
           className="pointer-events-none absolute -right-24 -top-24 size-[420px] rounded-full opacity-60 blur-3xl"
-          style={{ background: 'radial-gradient(circle, #e8dccb 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, rgba(138,112,83,0.35) 0%, transparent 70%)' }}
         />
 
         <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <div className="eyebrow">Ташкент</div>
 
-            <h1 className="display mt-4 text-[2.6rem] leading-[1.05] text-ink sm:text-6xl">
+            <h1 className="display mt-4 text-[2.6rem] leading-[1.05] text-text sm:text-6xl">
               Вся мебель города
               <br />
               <span className="text-gold">в одном месте</span>
@@ -84,7 +84,7 @@ export default async function HomePage() {
                 name="q"
                 placeholder="Например: кухня на заказ"
                 aria-label="Поиск мебели"
-                className="min-w-0 flex-1 rounded-full border border-line bg-paper px-6 py-4 shadow-[0_2px_10px_rgba(59,51,43,0.06)] outline-none transition-shadow duration-200 focus:shadow-[0_0_0_2px_var(--gold)]"
+                className="min-w-0 flex-1 rounded-full border border-line bg-paper px-6 py-4 shadow-[0_2px_10px_rgba(0,0,0,0.35)] outline-none transition-shadow duration-200 focus:shadow-[0_0_0_2px_var(--gold)]"
               />
               <button
                 type="submit"
@@ -118,7 +118,7 @@ export default async function HomePage() {
                 key={title}
                 className="lift rounded-2xl border border-line bg-paper/80 p-5 backdrop-blur-sm"
               >
-                <div className="font-semibold text-ink">{title}</div>
+                <div className="font-semibold text-text">{title}</div>
                 <div className="mt-1 text-sm leading-relaxed text-text-muted">{text}</div>
               </div>
             ))}
@@ -133,7 +133,7 @@ export default async function HomePage() {
             href="/catalog?type=ready_made"
             className="lift rounded-[var(--radius)] border border-line bg-paper p-8"
           >
-            <h2 className="display gold-rule text-xl text-ink">Готовая мебель</h2>
+            <h2 className="display gold-rule text-xl text-text">Готовая мебель</h2>
             <p className="mt-5 leading-relaxed text-text-muted">
               То, что можно купить и забрать сейчас. Фото и цены — сразу в каталоге.
             </p>
@@ -146,7 +146,7 @@ export default async function HomePage() {
             href="/catalog?type=custom_order"
             className="lift rounded-[var(--radius)] border border-line bg-paper p-8"
           >
-            <h2 className="display gold-rule text-xl text-ink">Мебель на заказ</h2>
+            <h2 className="display gold-rule text-xl text-text">Мебель на заказ</h2>
             <p className="mt-5 leading-relaxed text-text-muted">
               Своя идея, свои размеры. Найдите мастера, который делает именно то,
               что вам нужно.
@@ -159,7 +159,7 @@ export default async function HomePage() {
       {/* Свежие работы */}
       <section className="mx-auto max-w-6xl px-4 pb-14">
         <div className="mb-7 flex items-end justify-between">
-          <h2 className="display gold-rule text-2xl text-ink">Новые работы</h2>
+          <h2 className="display gold-rule text-2xl text-text">Новые работы</h2>
           <Link href="/catalog" className="text-sm font-semibold text-gold hover:underline">
             Весь каталог →
           </Link>

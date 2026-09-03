@@ -91,7 +91,7 @@ export function GalleryUpload({
               </div>
 
               {index === 0 && (
-                <span className="absolute left-0 top-0 bg-gold px-2 py-0.5 text-xs font-semibold text-ink">
+                <span className="absolute left-0 top-0 bg-gold px-2 py-0.5 text-xs font-semibold text-text">
                   Обложка
                 </span>
               )}
@@ -110,7 +110,7 @@ export function GalleryUpload({
                   type="button"
                   onClick={() => onChange(value.filter((u) => u !== url))}
                   aria-label="Удалить фото"
-                  className="flex-1 border-x border-line py-1.5 transition-colors hover:bg-red-50 hover:text-red-700"
+                  className="flex-1 border-x border-line py-1.5 transition-colors hover:bg-[#b91c1c]/15 hover:text-status-error"
                 >
                   ✕
                 </button>
@@ -154,7 +154,7 @@ export function GalleryUpload({
         До {MAX_PHOTOS} фото, каждое до {MAX_MB} МБ. Первое станет обложкой.
       </span>
 
-      {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
+      {error && <p className="mt-2 text-sm text-status-error">{error}</p>}
     </div>
   )
 }

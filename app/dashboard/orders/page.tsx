@@ -239,7 +239,7 @@ export default async function OrdersPage({
                 <input type="hidden" name="id" value={order.id} />
                 <button
                   type="submit"
-                  className="text-sm text-text-muted transition-colors hover:text-red-700"
+                  className="text-sm text-text-muted transition-colors hover:text-status-error"
                 >
                   Удалить заказ
                 </button>

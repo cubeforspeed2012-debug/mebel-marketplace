@@ -18,7 +18,7 @@ export function WelcomeForm({
   return (
     <form
       action={action}
-      className="rounded-[28px] border border-line bg-paper p-7 shadow-[0_18px_50px_rgba(59,51,43,0.10)] sm:p-9"
+      className="rounded-[28px] border border-line bg-paper p-7 shadow-[0_18px_50px_rgba(0,0,0,0.45)] sm:p-9"
     >
       <label className="block">
         <span className="mb-2 block text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-text-muted">
@@ -75,7 +75,7 @@ export function WelcomeForm({
               className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
                 role === value
                   ? 'bg-gold text-white shadow-[0_6px_16px_rgba(138,112,83,0.4)]'
-                  : 'text-text-muted hover:text-ink'
+                  : 'text-text-muted hover:text-text'
               }`}
             >
               {label}
@@ -85,7 +85,7 @@ export function WelcomeForm({
       </div>
 
       {state.error && (
-        <p className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p className="mt-5 rounded-xl border border-[#b91c1c]/40 bg-[#b91c1c]/15 px-4 py-3 text-sm text-status-error">
           {state.error}
         </p>
       )}

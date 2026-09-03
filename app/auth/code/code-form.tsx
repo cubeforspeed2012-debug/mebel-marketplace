@@ -10,7 +10,7 @@ const CELLS = 6
 /** Замок в круге — как на макете: мягкая утопленная площадка, золотая скоба */
 function LockBadge() {
   return (
-    <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-cream shadow-[inset_2px_2px_6px_rgba(59,51,43,0.10)]">
+    <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-cream shadow-[inset_2px_2px_6px_rgba(0,0,0,0.45)]">
       <svg viewBox="0 0 24 24" className="size-7" fill="none" strokeWidth={1.8}
            stroke="var(--gold)" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <rect x="4.5" y="10.5" width="15" height="10" rx="2.5" />
@@ -38,7 +38,7 @@ function RequestStep({
 
       <LockBadge />
 
-      <h1 className="mt-6 display text-center text-2xl text-ink">Вход по коду</h1>
+      <h1 className="mt-6 display text-center text-2xl text-text">Вход по коду</h1>
       <p className="mt-2 text-center text-sm text-text-muted">
         Пришлём код на почту — пароль не нужен
       </p>
@@ -54,7 +54,7 @@ function RequestStep({
       />
 
       {state.error && (
-        <p className="mt-4 text-center text-sm text-red-700">{state.error}</p>
+        <p className="mt-4 text-center text-sm text-status-error">{state.error}</p>
       )}
 
       <button
@@ -128,9 +128,9 @@ function VerifyStep({
 
       <LockBadge />
 
-      <h1 className="mt-6 display text-center text-2xl text-ink">Подтвердите вход</h1>
+      <h1 className="mt-6 display text-center text-2xl text-text">Подтвердите вход</h1>
       <p className="mt-2 text-center text-sm text-text-muted">Мы отправили код на</p>
-      <p className="mt-1 text-center font-semibold text-ink">{email}</p>
+      <p className="mt-1 text-center font-semibold text-text">{email}</p>
 
       <div className="mt-8 flex justify-center gap-3">
         {digits.map((digit, index) => (
@@ -148,15 +148,15 @@ function VerifyStep({
             onKeyDown={(e) => onKeyDown(index, e)}
             className={`size-12 rounded-2xl text-center text-xl font-semibold outline-none transition-shadow duration-200 sm:size-14 ${
               digit
-                ? 'border border-gold bg-gold-soft text-ink shadow-[inset_2px_2px_6px_rgba(59,51,43,0.12)]'
-                : 'border border-line bg-paper text-ink shadow-[0_3px_10px_rgba(59,51,43,0.08)]'
+                ? 'border border-gold bg-gold-soft text-text shadow-[inset_2px_2px_6px_rgba(0,0,0,0.5)]'
+                : 'border border-line bg-paper text-text shadow-[0_3px_10px_rgba(0,0,0,0.4)]'
             } focus:shadow-[0_0_0_2px_var(--gold)]`}
           />
         ))}
       </div>
 
       {state.error && (
-        <p className="mt-5 text-center text-sm text-red-700">{state.error}</p>
+        <p className="mt-5 text-center text-sm text-status-error">{state.error}</p>
       )}
 
       <button
@@ -172,7 +172,7 @@ function VerifyStep({
           <>
             <span className="size-4 animate-spin rounded-full border border-gold border-t-transparent" />
             <span className="text-text-muted">
-              Отправить снова через <span className="text-ink">{seconds}с</span>
+              Отправить снова через <span className="text-text">{seconds}с</span>
             </span>
           </>
         ) : (
@@ -193,7 +193,7 @@ export function CodeForm({ role }: { role: 'seller' | 'buyer' }) {
   const email = verifyState.email ?? sendState.email ?? ''
 
   return (
-    <div className="rounded-[28px] border border-line bg-paper p-7 shadow-[0_18px_50px_rgba(59,51,43,0.10)] sm:p-9">
+    <div className="rounded-[28px] border border-line bg-paper p-7 shadow-[0_18px_50px_rgba(0,0,0,0.45)] sm:p-9">
       {sent ? (
         <VerifyStep
           email={email}

@@ -26,7 +26,7 @@ export function CompanyCard({ company }: { company: Company }) {
       </div>
 
       <div className="min-w-0 flex-1">
-        <h3 className="truncate font-semibold text-ink">{company.name}</h3>
+        <h3 className="truncate font-semibold text-text">{company.name}</h3>
 
         <div className="eyebrow mt-1">
           {company.work_type && WORK_TYPES[company.work_type]}

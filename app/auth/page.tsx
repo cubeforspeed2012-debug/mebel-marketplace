@@ -39,7 +39,7 @@ export default async function AuthPage({
     <div
       className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-14"
       style={{
-        background: 'radial-gradient(120% 90% at 50% 0%, #fffdf9 0%, #f7f2ea 45%, #efe6d8 100%)',
+        background: 'radial-gradient(120% 90% at 50% 0%, #242424 0%, #181818 45%, #101010 100%)',
       }}
     >
       <div className="animate-page w-full max-w-md">
@@ -47,12 +47,12 @@ export default async function AuthPage({
           <div className="text-[0.6875rem] font-semibold uppercase tracking-[0.35em] text-text-muted">
             Mebel · Ташкент
           </div>
-          <h1 className="mt-4 display text-2xl text-ink">{heading}</h1>
+          <h1 className="mt-4 display text-2xl text-text">{heading}</h1>
           <p className="mt-2 text-sm text-text-muted">{subtitle}</p>
         </div>
 
         {error === 'link' && (
-          <p className="mb-5 rounded-2xl border border-gold bg-gold-soft px-4 py-3 text-center text-sm text-ink">
+          <p className="mb-5 rounded-2xl border border-gold bg-gold-soft px-4 py-3 text-center text-sm text-text">
             Ссылка из письма просрочена или уже использована. Запросите новую.
           </p>
         )}

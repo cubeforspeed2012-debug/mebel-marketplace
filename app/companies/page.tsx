@@ -87,7 +87,7 @@ export default async function CompaniesPage({
     <>
       <div className="border-b border-line bg-paper">
         <div className="mx-auto max-w-6xl px-4 py-10">
-          <h1 className="display gold-rule text-3xl text-ink">Мастера Ташкента</h1>
+          <h1 className="display gold-rule text-3xl text-text">Мастера Ташкента</h1>
           <p className="mt-6 max-w-xl leading-relaxed text-text-muted">
             Фабрики, цеха и частные мастера города. Выбирайте по типу работы и району —
             и звоните напрямую.

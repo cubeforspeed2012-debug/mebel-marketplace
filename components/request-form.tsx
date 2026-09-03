@@ -107,7 +107,7 @@ export function RequestForm({
         </label>
       </div>
 
-      {state.error && <p className="mt-3 text-sm text-red-700">{state.error}</p>}
+      {state.error && <p className="mt-3 text-sm text-status-error">{state.error}</p>}
 
       <button
         type="submit"

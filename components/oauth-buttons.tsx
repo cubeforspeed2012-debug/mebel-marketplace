@@ -81,7 +81,7 @@ export function OAuthButtons({ next = '/dashboard' }: { next?: string }) {
         {busy ? 'Открываем…' : 'Продолжить с Google'}
       </button>
 
-      {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
+      {error && <p className="mt-3 text-sm text-status-error">{error}</p>}
     </div>
   )
 }
