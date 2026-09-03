@@ -95,7 +95,10 @@ export type Product = {
 
 /** Товар вместе с компанией и фото — то, что показывается в каталоге. */
 export type ProductCard = Product & {
-  companies: Pick<Company, 'id' | 'name' | 'slug' | 'district' | 'phone_public' | 'work_type'> | null
+  companies: Pick<
+    Company,
+    'id' | 'name' | 'slug' | 'district' | 'phone_public' | 'work_type' | 'telegram' | 'instagram'
+  > | null
   product_images: ProductImage[]
   categories: Pick<Category, 'id' | 'name' | 'slug'> | null
 }

@@ -1,8 +1,11 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { ContactButtons } from '@/components/contact-buttons'
 import { ProductCard } from '@/components/product-card'
 import { RequestForm } from '@/components/request-form'
-import { formatPhone, telHref, WORK_TYPES } from '@/lib/constants'
+import { ShareButton } from '@/components/share-button'
+import { WorksGallery, type Work } from '@/components/works-gallery'
+import { WORK_TYPES } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import type { Company, ProductCard as ProductCardType } from '@/lib/types'
 import { bumpViews } from '@/lib/views'
@@ -69,6 +72,20 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
 
   const { company, products } = data
 
+  // Все фотографии работ одним списком — так их удобнее листать
+  const works: Work[] = products.flatMap((product) =>
+    (product.product_images ?? [])
+      .slice()
+      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+      .map((image) => ({
+        url: image.url,
+        title: product.title,
+        productId: product.id,
+        price: product.price,
+        priceFrom: product.price_from,
+      })),
+  )
+
   // Считаем просмотр — мастер видит его у себя, площадка в статистике
   await bumpViews('company', company.id)
 
@@ -111,41 +128,19 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
               <p className="mt-3 text-sm text-text-muted">Адрес: {company.address}</p>
             )}
 
-            {/* Главное действие — звонок. Так покупают мебель в Ташкенте. */}
-            <div className="mt-7 flex flex-wrap gap-3">
-              {company.phone_public && (
-                <a
-                  href={telHref(company.phone_public)}
-                  className="press rounded-[var(--radius)] bg-gold px-7 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
-                >
-                  Позвонить {formatPhone(company.phone_public)}
-                </a>
-              )}
-              {company.telegram && (
-                <a
-                  href={`https://t.me/${company.telegram.replace('@', '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="press rounded-[var(--radius)] border border-line px-7 py-3 font-semibold transition-colors hover:border-gold hover:text-gold"
-                >
-                  Telegram
-                </a>
-              )}
-              {company.instagram && (
-                <a
-                  href={`https://instagram.com/${company.instagram.replace('@', '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="press rounded-[var(--radius)] border border-line px-7 py-3 font-semibold transition-colors hover:border-gold hover:text-gold"
-                >
-                  Instagram
-                </a>
-              )}
+            {/* Позвонить или написать — в Ташкенте пользуются и тем, и другим */}
+            <div className="mt-7">
+              <ContactButtons
+                phone={company.phone_public}
+                telegram={company.telegram}
+                instagram={company.instagram}
+              />
             </div>
 
             {/* Не дозвонились — можно оставить заявку, мастер перезвонит */}
-            <div className="mt-4">
+            <div className="mt-4 flex flex-wrap items-center gap-3">
               <RequestForm companyId={company.id} />
+              <ShareButton title={company.name} />
             </div>
           </div>
         </div>
@@ -153,10 +148,12 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
 
       <div className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="display gold-rule mb-8 text-2xl">
-          Работы {products.length > 0 && <span className="text-text-muted">({products.length})</span>}
+          Работы {works.length > 0 && <span className="text-text-muted">({works.length})</span>}
         </h2>
 
-        {products.length > 0 ? (
+        {works.length > 0 ? (
+          <WorksGallery works={works} />
+        ) : products.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
@@ -166,6 +163,17 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
           <p className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-12 text-center text-text-muted">
             Мастер пока не добавил работы.
           </p>
+        )}
+
+        {works.length > 0 && (
+          <>
+            <h2 className="display gold-rule mb-8 mt-14 text-2xl">Что можно заказать</h2>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </>
         )}
 
         <div className="mt-12">

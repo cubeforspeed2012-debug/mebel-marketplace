@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { RequestForm } from '@/components/request-form'
-import { formatPhone, formatPrice, PRODUCT_TYPES, telHref, WORK_TYPES } from '@/lib/constants'
+import { ContactButtons } from '@/components/contact-buttons'
+import { formatPrice, PRODUCT_TYPES, WORK_TYPES } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import type { ProductCard as ProductCardType } from '@/lib/types'
 import { bumpViews } from '@/lib/views'
@@ -18,7 +19,7 @@ async function getProduct(id: string) {
       .select(
         `id, company_id, category_id, slug, title, description, type, price,
          price_from, currency, status, boosted_until, views_count, created_at,
-         companies!inner (id, name, slug, district, phone_public, work_type),
+         companies!inner (id, name, slug, district, phone_public, work_type, telegram, instagram),
          product_images (id, product_id, url, sort_order),
          categories (id, name, slug)`,
       )
@@ -140,14 +141,14 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 {company.district && <span> · {company.district} район</span>}
               </div>
 
-              {company.phone_public && (
-                <a
-                  href={telHref(company.phone_public)}
-                  className="mt-5 block bg-gold px-6 py-3 text-center font-semibold text-white transition-colors hover:bg-gold-deep"
-                >
-                  Позвонить {formatPhone(company.phone_public)}
-                </a>
-              )}
+              <div className="mt-5">
+                <ContactButtons
+                  phone={company.phone_public}
+                  telegram={company.telegram}
+                  instagram={company.instagram}
+                  size="small"
+                />
+              </div>
 
               <div className="mt-3">
                 <RequestForm companyId={company.id} productId={product.id} compact />
