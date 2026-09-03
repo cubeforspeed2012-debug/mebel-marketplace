@@ -102,6 +102,11 @@ function Footer() {
                   Условия
                 </Link>
               </li>
+              <li>
+                <Link href="/privacy" className="transition-colors hover:text-on-dark">
+                  Конфиденциальность
+                </Link>
+              </li>
             </ul>
           </div>
 
