@@ -6,7 +6,17 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare'
 
 const ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions'
-const MODEL = 'llama-3.3-70b-versatile'
+
+/**
+ * Groq время от времени выводит модели из обращения. Держим список:
+ * если первая отвечает «нет такой модели», пробуем следующую,
+ * чтобы помощник не умирал молча в день, когда её отключили.
+ */
+const MODELS = [
+  'llama-3.3-70b-versatile',
+  'llama-3.1-8b-instant',
+  'openai/gpt-oss-20b',
+]
 
 export type AiResult = { text?: string; error?: string }
 
@@ -34,43 +44,59 @@ export async function askGroq(system: string, user: string): Promise<AiResult> {
     return { error: 'Помощник ещё не подключён — нужен ключ Groq в настройках сайта' }
   }
 
-  try {
-    const response = await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${key}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        temperature: 0.7,
-        max_tokens: 600,
-        messages: [
-          { role: 'system', content: system },
-          { role: 'user', content: user },
-        ],
-      }),
-      // Ждём недолго: человек стоит у экрана, а не пьёт чай
-      signal: AbortSignal.timeout(20000),
-    })
+  let lastError = 'Помощник не ответил. Попробуйте ещё раз'
 
-    if (response.status === 401 || response.status === 403) {
-      return { error: 'Ключ помощника не принят. Проверьте ключ Groq в настройках сайта' }
-    }
-    if (response.status === 429) {
-      return { error: 'Помощник занят — слишком много запросов. Попробуйте через минуту' }
-    }
-    if (!response.ok) {
-      return { error: 'Помощник не ответил. Попробуйте ещё раз' }
-    }
+  for (const model of MODELS) {
+    try {
+      const response = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${key}`,
+        },
+        body: JSON.stringify({
+          model,
+          temperature: 0.7,
+          max_tokens: 900,
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: user },
+          ],
+        }),
+        // Ждём недолго: человек стоит у экрана, а не пьёт чай
+        signal: AbortSignal.timeout(25000),
+      })
 
-    const data = (await response.json()) as {
-      choices?: { message?: { content?: string } }[]
-    }
-    const text = data.choices?.[0]?.message?.content?.trim()
+      if (response.ok) {
+        const data = (await response.json()) as {
+          choices?: { message?: { content?: string } }[]
+        }
+        const text = data.choices?.[0]?.message?.content?.trim()
 
-    return text ? { text } : { error: 'Помощник вернул пустой ответ. Попробуйте ещё раз' }
-  } catch {
-    return { error: 'Помощник не отвечает. Попробуйте ещё раз через минуту' }
+        if (text) return { text }
+
+        lastError = 'Помощник вернул пустой ответ. Попробуйте ещё раз'
+        continue
+      }
+
+      if (response.status === 401 || response.status === 403) {
+        return { error: 'Ключ помощника не принят. Проверьте ключ Groq в настройках сайта' }
+      }
+      if (response.status === 429) {
+        return { error: 'Помощник занят — слишком много запросов. Попробуйте через минуту' }
+      }
+
+      // Модель отключили или переименовали — пробуем следующую из списка
+      const detail = await response.text()
+      lastError = `Помощник не ответил (${response.status}). Попробуйте ещё раз`
+
+      if (response.status === 404 || /model/i.test(detail)) continue
+
+      return { error: lastError }
+    } catch {
+      lastError = 'Помощник не отвечает. Попробуйте ещё раз через минуту'
+    }
   }
+
+  return { error: lastError }
 }
