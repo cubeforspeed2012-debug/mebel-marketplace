@@ -6,6 +6,8 @@ import { RequestForm } from '@/components/request-form'
 import { ShareButton } from '@/components/share-button'
 import { WorksGallery, type Work } from '@/components/works-gallery'
 import { WORK_TYPES } from '@/lib/constants'
+import { districtIn } from '@/lib/i18n'
+import { getDictionary } from '@/lib/locale'
 import { createClient } from '@/lib/supabase/server'
 import type { Company, ProductCard as ProductCardType } from '@/lib/types'
 import { bumpViews } from '@/lib/views'
@@ -67,6 +69,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CompanyPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  const dict = await getDictionary()
   const data = await getCompany(slug)
   if (!data) notFound()
 
@@ -109,11 +112,15 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
             <h1 className="display text-3xl text-text">{company.name}</h1>
 
             <div className="eyebrow mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-              {company.work_type && <span>{WORK_TYPES[company.work_type]}</span>}
-              {company.district && <span>· {company.district} район</span>}
+              {company.work_type && <span>{dict.workTypes[company.work_type]}</span>}
+              {company.district && (
+                <span>
+                  · {districtIn(dict, company.district)} {dict.companies.district}
+                </span>
+              )}
               {company.phone_verified && (
                 <span className="rounded-[var(--radius)] border border-status-done px-2 py-0.5 text-status-done">
-                  Телефон подтверждён
+                  {dict.company.phoneVerified}
                 </span>
               )}
             </div>
@@ -125,12 +132,15 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
             )}
 
             {company.address && (
-              <p className="mt-3 text-sm text-text-muted">Адрес: {company.address}</p>
+              <p className="mt-3 text-sm text-text-muted">
+                {dict.company.address}: {company.address}
+              </p>
             )}
 
             {/* Позвонить или написать — в Ташкенте пользуются и тем, и другим */}
             <div className="mt-7">
               <ContactButtons
+                dict={dict}
                 phone={company.phone_public}
                 telegram={company.telegram}
                 instagram={company.instagram}
@@ -148,7 +158,8 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
 
       <div className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="display gold-rule mb-8 text-2xl">
-          Работы {works.length > 0 && <span className="text-text-muted">({works.length})</span>}
+          {dict.company.works}{' '}
+          {works.length > 0 && <span className="text-text-muted">({works.length})</span>}
         </h2>
 
         {works.length > 0 ? (
@@ -161,13 +172,13 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
           </div>
         ) : (
           <p className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-12 text-center text-text-muted">
-            Мастер пока не добавил работы.
+            {dict.company.noWorks}
           </p>
         )}
 
         {works.length > 0 && (
           <>
-            <h2 className="display gold-rule mb-8 mt-14 text-2xl">Что можно заказать</h2>
+            <h2 className="display gold-rule mb-8 mt-14 text-2xl">{dict.company.canOrder}</h2>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
@@ -178,7 +189,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
 
         <div className="mt-12">
           <Link href="/catalog" className="font-semibold text-gold-deep hover:underline">
-            ← Вернуться в каталог
+            {dict.company.backToCatalog}
           </Link>
         </div>
       </div>

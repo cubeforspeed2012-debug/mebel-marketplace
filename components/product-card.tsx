@@ -1,5 +1,8 @@
+'use client'
+
 import Link from 'next/link'
-import { formatPrice, PRODUCT_TYPES } from '@/lib/constants'
+import { useDict } from '@/components/locale-provider'
+import { districtIn, priceIn } from '@/lib/i18n'
 import type { ProductCard as ProductCardType } from '@/lib/types'
 
 /**
@@ -7,6 +10,7 @@ import type { ProductCard as ProductCardType } from '@/lib/types'
  * фото на белом, под ним спецификация: что это, сколько, кто делает.
  */
 export function ProductCard({ product }: { product: ProductCardType }) {
+  const dict = useDict()
   const image = product.product_images?.[0]?.url
   const company = product.companies
   const isBoosted = product.boosted_until && new Date(product.boosted_until) > new Date()
@@ -27,31 +31,31 @@ export function ProductCard({ product }: { product: ProductCardType }) {
           />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-text-muted">
-            Фото скоро
+            {dict.common.loading}
           </div>
         )}
 
         {isBoosted && (
-          <span className="absolute left-3 top-3 rounded-[var(--radius)] bg-ink px-2.5 py-1 text-[0.6875rem] font-semibold uppercase tracking-widest text-on-dark">
-            Топ
+          <span className="absolute left-3 top-3 rounded-[var(--radius)] bg-gold px-2.5 py-1 text-[0.6875rem] font-semibold uppercase tracking-widest text-white">
+            TOP
           </span>
         )}
       </div>
 
       <div className="flex flex-1 flex-col border-t border-line p-4">
-        {product.type && <div className="eyebrow">{PRODUCT_TYPES[product.type]}</div>}
+        {product.type && <div className="eyebrow">{dict.productTypes[product.type]}</div>}
 
         <h3 className="mt-1.5 line-clamp-2 font-semibold leading-snug text-text">
           {product.title}
         </h3>
 
         <div className="display mt-2 text-lg text-gold">
-          {formatPrice(product.price, product.price_from)}
+          {priceIn(dict, product.price, product.price_from)}
         </div>
 
         <div className="mt-auto pt-3 text-sm text-text-muted">
           {company?.name}
-          {company?.district && <span> · {company.district}</span>}
+          {company?.district && <span> · {districtIn(dict, company.district)}</span>}
         </div>
       </div>
     </Link>

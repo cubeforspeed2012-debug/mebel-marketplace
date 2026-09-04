@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { ProductCard } from '@/components/product-card'
 import { DISTRICTS, FALLBACK_CATEGORIES, PRODUCT_TYPES } from '@/lib/constants'
+import { districtIn } from '@/lib/i18n'
+import { getDictionary } from '@/lib/locale'
 import { createClient } from '@/lib/supabase/server'
 import type { Category, ProductCard as ProductCardType } from '@/lib/types'
 
@@ -117,25 +119,32 @@ export default async function CatalogPage({
   searchParams: Promise<SearchParams>
 }) {
   const params = await searchParams
+  const dict = await getDictionary()
   const { categories, products } = await getCatalog(params)
 
   const categoryList = categories.length
-    ? categories.map((c) => ({ slug: c.slug ?? String(c.id), name: c.name }))
-    : FALLBACK_CATEGORIES
+    ? categories.map((c) => ({
+        slug: c.slug ?? String(c.id),
+        name: (dict.code === 'uz' ? c.name_uz : c.name) ?? c.name,
+      }))
+    : FALLBACK_CATEGORIES.map((c) => ({
+        slug: c.slug,
+        name: (dict.categories as Record<string, string>)[c.slug] ?? c.name,
+      }))
 
   return (
     <>
       <div className="border-b border-line bg-paper">
         <div className="mx-auto max-w-6xl px-4 py-10">
-          <h1 className="display gold-rule text-3xl text-text">Каталог мебели</h1>
+          <h1 className="display gold-rule text-3xl text-text">{dict.catalog.title}</h1>
 
           <form action="/catalog" className="mt-7 flex max-w-lg gap-2">
             <input
               type="search"
               name="q"
               defaultValue={params.q ?? ''}
-              placeholder="Поиск по каталогу"
-              aria-label="Поиск по каталогу"
+              placeholder={dict.catalog.searchPlaceholder}
+              aria-label={dict.catalog.searchPlaceholder}
               className="min-w-0 flex-1 rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
             />
             {params.category && <input type="hidden" name="category" value={params.category} />}
@@ -145,7 +154,7 @@ export default async function CatalogPage({
               type="submit"
               className="press rounded-[var(--radius)] bg-gold px-6 py-2.5 font-semibold text-white transition-colors hover:bg-gold-deep"
             >
-              Найти
+              {dict.common.search}
             </button>
           </form>
         </div>
@@ -156,7 +165,7 @@ export default async function CatalogPage({
         <div className="space-y-5">
           <div>
             <div className="mb-2.5 text-xs font-semibold uppercase tracking-widest text-text-muted">
-              Категория
+              {dict.catalog.category}
             </div>
             <div className="flex flex-wrap gap-2">
               {categoryList.map((category) => (
@@ -173,16 +182,16 @@ export default async function CatalogPage({
 
           <div>
             <div className="mb-2.5 text-xs font-semibold uppercase tracking-widest text-text-muted">
-              Тип
+              {dict.catalog.type}
             </div>
             <div className="flex flex-wrap gap-2">
-              {Object.entries(PRODUCT_TYPES).map(([value, label]) => (
+              {Object.keys(PRODUCT_TYPES).map((value) => (
                 <FilterChip
                   key={value}
                   href={filterHref(params, 'type', value)}
                   active={params.type === value}
                 >
-                  {label}
+                  {dict.productTypes[value as keyof typeof PRODUCT_TYPES]}
                 </FilterChip>
               ))}
             </div>
@@ -190,7 +199,10 @@ export default async function CatalogPage({
 
           <details>
             <summary className="cursor-pointer text-xs font-semibold uppercase tracking-widest text-text-muted hover:text-text">
-              Район {params.district && <span className="text-gold-deep">· {params.district}</span>}
+              {dict.catalog.district}{' '}
+              {params.district && (
+                <span className="text-gold-deep">· {districtIn(dict, params.district)}</span>
+              )}
             </summary>
             <div className="mt-3 flex flex-wrap gap-2">
               {DISTRICTS.map((district) => (
@@ -199,7 +211,7 @@ export default async function CatalogPage({
                   href={filterHref(params, 'district', district)}
                   active={params.district === district}
                 >
-                  {district}
+                  {districtIn(dict, district)}
                 </FilterChip>
               ))}
             </div>
@@ -210,7 +222,9 @@ export default async function CatalogPage({
         <div className="mt-12">
           {products.length > 0 ? (
             <>
-              <div className="mb-5 text-sm text-text-muted">Найдено: {products.length}</div>
+              <div className="mb-5 text-sm text-text-muted">
+                {dict.catalog.found}: {products.length}
+              </div>
               <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
@@ -219,12 +233,12 @@ export default async function CatalogPage({
             </>
           ) : (
             <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-14 text-center">
-              <p className="text-text-muted">По этому запросу пока ничего нет.</p>
+              <p className="text-text-muted">{dict.catalog.empty}</p>
               <Link
                 href="/catalog"
                 className="mt-3 inline-block font-semibold text-gold hover:underline"
               >
-                Сбросить фильтры
+                {dict.catalog.reset}
               </Link>
             </div>
           )}

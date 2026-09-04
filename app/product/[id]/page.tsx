@@ -2,7 +2,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { RequestForm } from '@/components/request-form'
 import { ContactButtons } from '@/components/contact-buttons'
-import { formatPrice, PRODUCT_TYPES, WORK_TYPES } from '@/lib/constants'
+import { formatPrice } from '@/lib/constants'
+import { districtIn, priceIn } from '@/lib/i18n'
+import { getDictionary } from '@/lib/locale'
 import { createClient } from '@/lib/supabase/server'
 import type { ProductCard as ProductCardType } from '@/lib/types'
 import { bumpViews } from '@/lib/views'
@@ -51,6 +53,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const dict = await getDictionary()
   const product = await getProduct(id)
   if (!product) notFound()
 
@@ -104,19 +107,18 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 {product.categories.name}
               </Link>
             )}
-            {product.type && <span>· {PRODUCT_TYPES[product.type]}</span>}
+            {product.type && <span>· {dict.productTypes[product.type]}</span>}
           </div>
 
           <h1 className="display mt-3 text-2xl leading-tight sm:text-3xl">{product.title}</h1>
 
           <div className="mt-5 border-y border-line py-5">
             <div className="display text-3xl text-gold-deep">
-              {formatPrice(product.price, product.price_from)}
+              {priceIn(dict, product.price, product.price_from)}
             </div>
             {product.type === 'custom_order' && (
               <p className="mt-2 text-sm leading-relaxed text-text-muted">
-                Мебель на заказ — итоговая цена зависит от размеров и материалов.
-                Позвоните мастеру и опишите, что нужно.
+                {dict.product.customNote}
               </p>
             )}
           </div>
@@ -128,7 +130,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           {company && (
             <div className="mt-8 rounded-[var(--radius)] border border-line bg-paper p-6">
               <div className="text-xs font-semibold uppercase tracking-widest text-text-muted">
-                Мастер
+                {dict.product.master}
               </div>
               <Link
                 href={`/company/${company.slug ?? company.id}`}
@@ -137,12 +139,18 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 {company.name}
               </Link>
               <div className="mt-1 text-sm text-text-muted">
-                {company.work_type && WORK_TYPES[company.work_type]}
-                {company.district && <span> · {company.district} район</span>}
+                {company.work_type && dict.workTypes[company.work_type]}
+                {company.district && (
+                  <span>
+                    {' · '}
+                    {districtIn(dict, company.district)} {dict.companies.district}
+                  </span>
+                )}
               </div>
 
               <div className="mt-5">
                 <ContactButtons
+                  dict={dict}
                   phone={company.phone_public}
                   telegram={company.telegram}
                   instagram={company.instagram}
@@ -157,10 +165,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           )}
 
           <p className="mt-6 text-xs leading-relaxed text-text-muted">
-            Mebel — витрина мастеров. Договор, оплата, сроки и качество — между вами и
-            мастером напрямую; площадка в сделке не участвует.{' '}
+            {dict.product.disclaimer}{' '}
             <Link href="/terms" className="underline hover:text-gold-deep">
-              Условия
+              {dict.product.terms}
             </Link>
           </p>
         </div>

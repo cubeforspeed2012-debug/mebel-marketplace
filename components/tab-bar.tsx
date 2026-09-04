@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { LiquidTabs, type TabItem } from '@/components/liquid-tabs'
+import { useDict } from '@/components/locale-provider'
 
 /* Иконки одной толщины — набор должен читаться как один комплект */
 
@@ -46,23 +47,26 @@ function IconProfile(active: boolean) {
   )
 }
 
-const TABS: (TabItem & { match: (path: string) => boolean })[] = [
-  { href: '/', label: 'Главная', icon: IconHome, match: (p) => p === '/' },
+const TABS: (Omit<TabItem, 'label'> & {
+  key: 'home' | 'catalog' | 'masters' | 'profile'
+  match: (path: string) => boolean
+})[] = [
+  { href: '/', key: 'home', icon: IconHome, match: (p) => p === '/' },
   {
     href: '/catalog',
-    label: 'Каталог',
+    key: 'catalog',
     icon: IconSearch,
     match: (p) => p.startsWith('/catalog') || p.startsWith('/product'),
   },
   {
     href: '/companies',
-    label: 'Мастера',
+    key: 'masters',
     icon: IconMasters,
     match: (p) => p.startsWith('/companies') || p.startsWith('/company'),
   },
   {
     href: '/dashboard',
-    label: 'Профиль',
+    key: 'profile',
     icon: IconProfile,
     match: (p) =>
       p.startsWith('/dashboard') ||
@@ -77,6 +81,7 @@ const TABS: (TabItem & { match: (path: string) => boolean })[] = [
  * и приподнятая кнопка главного действия посередине.
  */
 export function TabBar() {
+  const dict = useDict()
   const pathname = usePathname()
   useSearchParams() // держим компонент в Suspense-границе вместе с навигацией
 
@@ -84,16 +89,19 @@ export function TabBar() {
 
   return (
     <nav
-      aria-label="Основное меню"
+      aria-label={dict.nav.home}
       className="fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden"
     >
       <div className="glass relative w-full max-w-md rounded-[26px] px-2 py-1.5">
-        <LiquidTabs items={TABS} activeIndex={activeIndex} />
+        <LiquidTabs
+          items={TABS.map((tab) => ({ ...tab, label: dict.nav[tab.key] }))}
+          activeIndex={activeIndex}
+        />
 
         {/* Главное действие — приподнятая кнопка по центру */}
         <Link
           href="/dashboard/products/new"
-          aria-label="Разместить мебель"
+          aria-label={dict.nav.add}
           className="press absolute -top-7 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-[20px] bg-gold text-white shadow-[0_10px_24px_rgba(138,112,83,0.45)] transition-colors duration-200 hover:bg-gold-deep"
         >
           <svg viewBox="0 0 24 24" className="size-7" fill="none" strokeWidth={2.2}

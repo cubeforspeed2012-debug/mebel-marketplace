@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useActionState, useState } from 'react'
+import { useDict } from '@/components/locale-provider'
 import { OAuthButtons } from '@/components/oauth-buttons'
 import { signIn, signUp, type AuthState } from './actions'
 
@@ -46,6 +47,7 @@ export function AuthForm({
   next: string
   role?: 'seller' | 'buyer'
 }) {
+  const dict = useDict()
   const [mode, setMode] = useState<'in' | 'up'>(role === 'buyer' ? 'up' : 'in')
   const [signInState, signInAction, signingIn] = useActionState(signIn, EMPTY)
   const [signUpState, signUpAction, signingUp] = useActionState(signUp, EMPTY)
@@ -60,8 +62,8 @@ export function AuthForm({
       <div className="mb-8 flex rounded-2xl bg-cream p-1.5">
         {(
           [
-            ['in', 'Вход'],
-            ['up', 'Регистрация'],
+            ['in', dict.auth.signIn],
+            ['up', dict.auth.signUp],
           ] as const
         ).map(([value, label]) => (
           <button
@@ -82,8 +84,8 @@ export function AuthForm({
       {isLogin ? (
         <form action={signInAction} className="space-y-5">
           <input type="hidden" name="next" value={next} />
-          <Field label="Почта" name="email" type="email" placeholder="" />
-          <Field label="Пароль" name="password" type="password" placeholder="" />
+          <Field label={dict.auth.email} name="email" type="email" placeholder="" />
+          <Field label={dict.auth.password} name="password" type="password" placeholder="" />
 
           {state.error && (
             <p className="rounded-xl border border-[#b91c1c]/40 bg-[#b91c1c]/15 px-4 py-3 text-sm text-status-error">
@@ -96,15 +98,15 @@ export function AuthForm({
             disabled={pending}
             className="press w-full rounded-2xl bg-gold py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white shadow-[0_8px_22px_rgba(138,112,83,0.45)] hover:bg-gold-deep transition-opacity duration-200 disabled:opacity-60"
           >
-            {pending ? 'Входим…' : 'Войти'}
+            {pending ? dict.auth.signingIn : dict.auth.doSignIn}
           </button>
 
           <div className="flex items-center justify-between text-sm">
             <Link href="/auth/code" className="text-gold hover:underline">
-              Войти по коду
+              {dict.auth.codeLogin}
             </Link>
             <Link href="/auth/reset" className="text-text-muted hover:text-text">
-              Забыли пароль?
+              {dict.auth.forgot}
             </Link>
           </div>
         </form>
@@ -112,20 +114,18 @@ export function AuthForm({
         <form action={signUpAction} className="space-y-5">
           <input type="hidden" name="role" value={role} />
 
-          <Field label="Ваше имя" name="full_name" placeholder="" />
+          <Field label={dict.auth.name} name="full_name" placeholder="" />
           <Field
-            label="Телефон"
+            label={dict.auth.phone}
             name="phone"
             type="tel"
             placeholder=""
             hint={
-              role === 'buyer'
-                ? 'По нему мастер свяжется с вами по заявке'
-                : 'По нему с вами будут связываться клиенты'
+              role === 'buyer' ? dict.auth.phoneHintBuyer : dict.auth.phoneHintSeller
             }
           />
-          <Field label="Почта" name="email" type="email" placeholder="" />
-          <Field label="Пароль" name="password" type="password" placeholder="" />
+          <Field label={dict.auth.email} name="email" type="email" placeholder="" />
+          <Field label={dict.auth.password} name="password" type="password" placeholder="" />
 
           {state.error && (
             <p className="rounded-xl border border-[#b91c1c]/40 bg-[#b91c1c]/15 px-4 py-3 text-sm text-status-error">
@@ -143,13 +143,11 @@ export function AuthForm({
             disabled={pending}
             className="press w-full rounded-2xl bg-gold py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white shadow-[0_8px_22px_rgba(138,112,83,0.45)] hover:bg-gold-deep transition-opacity duration-200 disabled:opacity-60"
           >
-            {pending ? 'Создаём…' : 'Создать кабинет'}
+            {pending ? dict.auth.creating : dict.auth.createAccount}
           </button>
 
           <p className="text-center text-xs leading-relaxed text-text-muted">
-            {role === 'buyer'
-              ? 'Регистрация бесплатная. Все заявки мастерам — в одном месте.'
-              : 'Регистрация бесплатная. Дальше заполните профиль мастерской.'}
+            {role === 'buyer' ? dict.auth.freeBuyer : dict.auth.freeSeller}
           </p>
         </form>
       )}

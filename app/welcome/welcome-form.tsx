@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState, useState } from 'react'
+import { useDict } from '@/components/locale-provider'
 import { completeProfile, type WelcomeState } from './actions'
 
 const EMPTY: WelcomeState = {}
@@ -12,6 +13,7 @@ export function WelcomeForm({
   suggestedName: string
   role: 'seller' | 'buyer'
 }) {
+  const dict = useDict()
   const [state, action, pending] = useActionState(completeProfile, EMPTY)
   const [role, setRole] = useState<'seller' | 'buyer'>(initialRole)
 
@@ -22,7 +24,7 @@ export function WelcomeForm({
     >
       <label className="block">
         <span className="mb-2 block text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-text-muted">
-          Как вас зовут
+          {dict.welcome.name}
         </span>
         <input
           name="full_name"
@@ -33,13 +35,13 @@ export function WelcomeForm({
           className="w-full rounded-2xl border border-line bg-cream px-5 py-3.5 text-text outline-none transition-shadow duration-200 focus:shadow-[0_0_0_2px_var(--gold)]"
         />
         <span className="mt-1.5 block text-xs text-text-muted">
-          Это имя увидят люди, с которыми вы будете общаться на площадке
+          {dict.welcome.nameHint}
         </span>
       </label>
 
       <label className="mt-5 block">
         <span className="mb-2 block text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-text-muted">
-          Телефон
+          {dict.welcome.phone}
         </span>
         <input
           name="phone"
@@ -49,23 +51,21 @@ export function WelcomeForm({
           className="w-full rounded-2xl border border-line bg-cream px-5 py-3.5 text-text outline-none transition-shadow duration-200 focus:shadow-[0_0_0_2px_var(--gold)]"
         />
         <span className="mt-1.5 block text-xs text-text-muted">
-          {role === 'seller'
-            ? 'По нему с вами будут связываться клиенты'
-            : 'По нему мастер свяжется с вами по заявке'}
+          {role === 'seller' ? dict.welcome.phoneHintSeller : dict.welcome.phoneHintBuyer}
         </span>
       </label>
 
       {/* Через Google не понять, мастер человек или покупатель — спрашиваем прямо */}
       <div className="mt-6">
         <span className="mb-2 block text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-text-muted">
-          Зачем вы здесь
+          {dict.welcome.role}
         </span>
         <input type="hidden" name="role" value={role} />
         <div className="flex rounded-2xl bg-cream p-1.5">
           {(
             [
-              ['buyer', 'Ищу мебель'],
-              ['seller', 'Делаю мебель'],
+              ['buyer', dict.welcome.roleBuyer],
+              ['seller', dict.welcome.roleSeller],
             ] as const
           ).map(([value, label]) => (
             <button
@@ -95,7 +95,7 @@ export function WelcomeForm({
         disabled={pending}
         className="press mt-7 w-full rounded-2xl bg-gold py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white shadow-[0_8px_22px_rgba(138,112,83,0.45)] transition-opacity duration-200 hover:bg-gold-deep disabled:opacity-60"
       >
-        {pending ? 'Сохраняем…' : 'Продолжить'}
+        {pending ? dict.welcome.saving : dict.welcome.submit}
       </button>
     </form>
   )

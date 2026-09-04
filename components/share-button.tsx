@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { useDict } from '@/components/locale-provider'
 
 /**
  * Кнопка «Поделиться». Мастер сам рассылает свою страницу клиентам —
  * на телефоне открывается системное меню, на компьютере копируется ссылка.
  */
 export function ShareButton({ title }: { title: string }) {
+  const dict = useDict()
   const [copied, setCopied] = useState(false)
 
   async function share() {
@@ -43,7 +45,7 @@ export function ShareButton({ title }: { title: string }) {
         <path d="m8 7 4-4 4 4" />
         <path d="M5 13v6.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V13" />
       </svg>
-      {copied ? 'Ссылка скопирована' : 'Поделиться'}
+      {copied ? dict.common.shareCopied : dict.common.share}
     </button>
   )
 }

@@ -1,9 +1,14 @@
+'use client'
+
 import Link from 'next/link'
-import { WORK_TYPES } from '@/lib/constants'
+import { useDict } from '@/components/locale-provider'
+import { districtIn } from '@/lib/i18n'
 import type { Company } from '@/lib/types'
 
 /** Карточка мебельщика в списке мастеров. */
 export function CompanyCard({ company }: { company: Company }) {
+  const dict = useDict()
+
   return (
     <Link
       href={`/company/${company.slug ?? company.id}`}
@@ -29,8 +34,8 @@ export function CompanyCard({ company }: { company: Company }) {
         <h3 className="truncate font-semibold text-text">{company.name}</h3>
 
         <div className="eyebrow mt-1">
-          {company.work_type && WORK_TYPES[company.work_type]}
-          {company.district && <span> · {company.district}</span>}
+          {company.work_type && dict.workTypes[company.work_type]}
+          {company.district && <span> · {districtIn(dict, company.district)}</span>}
         </div>
 
         {company.description && (

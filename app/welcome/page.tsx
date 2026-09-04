@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { getDictionary } from '@/lib/locale'
 import { createClient } from '@/lib/supabase/server'
 import { WelcomeForm } from './welcome-form'
 
@@ -10,6 +11,7 @@ export default async function WelcomePage({
   searchParams: Promise<{ next?: string }>
 }) {
   const { next } = await searchParams
+  const dict = await getDictionary()
   const supabase = await createClient()
 
   const {
@@ -45,18 +47,18 @@ export default async function WelcomePage({
       <div className="animate-page w-full max-w-md">
         <div className="mb-7 text-center">
           <div className="text-[0.6875rem] font-semibold uppercase tracking-[0.35em] text-text-muted">
-            Mebel · Ташкент
+            {dict.welcome.brand}
           </div>
-          <h1 className="display mt-4 text-2xl text-text">Давайте познакомимся</h1>
+          <h1 className="display mt-4 text-2xl text-text">{dict.welcome.title}</h1>
           <p className="mt-2 text-sm text-text-muted">
-            Осталось два поля — и кабинет ваш
+            {dict.welcome.subtitle}
           </p>
         </div>
 
         <WelcomeForm suggestedName={suggested} role={role} />
 
         <p className="mt-7 text-center text-xs leading-relaxed text-text-muted">
-          Имя и телефон можно поменять в кабинете в любой момент.
+          {dict.welcome.note}
         </p>
       </div>
     </div>

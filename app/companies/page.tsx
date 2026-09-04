@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { CompanyCard } from '@/components/company-card'
 import { DISTRICTS, WORK_TYPES } from '@/lib/constants'
+import { districtIn } from '@/lib/i18n'
+import { getDictionary } from '@/lib/locale'
 import { createClient } from '@/lib/supabase/server'
 import type { Company } from '@/lib/types'
 
@@ -81,16 +83,16 @@ export default async function CompaniesPage({
   searchParams: Promise<SearchParams>
 }) {
   const params = await searchParams
+  const dict = await getDictionary()
   const companies = await getCompanies(params)
 
   return (
     <>
       <div className="border-b border-line bg-paper">
         <div className="mx-auto max-w-6xl px-4 py-10">
-          <h1 className="display gold-rule text-3xl text-text">Мастера Ташкента</h1>
+          <h1 className="display gold-rule text-3xl text-text">{dict.companies.title}</h1>
           <p className="mt-6 max-w-xl leading-relaxed text-text-muted">
-            Фабрики, цеха и частные мастера города. Выбирайте по типу работы и району —
-            и звоните напрямую.
+            {dict.companies.lead}
           </p>
         </div>
       </div>
@@ -99,16 +101,16 @@ export default async function CompaniesPage({
         <div className="space-y-5">
           <div>
             <div className="mb-2.5 text-xs font-semibold uppercase tracking-widest text-text-muted">
-              Что делают
+              {dict.companies.filterWork}
             </div>
             <div className="flex flex-wrap gap-2">
-              {Object.entries(WORK_TYPES).map(([value, label]) => (
+              {Object.keys(WORK_TYPES).map((value) => (
                 <Chip
                   key={value}
                   href={chipHref(params, 'work_type', value)}
                   active={params.work_type === value}
                 >
-                  {label}
+                  {dict.workTypes[value as keyof typeof WORK_TYPES]}
                 </Chip>
               ))}
             </div>
@@ -116,7 +118,10 @@ export default async function CompaniesPage({
 
           <details>
             <summary className="cursor-pointer text-xs font-semibold uppercase tracking-widest text-text-muted hover:text-text">
-              Район {params.district && <span className="text-gold-deep">· {params.district}</span>}
+              {dict.catalog.district}{' '}
+              {params.district && (
+                <span className="text-gold-deep">· {districtIn(dict, params.district)}</span>
+              )}
             </summary>
             <div className="mt-3 flex flex-wrap gap-2">
               {DISTRICTS.map((district) => (
@@ -125,7 +130,7 @@ export default async function CompaniesPage({
                   href={chipHref(params, 'district', district)}
                   active={params.district === district}
                 >
-                  {district}
+                  {districtIn(dict, district)}
                 </Chip>
               ))}
             </div>
@@ -141,12 +146,12 @@ export default async function CompaniesPage({
             </div>
           ) : (
             <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-14 text-center">
-              <p className="text-text-muted">Мастеров пока нет — площадка только запускается.</p>
+              <p className="text-text-muted">{dict.companies.empty}</p>
               <Link
                 href="/dashboard"
                 className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
               >
-                Стать первым мастером на площадке
+                {dict.companies.emptyAction}
               </Link>
             </div>
           )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useDict } from '@/components/locale-provider'
 import { createClient } from '@/lib/supabase/client'
 
 /** Логотип Google — фирменные цвета, иначе кнопка выглядит подделкой. */
@@ -32,6 +33,7 @@ function GoogleMark() {
  * если он не настроен, показываем понятную подсказку, а не ошибку.
  */
 export function OAuthButtons({ next = '/dashboard' }: { next?: string }) {
+  const dict = useDict()
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -51,14 +53,14 @@ export function OAuthButtons({ next = '/dashboard' }: { next?: string }) {
       if (authError) {
         setError(
           /not enabled|unsupported|provider/i.test(authError.message)
-            ? 'Вход через Google ещё не подключён'
+            ? dict.auth.googleOff
             : authError.message,
         )
         setBusy(false)
       }
       // При успехе браузер уходит на страницу Google — состояние не сбрасываем.
     } catch {
-      setError('Не удалось открыть окно входа. Попробуйте ещё раз')
+      setError(dict.auth.googleFailed)
       setBusy(false)
     }
   }
@@ -67,7 +69,7 @@ export function OAuthButtons({ next = '/dashboard' }: { next?: string }) {
     <div>
       <div className="mb-4 flex items-center gap-3 text-xs uppercase tracking-widest text-text-muted">
         <span className="h-px flex-1 bg-line" />
-        или
+        {dict.auth.or}
         <span className="h-px flex-1 bg-line" />
       </div>
 
@@ -78,7 +80,7 @@ export function OAuthButtons({ next = '/dashboard' }: { next?: string }) {
         className="flex w-full items-center justify-center gap-3 border border-line px-5 py-2.5 font-medium transition-colors hover:border-gold disabled:opacity-60"
       >
         <GoogleMark />
-        {busy ? 'Открываем…' : 'Продолжить с Google'}
+        {busy ? dict.auth.googleOpening : dict.auth.google}
       </button>
 
       {error && <p className="mt-3 text-sm text-status-error">{error}</p>}

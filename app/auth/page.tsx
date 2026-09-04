@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { getDictionary } from '@/lib/locale'
 import { createClient } from '@/lib/supabase/server'
 import { AuthForm } from './auth-form'
 
@@ -13,6 +14,7 @@ export default async function AuthPage({
   searchParams: Promise<{ next?: string; role?: string; error?: string }>
 }) {
   const { next, role: roleParam, error } = await searchParams
+  const dict = await getDictionary()
   const role = roleParam === 'buyer' ? 'buyer' : 'seller'
 
   // Уже вошёл — сразу в кабинет. Если база недоступна, показываем форму.
@@ -29,11 +31,8 @@ export default async function AuthPage({
 
   if (signedIn) redirect(next ?? '/dashboard')
 
-  const heading = role === 'buyer' ? 'Личный кабинет' : 'Кабинет мастера'
-  const subtitle =
-    role === 'buyer'
-      ? 'Заявки мастерам и история обращений — в одном месте'
-      : 'Работы, заявки и клиенты — в одном месте'
+  const heading = role === 'buyer' ? dict.auth.buyerTitle : dict.auth.sellerTitle
+  const subtitle = role === 'buyer' ? dict.auth.buyerSubtitle : dict.auth.sellerSubtitle
 
   return (
     <div
@@ -45,7 +44,7 @@ export default async function AuthPage({
       <div className="animate-page w-full max-w-md">
         <div className="mb-7 text-center">
           <div className="text-[0.6875rem] font-semibold uppercase tracking-[0.35em] text-text-muted">
-            Mebel · Ташкент
+            {dict.auth.brand}
           </div>
           <h1 className="mt-4 display text-2xl text-text">{heading}</h1>
           <p className="mt-2 text-sm text-text-muted">{subtitle}</p>
@@ -53,7 +52,7 @@ export default async function AuthPage({
 
         {error === 'link' && (
           <p className="mb-5 rounded-2xl border border-gold bg-gold-soft px-4 py-3 text-center text-sm text-text">
-            Ссылка из письма просрочена или уже использована. Запросите новую.
+            {dict.auth.linkExpired}
           </p>
         )}
 
@@ -62,16 +61,16 @@ export default async function AuthPage({
         <p className="mt-7 text-center text-sm text-text-muted">
           {role === 'buyer' ? (
             <>
-              Делаете мебель?{' '}
+              {dict.auth.orSeller}{' '}
               <a href="/auth" className="text-gold hover:underline">
-                Кабинет мастера
+                {dict.auth.orSellerLink}
               </a>
             </>
           ) : (
             <>
-              Ищете мебель?{' '}
+              {dict.auth.orBuyer}{' '}
               <a href="/auth?role=buyer" className="text-gold hover:underline">
-                Кабинет покупателя
+                {dict.auth.orBuyerLink}
               </a>
             </>
           )}

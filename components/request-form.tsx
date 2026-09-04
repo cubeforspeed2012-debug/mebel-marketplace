@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from 'react'
 import { sendRequest, type RequestState } from '@/app/actions/request'
+import { useDict } from '@/components/locale-provider'
 
 const EMPTY: RequestState = {}
 
@@ -18,6 +19,7 @@ export function RequestForm({
   productId?: number
   compact?: boolean
 }) {
+  const dict = useDict()
   const [open, setOpen] = useState(false)
   const [state, action, pending] = useActionState(sendRequest, EMPTY)
 
@@ -38,7 +40,7 @@ export function RequestForm({
           compact ? 'w-full px-6 py-3 text-center' : 'px-7 py-3'
         }`}
       >
-        Написать заявку
+        {dict.request.button}
       </button>
     )
   }
@@ -59,20 +61,20 @@ export function RequestForm({
       />
 
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-semibold">Заявка мастеру</h3>
+        <h3 className="font-semibold">{dict.request.title}</h3>
         <button
           type="button"
           onClick={() => setOpen(false)}
           className="text-sm text-text-muted hover:text-text"
         >
-          Закрыть
+          {dict.request.close}
         </button>
       </div>
 
       <div className="space-y-3">
         <label className="block">
           <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
-            Ваше имя
+            {dict.request.name}
           </span>
           <input
             name="name"
@@ -83,7 +85,7 @@ export function RequestForm({
 
         <label className="block">
           <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
-            Телефон
+            {dict.request.phone}
           </span>
           <input
             name="phone"
@@ -96,12 +98,12 @@ export function RequestForm({
 
         <label className="block">
           <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
-            Что нужно
+            {dict.request.comment}
           </span>
           <textarea
             name="message"
             rows={3}
-            placeholder="Например: кухня 3 метра, фасады МДФ, нужен замер"
+            placeholder={dict.request.commentPlaceholder}
             className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none focus:border-gold"
           />
         </label>
@@ -114,12 +116,11 @@ export function RequestForm({
         disabled={pending}
         className="mt-5 w-full bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep disabled:opacity-60"
       >
-        {pending ? 'Отправляем…' : 'Отправить заявку'}
+        {pending ? dict.request.sending : dict.request.submit}
       </button>
 
       <p className="mt-3 text-xs leading-relaxed text-text-muted">
-        Заявка уйдёт напрямую мастеру. Договариваетесь и оплачиваете вы с ним —
-        площадка в сделке не участвует.
+        {dict.request.note}
       </p>
     </form>
   )

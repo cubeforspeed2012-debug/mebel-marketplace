@@ -1,4 +1,5 @@
 import { formatPhone, instagramHref, telHref, telegramHref } from '@/lib/constants'
+import type { Dict } from '@/lib/i18n'
 
 /* Значки мессенджеров рисуем сами: чужие библиотеки ради двух иконок не тянем */
 
@@ -36,11 +37,13 @@ function PhoneMark() {
  * поэтому мессенджеры стоят рядом, а не спрятаны внизу страницы.
  */
 export function ContactButtons({
+  dict,
   phone,
   telegram,
   instagram,
   size = 'large',
 }: {
+  dict: Dict
   phone: string | null
   telegram?: string | null
   instagram?: string | null
@@ -60,7 +63,7 @@ export function ContactButtons({
           className={`press inline-flex items-center gap-2 rounded-full bg-gold font-semibold text-white transition-colors hover:bg-gold-deep ${base}`}
         >
           <PhoneMark />
-          {big ? `Позвонить ${formatPhone(phone)}` : 'Позвонить'}
+          {big ? `${dict.company.call} ${formatPhone(phone)}` : dict.company.call}
         </a>
       )}
 

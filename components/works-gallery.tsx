@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { formatPrice } from '@/lib/constants'
+import { useDict } from '@/components/locale-provider'
+import { priceIn } from '@/lib/i18n'
 
 export type Work = {
   url: string
@@ -18,6 +19,7 @@ export type Work = {
  * крупные, а не мелкими карточками: сначала работа, потом подписи.
  */
 export function WorksGallery({ works }: { works: Work[] }) {
+  const dict = useDict()
   const [open, setOpen] = useState<number | null>(null)
   const touchStart = useRef<number | null>(null)
 
@@ -67,7 +69,7 @@ export function WorksGallery({ works }: { works: Work[] }) {
             className={`group relative overflow-hidden rounded-[var(--radius)] border border-line bg-cream ${
               index === 0 ? 'col-span-2 row-span-2 sm:col-span-2' : ''
             }`}
-            aria-label={`Открыть фото: ${work.title}`}
+            aria-label={`${dict.gallery.open}: ${work.title}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -101,14 +103,14 @@ export function WorksGallery({ works }: { works: Work[] }) {
         >
           <div className="flex items-center justify-between px-4 py-4 text-sm text-white/70">
             <span>
-              {(open ?? 0) + 1} из {works.length}
+              {(open ?? 0) + 1} {dict.gallery.of} {works.length}
             </span>
             <button
               type="button"
               onClick={close}
               className="press rounded-full bg-white/10 px-4 py-2 text-white transition-colors hover:bg-white/20"
             >
-              Закрыть
+              {dict.gallery.close}
             </button>
           </div>
 
@@ -130,8 +132,7 @@ export function WorksGallery({ works }: { works: Work[] }) {
               <div className="truncate font-semibold text-white">{current.title}</div>
               {current.price !== null && (
                 <div className="text-sm text-white/60">
-                  {current.priceFrom && 'от '}
-                  {formatPrice(current.price)}
+                  {priceIn(dict, current.price, current.priceFrom)}
                 </div>
               )}
             </div>
@@ -142,7 +143,7 @@ export function WorksGallery({ works }: { works: Work[] }) {
                   <button
                     type="button"
                     onClick={() => move(-1)}
-                    aria-label="Предыдущее фото"
+                    aria-label={dict.gallery.prev}
                     className="press rounded-full bg-white/10 px-4 py-2 text-white transition-colors hover:bg-white/20"
                   >
                     ←
@@ -150,7 +151,7 @@ export function WorksGallery({ works }: { works: Work[] }) {
                   <button
                     type="button"
                     onClick={() => move(1)}
-                    aria-label="Следующее фото"
+                    aria-label={dict.gallery.next}
                     className="press rounded-full bg-white/10 px-4 py-2 text-white transition-colors hover:bg-white/20"
                   >
                     →
@@ -161,7 +162,7 @@ export function WorksGallery({ works }: { works: Work[] }) {
                 href={`/product/${current.productId}`}
                 className="press rounded-full bg-gold px-5 py-2 font-semibold text-white transition-colors hover:bg-gold-deep"
               >
-                Открыть работу
+                {dict.gallery.openWork}
               </Link>
             </div>
           </div>
