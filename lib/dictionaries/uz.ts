@@ -22,6 +22,7 @@ export const uz: typeof ru = {
     masters: 'Ustalar',
     home: 'Bosh sahifa',
     profile: 'Profil',
+    admin: 'Boshqaruv',
     signIn: 'Kirish',
     postFurniture: 'Mebel joylashtirish',
     add: "Qo'shish",

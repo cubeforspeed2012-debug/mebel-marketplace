@@ -23,6 +23,7 @@ export const ru = {
     masters: 'Мастера',
     home: 'Главная',
     profile: 'Профиль',
+    admin: 'Панель',
     signIn: 'Войти',
     postFurniture: 'Разместить мебель',
     add: 'Добавить',

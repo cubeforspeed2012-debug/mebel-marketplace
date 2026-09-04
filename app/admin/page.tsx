@@ -192,6 +192,15 @@ export default async function AdminPage({
             Просмотры считаются при каждом открытии страницы мастера или товара —
             это не уникальные люди, а обращения к площадке.
           </p>
+
+          {/* Видит ли сайт ключ помощника. Само значение не показываем и не пишем в логи */}
+          <p className="mt-3 flex items-center gap-2 text-xs text-[#6b6b6b]">
+            <span
+              className={`size-2 rounded-full ${aiReady ? 'bg-[#4b9d63]' : 'bg-[#b91c1c]'}`}
+              aria-hidden
+            />
+            Помощник для мастеров: {aiReady ? 'ключ на месте' : 'ключа нет'}
+          </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">

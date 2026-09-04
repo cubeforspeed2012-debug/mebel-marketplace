@@ -10,6 +10,7 @@ import { TabBar } from '@/components/tab-bar'
 import type { Dict } from '@/lib/i18n'
 import { getLocale } from '@/lib/locale'
 import { getDict } from '@/lib/i18n'
+import { createClient } from '@/lib/supabase/server'
 import './globals.css'
 
 const inter = Inter({
@@ -154,6 +155,26 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = await getLocale()
   const dict = getDict(locale)
 
+  // Администратору в нижнем меню нужна кнопка панели управления
+  let isAdmin = false
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .maybeSingle()
+      isAdmin = profile?.role === 'admin'
+    }
+  } catch {
+    isAdmin = false
+  }
+
   return (
     <html lang={locale} className={`${inter.variable} ${manrope.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
@@ -166,7 +187,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           {/* Нижнее меню на телефоне */}
           <Suspense fallback={null}>
-            <TabBar />
+            <TabBar isAdmin={isAdmin} />
           </Suspense>
         </LocaleProvider>
       </body>

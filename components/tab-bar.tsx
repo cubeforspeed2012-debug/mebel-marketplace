@@ -37,6 +37,16 @@ function IconMasters(active: boolean) {
   )
 }
 
+function IconPanel(active: boolean) {
+  return (
+    <svg viewBox="0 0 24 24" className="size-[22px]" fill="none" strokeWidth={active ? 2.4 : 1.8}
+         stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 3.5v8.5h8.5" />
+    </svg>
+  )
+}
+
 function IconProfile(active: boolean) {
   return (
     <svg viewBox="0 0 24 24" className="size-[22px]" fill="none" strokeWidth={active ? 2.4 : 1.8}
@@ -48,7 +58,7 @@ function IconProfile(active: boolean) {
 }
 
 const TABS: (Omit<TabItem, 'label'> & {
-  key: 'home' | 'catalog' | 'masters' | 'profile'
+  key: 'home' | 'catalog' | 'masters' | 'profile' | 'admin'
   match: (path: string) => boolean
 })[] = [
   { href: '/', key: 'home', icon: IconHome, match: (p) => p === '/' },
@@ -81,12 +91,27 @@ const TABS: (Omit<TabItem, 'label'> & {
  * Нижнее меню на телефоне: стеклянная плашка, перетекающая капсула
  * и приподнятая кнопка главного действия посередине.
  */
-export function TabBar() {
+export function TabBar({ isAdmin = false }: { isAdmin?: boolean }) {
   const dict = useDict()
   const pathname = usePathname()
   useSearchParams() // держим компонент в Suspense-границе вместе с навигацией
 
-  const activeIndex = TABS.findIndex((tab) => tab.match(pathname))
+  // У администратора вместо «Мастеров» — вход в панель управления:
+  // мастеров он и так видит внутри неё, а панель нужна каждый день.
+  const tabs = isAdmin
+    ? TABS.map((tab) =>
+        tab.key === 'masters'
+          ? {
+              href: '/admin',
+              key: 'admin' as const,
+              icon: IconPanel,
+              match: (p: string) => p.startsWith('/admin'),
+            }
+          : tab,
+      )
+    : TABS
+
+  const activeIndex = tabs.findIndex((tab) => tab.match(pathname))
 
   return (
     <nav
@@ -95,7 +120,7 @@ export function TabBar() {
     >
       <div className="glass relative w-full max-w-md rounded-[26px] px-2 py-1.5">
         <LiquidTabs
-          items={TABS.map((tab) => ({ ...tab, label: dict.nav[tab.key] }))}
+          items={tabs.map((tab) => ({ ...tab, label: dict.nav[tab.key] }))}
           activeIndex={activeIndex}
         />
 
