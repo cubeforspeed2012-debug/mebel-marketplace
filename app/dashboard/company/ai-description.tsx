@@ -1,16 +1,30 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { WORK_TYPES } from '@/lib/constants'
 import { suggestDescription, type DescriptionState } from './ai-actions'
 
-function Small({
+/* Готовые ответы на то, что покупатель в Ташкенте спрашивает первым делом.
+   Мастеру быстрее нажать, чем печатать, а профиль от этого сразу крепче. */
+const ADVANTAGES = [
+  'Бесплатный замер',
+  'Доставка и установка',
+  'Работаем по договору',
+  'Свой цех',
+  '3D-проект до заказа',
+  'Рассрочка',
+  'Выезд по всему Ташкенту',
+  'Гарантийное обслуживание',
+]
+
+function Field({
   label,
+  hint,
   placeholder,
   value,
   onChange,
 }: {
   label: string
+  hint?: string
   placeholder: string
   value: string
   onChange: (value: string) => void
@@ -26,14 +40,17 @@ function Small({
         placeholder={placeholder}
         className="w-full rounded-2xl bg-cream px-4 py-2.5 text-sm text-text outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
       />
+      {hint && <span className="mt-1 block text-xs text-text-muted">{hint}</span>}
     </label>
   )
 }
 
 /**
- * Помощник для текста «О мастерской». Мастеру трудно писать о себе с чистого листа,
- * зато он легко отвечает на конкретные вопросы — из ответов и собираем текст.
- * Готовый текст не подставляется молча: человек сначала читает и решает сам.
+ * Помощник для профиля мастерской.
+ *
+ * Вопросы подобраны не «чтобы был текст», а по тому, что покупатель мебели
+ * в Ташкенте выясняет перед звонком: сроки, гарантия, замер, от какой цены.
+ * Ответы идут и в текст, и в советы — где профиль ещё дырявый.
  */
 export function AiDescription({
   companyName,
@@ -52,7 +69,16 @@ export function AiDescription({
   const [makes, setMakes] = useState('')
   const [materials, setMaterials] = useState('')
   const [warranty, setWarranty] = useState('')
+  const [term, setTerm] = useState('')
+  const [priceFrom, setPriceFrom] = useState('')
+  const [chosen, setChosen] = useState<string[]>([])
   const [extra, setExtra] = useState('')
+
+  function toggle(item: string) {
+    setChosen((current) =>
+      current.includes(item) ? current.filter((value) => value !== item) : [...current, item],
+    )
+  }
 
   function write() {
     const data = new FormData()
@@ -62,6 +88,9 @@ export function AiDescription({
     data.set('makes', makes)
     data.set('materials', materials)
     data.set('warranty', warranty)
+    data.set('term', term)
+    data.set('price_from', priceFrom)
+    data.set('advantages', chosen.join(', '))
     data.set('extra', extra)
 
     startTransition(async () => {
@@ -90,8 +119,8 @@ export function AiDescription({
         <div>
           <div className="font-semibold text-text">Помощник напишет за вас</div>
           <p className="mt-1 text-sm leading-relaxed text-text-muted">
-            Ответьте коротко — помощник соберёт из этого нормальный текст. Заполнять всё
-            не обязательно.
+            Это то, что покупатель выясняет перед звонком. Ответьте коротко — помощник
+            соберёт текст и подскажет, что ещё добавить, чтобы звонили чаще.
           </p>
         </div>
         <button
@@ -103,32 +132,75 @@ export function AiDescription({
         </button>
       </div>
 
-      {/* Не форма: этот блок живёт внутри формы профиля, вложенные формы браузер не пускает */}
+      {/* Не форма: блок живёт внутри формы профиля, вложенные формы браузер не пускает */}
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <Small
+        <Field
           label="Сколько лет работаете"
           placeholder="7 лет"
           value={years}
           onChange={setYears}
         />
-        <Small
+        <Field
           label="Что делаете чаще всего"
+          hint="Чем уже специализация, тем охотнее звонят"
           placeholder="кухни и шкафы-купе"
           value={makes}
           onChange={setMakes}
         />
-        <Small
-          label="Материалы"
+        <Field
+          label="Материалы и фурнитура"
+          hint="Названия брендов внушают доверие"
           placeholder="МДФ, ЛДСП Egger, фурнитура Blum"
           value={materials}
           onChange={setMaterials}
         />
-        <Small
+        <Field
           label="Гарантия"
           placeholder="2 года на фурнитуру"
           value={warranty}
           onChange={setWarranty}
         />
+        <Field
+          label="Срок изготовления"
+          hint="Первый вопрос почти каждого клиента"
+          placeholder="3 недели на кухню"
+          value={term}
+          onChange={setTerm}
+        />
+        <Field
+          label="Цена от"
+          hint="Отсекает тех, кто искал дешевле — вам меньше пустых звонков"
+          placeholder="от 4 000 000 сум за погонный метр"
+          value={priceFrom}
+          onChange={setPriceFrom}
+        />
+
+        <div className="sm:col-span-2">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-widest text-text-muted">
+            Что входит — нажмите на своё
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {ADVANTAGES.map((item) => {
+              const active = chosen.includes(item)
+
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => toggle(item)}
+                  aria-pressed={active}
+                  className={`press rounded-full px-4 py-2 text-sm transition-colors duration-200 ${
+                    active
+                      ? 'bg-gold font-semibold text-white'
+                      : 'bg-paper text-text-muted hover:text-text'
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+            })}
+          </div>
+        </div>
 
         <label className="block sm:col-span-2">
           <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
@@ -138,7 +210,7 @@ export function AiDescription({
             rows={2}
             value={extra}
             onChange={(event) => setExtra(event.target.value)}
-            placeholder="Бесплатный замер по городу, свой цех, делаем за 3 недели"
+            placeholder="Делаем сложные угловые кухни, работаем с дизайнерами, есть свой сборщик"
             className="w-full rounded-2xl bg-paper px-4 py-2.5 text-sm text-text outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
           />
         </label>
@@ -150,7 +222,7 @@ export function AiDescription({
             disabled={pending}
             className="press rounded-full bg-gold px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-deep disabled:opacity-60"
           >
-            {pending ? 'Пишем…' : 'Написать текст'}
+            {pending ? 'Пишем…' : 'Написать текст и советы'}
           </button>
         </div>
       </div>
@@ -163,22 +235,49 @@ export function AiDescription({
 
       {state.text && (
         <div className="animate-fade mt-4 rounded-2xl bg-paper p-4">
-          <p className="whitespace-pre-line leading-relaxed text-text">{state.text}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="text-xs font-semibold uppercase tracking-widest text-text-muted">
+            Текст о мастерской
+          </div>
+          <p className="mt-2 whitespace-pre-line leading-relaxed text-text">{state.text}</p>
+
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => {
-                onUse(state.text ?? '')
-                setOpen(false)
-              }}
+              onClick={() => onUse(state.text ?? '')}
               className="press rounded-full bg-gold px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-gold-deep"
             >
               Вставить в профиль
             </button>
-            <span className="self-center text-xs text-text-muted">
+            <button
+              type="button"
+              onClick={write}
+              disabled={pending}
+              className="press rounded-full bg-cream px-5 py-2 text-sm text-text transition-colors hover:bg-sand disabled:opacity-60"
+            >
+              Другой вариант
+            </button>
+            <span className="text-xs text-text-muted">
               Перечитайте и поправьте — это ваш текст, а не помощника
             </span>
           </div>
+        </div>
+      )}
+
+      {state.tips && state.tips.length > 0 && (
+        <div className="animate-fade mt-3 rounded-2xl bg-paper p-4">
+          <div className="text-xs font-semibold uppercase tracking-widest text-gold">
+            Чтобы звонили чаще
+          </div>
+          <ul className="mt-3 space-y-2.5">
+            {state.tips.map((tip, index) => (
+              <li key={tip} className="flex gap-3 text-sm leading-relaxed text-text">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-gold-soft text-xs font-semibold text-gold">
+                  {index + 1}
+                </span>
+                {tip}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
