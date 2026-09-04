@@ -193,14 +193,55 @@ export default async function AdminPage({
             это не уникальные люди, а обращения к площадке.
           </p>
 
-          {/* Видит ли сайт ключ помощника. Само значение не показываем и не пишем в логи */}
-          <p className="mt-3 flex items-center gap-2 text-xs text-[#6b6b6b]">
-            <span
-              className={`size-2 rounded-full ${aiReady ? 'bg-[#4b9d63]' : 'bg-[#b91c1c]'}`}
-              aria-hidden
-            />
-            Помощник для мастеров: {aiReady ? 'ключ на месте' : 'ключа нет'}
-          </p>
+          {/* Быстрые дела и состояние помощника — под графиком, чтобы колонка не пустовала */}
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <Link
+              href="/admin/approvals"
+              className="rounded-3xl bg-[#1f1f1f] p-5 transition-colors hover:bg-[#242424]"
+            >
+              <div className="font-semibold text-white">Одобрение мастерских</div>
+              <p className="mt-1.5 text-sm leading-relaxed text-[#8f8f8f]">
+                {(overview?.companies_pending ?? 0) > 0
+                  ? `Ждут решения: ${overview?.companies_pending}`
+                  : 'Очередь разобрана'}
+              </p>
+            </Link>
+
+            <Link
+              href="/admin/users"
+              className="rounded-3xl bg-[#1f1f1f] p-5 transition-colors hover:bg-[#242424]"
+            >
+              <div className="font-semibold text-white">Аккаунты</div>
+              <p className="mt-1.5 text-sm leading-relaxed text-[#8f8f8f]">
+                Всего людей на площадке: {overview?.users_total ?? 0}
+              </p>
+            </Link>
+
+            {/* Видит ли сайт ключ помощника. Само значение не показываем и не пишем в логи */}
+            <div className="rounded-3xl bg-[#1f1f1f] p-5 sm:col-span-2">
+              <div className="flex flex-wrap items-center gap-3">
+                <span
+                  className={`size-2.5 rounded-full ${aiReady ? 'bg-[#4b9d63]' : 'bg-[#b91c1c]'}`}
+                  aria-hidden
+                />
+                <span className="font-semibold text-white">Помощник для мастеров</span>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${
+                    aiReady
+                      ? 'bg-[#4b9d63]/20 text-[#7fd39a]'
+                      : 'bg-[#b91c1c]/20 text-[#f0908f]'
+                  }`}
+                >
+                  {aiReady ? 'Работает' : 'Ключа нет'}
+                </span>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#8f8f8f]">
+                {aiReady
+                  ? 'Мастера могут нажать «Помочь с текстом» в профиле мастерской: помощник напишет описание и подскажет, что доделать, чтобы звонили чаще.'
+                  : 'Добавьте ключ Groq в настройках воркера как Secret с именем GROQ_API_KEY — и помощник заработает.'}
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
