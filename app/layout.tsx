@@ -3,6 +3,7 @@ import { Inter, Manrope } from 'next/font/google'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { HeaderNav } from '@/components/header-nav'
+import { InstallApp } from '@/components/install-app'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { LocaleProvider } from '@/components/locale-provider'
 import { TabBar } from '@/components/tab-bar'
@@ -36,6 +37,15 @@ export const metadata: Metadata = {
   description:
     'Каталог мебельных мастеров и фабрик Ташкента. Кухни, спальни, офисная и детская мебель — готовая и на заказ. Сравните работы и позвоните напрямую.',
   keywords: ['мебель Ташкент', 'мебель на заказ', 'кухни на заказ', 'mebel Toshkent'],
+  applicationName: 'Mebel',
+  appleWebApp: { capable: true, title: 'Mebel', statusBarStyle: 'black-translucent' },
+  icons: {
+    icon: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
 }
 
 function Header({ dict }: { dict: Dict }) {
@@ -59,7 +69,7 @@ function Header({ dict }: { dict: Dict }) {
           </Link>
           <Link
             href="/dashboard"
-            className="press rounded-[var(--radius)] bg-gold px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-gold-deep"
+            className="press whitespace-nowrap rounded-[var(--radius)] bg-gold px-3 py-2 text-[0.8125rem] font-semibold text-white transition-colors duration-200 hover:bg-gold-deep sm:px-4 sm:text-sm"
           >
             {dict.nav.postFurniture}
           </Link>
@@ -149,6 +159,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="flex min-h-full flex-col font-sans">
         <LocaleProvider dict={dict}>
           <Header dict={dict} />
+          {/* Предложение поставить на домашний экран — там, где его видно сразу */}
+          <InstallApp />
           <main className="animate-page flex-1">{children}</main>
           <Footer dict={dict} />
 

@@ -316,6 +316,23 @@ export const uz: typeof ru = {
     footerEnd: '.',
   },
 
+  install: {
+    title: 'Telefoningizga o‘rnating',
+    text: "Bosh ekranda belgi paydo bo'ladi va oddiy ilova kabi ochiladi — App Store'siz va telefon xotirasini egallamasdan.",
+    button: "O'rnatish",
+    iosButton: "Qanday o'rnatiladi",
+    later: 'Keyinroq',
+    close: 'Yopish',
+    installed: "Tayyor — belgi bosh ekranda",
+    iosTitle: "iPhone'ga o'rnatish",
+    iosSteps: [
+      "Ekran pastidagi «Ulashish» belgisini bosing — yuqoriga strelkali kvadrat.",
+      "Ro'yxatni aylantirib «Bosh ekranga» («Add to Home Screen») ni tanlang.",
+      "«Qo'shish» ni bosing — Mebel belgisi boshqa ilovalar yonida paydo bo'ladi.",
+    ],
+    iosNote: "Safari'da ishlaydi. Havolani Telegram yoki Instagram'da ochgan bo'lsangiz, «Safari'da ochish» ni bosing, aks holda o'rnatish tugmasi chiqmaydi.",
+  },
+
   districts: {
     Алмазарский: 'Olmazor',
     Бектемирский: 'Bektemir',
