@@ -80,6 +80,25 @@ export function AiDescription({
     )
   }
 
+  /*
+   * Вставка должна быть видимой: текст уходит в поле профиля, помощник
+   * закрывается, страница прокручивается к этому полю и оно на миг
+   * подсвечивается. Иначе человек нажимает и не понимает, сработало ли.
+   */
+  function use() {
+    onUse(state.text ?? '')
+    setOpen(false)
+
+    requestAnimationFrame(() => {
+      const field = document.getElementById('company-description')
+      if (!field) return
+
+      field.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      field.classList.add('flash')
+      setTimeout(() => field.classList.remove('flash'), 1200)
+    })
+  }
+
   function write() {
     const data = new FormData()
     data.set('name', companyName)
@@ -243,7 +262,7 @@ export function AiDescription({
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => onUse(state.text ?? '')}
+              onClick={use}
               className="press rounded-full bg-gold px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-gold-deep"
             >
               Вставить в профиль

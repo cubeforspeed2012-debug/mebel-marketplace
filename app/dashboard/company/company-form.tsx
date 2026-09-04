@@ -31,7 +31,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
           required
           value={name}
           onChange={(event) => setName(event.target.value)}
-          placeholder="Например: Rich Kitchen"
+          placeholder="Название вашей мастерской"
           className="w-full rounded-2xl bg-cream px-4 py-2.5 outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
         />
       </label>
@@ -81,6 +81,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
           О мастерской
         </span>
         <textarea
+          id="company-description"
           name="description"
           rows={5}
           value={description}

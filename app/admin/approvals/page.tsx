@@ -3,6 +3,7 @@ import { setCompanyStatus } from '@/app/admin/actions'
 import { formatPhone, telHref, WORK_TYPES } from '@/lib/constants'
 import { requireAdmin } from '@/lib/session'
 import type { Company } from '@/lib/types'
+import { SubmitButton } from '@/components/submit-button'
 
 export const metadata = { title: 'Одобрение' }
 
@@ -113,12 +114,12 @@ export default async function ApprovalsPage() {
                 <form action={setCompanyStatus}>
                   <input type="hidden" name="id" value={company.id} />
                   <input type="hidden" name="status" value="active" />
-                  <button
-                    type="submit"
-                    className="press rounded-full bg-[#4b9d63] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#3f8654]"
+                  <SubmitButton
+                    pendingLabel="Одобряем…"
+                    className="rounded-full bg-[#4b9d63] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#3f8654]"
                   >
                     Одобрить
-                  </button>
+                  </SubmitButton>
                 </form>
 
                 <form action={setCompanyStatus} className="flex flex-wrap items-center gap-2">
@@ -129,12 +130,12 @@ export default async function ApprovalsPage() {
                     placeholder="Причина отказа"
                     className="rounded-full bg-[#2a2a2a] px-4 py-2.5 text-sm text-white outline-none placeholder:text-[#6b6b6b] focus:ring-2 focus:ring-gold"
                   />
-                  <button
-                    type="submit"
-                    className="press rounded-full bg-[#2a2a2a] px-5 py-2.5 text-sm text-[#a8a8a8] transition-colors hover:bg-status-error hover:text-white"
+                  <SubmitButton
+                    pendingLabel="Отклоняем…"
+                    className="rounded-full bg-[#2a2a2a] px-5 py-2.5 text-sm text-[#a8a8a8] hover:bg-status-error hover:text-white"
                   >
                     Отклонить
-                  </button>
+                  </SubmitButton>
                 </form>
 
                 <Link

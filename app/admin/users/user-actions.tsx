@@ -1,6 +1,7 @@
 'use client'
 
 import { deleteUser, setUserBlocked } from '@/app/admin/actions'
+import { SubmitButton } from '@/components/submit-button'
 
 /**
  * Кнопки по аккаунту. Удаление спрашивает подтверждение —
@@ -26,16 +27,16 @@ export function UserActions({
       <form action={setUserBlocked}>
         <input type="hidden" name="user_id" value={userId} />
         <input type="hidden" name="blocked" value={blocked ? '0' : '1'} />
-        <button
-          type="submit"
-          className={`press rounded-full px-4 py-2 text-xs transition-colors ${
+        <SubmitButton
+          pendingLabel="Меняем…"
+          className={`rounded-full px-4 py-2 text-xs ${
             blocked
               ? 'bg-[#4b9d63] text-white hover:bg-[#3f8654]'
               : 'bg-[#2a2a2a] text-[#d6d6d6] hover:bg-[#e8c14a] hover:text-[#3b2f10]'
           }`}
         >
           {blocked ? 'Разблокировать' : 'Заблокировать'}
-        </button>
+        </SubmitButton>
       </form>
 
       <form
@@ -48,12 +49,12 @@ export function UserActions({
         }}
       >
         <input type="hidden" name="user_id" value={userId} />
-        <button
-          type="submit"
-          className="press rounded-full bg-[#2a2a2a] px-4 py-2 text-xs text-[#8f8f8f] transition-colors hover:bg-[#b91c1c] hover:text-white"
+        <SubmitButton
+          pendingLabel="Удаляем…"
+          className="rounded-full bg-[#2a2a2a] px-4 py-2 text-xs text-[#8f8f8f] hover:bg-[#b91c1c] hover:text-white"
         >
           Удалить
-        </button>
+        </SubmitButton>
       </form>
     </div>
   )

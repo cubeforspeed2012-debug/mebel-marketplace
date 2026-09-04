@@ -6,6 +6,7 @@ import { HeaderNav } from '@/components/header-nav'
 import { InstallApp } from '@/components/install-app'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { LocaleProvider } from '@/components/locale-provider'
+import { RouteProgress } from '@/components/route-progress'
 import { TabBar } from '@/components/tab-bar'
 import type { Dict } from '@/lib/i18n'
 import { getLocale } from '@/lib/locale'
@@ -208,6 +209,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang={locale} className={`${inter.variable} ${manrope.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
         <LocaleProvider dict={dict}>
+          <Suspense fallback={null}>
+            <RouteProgress />
+          </Suspense>
           <Header dict={dict} signedIn={signedIn} />
           {/* Предложение поставить на домашний экран — там, где его видно сразу */}
           <InstallApp />

@@ -71,6 +71,21 @@ body {
   color: var(--text);
 }
 
+/*
+ * Телефоны ждут пол-секунды после нажатия — вдруг человек хочет
+ * увеличить масштаб двойным касанием. Кнопкам и ссылкам это не нужно,
+ * и без этой задержки интерфейс ощущается заметно быстрее.
+ */
+a,
+button,
+[role="button"],
+label,
+select,
+summary {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Заголовки — плотные и уверенные. Без верхнего регистра:
    строгий корпоративный софт читается спокойнее. */
 .display {
@@ -174,6 +189,26 @@ body {
 .lift:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 22px rgb(0 0 0 / 0.45);
+}
+
+/* Полоса перехода: быстро бежит вперёд и притормаживает, ожидая страницу */
+@keyframes route-bar {
+  0% { width: 0; }
+  40% { width: 55%; }
+  80% { width: 82%; }
+  100% { width: 92%; }
+}
+.route-bar {
+  animation: route-bar 2.4s var(--ease-ios) forwards;
+}
+
+/* Поле, куда только что вставили текст, коротко подсвечивается */
+@keyframes flash-field {
+  from { box-shadow: 0 0 0 2px var(--gold); }
+  to { box-shadow: 0 0 0 2px transparent; }
+}
+.flash {
+  animation: flash-field 1.2s var(--ease-ios) both;
 }
 
 /* Нажатие — лёгкое утопление, как на телефоне */

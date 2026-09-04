@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/session'
 import { hasAiKey } from '@/lib/groq'
 import { confirmPromotion } from './actions'
 import { ViewsChart } from './views-chart'
+import { SubmitButton } from '@/components/submit-button'
 
 export const metadata = { title: 'Управление площадкой' }
 
@@ -280,12 +281,12 @@ export default async function AdminPage({
                 </div>
                 <form action={confirmPromotion}>
                   <input type="hidden" name="id" value={promo.id} />
-                  <button
-                    type="submit"
-                    className="press rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-deep"
+                  <SubmitButton
+                    pendingLabel="Запускаем…"
+                    className="rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-white hover:bg-gold-deep"
                   >
                     Оплата получена — запустить
-                  </button>
+                  </SubmitButton>
                 </form>
               </div>
             ))}

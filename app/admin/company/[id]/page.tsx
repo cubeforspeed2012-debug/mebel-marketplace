@@ -4,6 +4,7 @@ import { setCompanyStatus } from '@/app/admin/actions'
 import { formatPhone, formatPrice, telHref, WORK_TYPES } from '@/lib/constants'
 import { ORDER_STATUSES } from '@/lib/orders'
 import { requireAdmin } from '@/lib/session'
+import { SubmitButton } from '@/components/submit-button'
 
 export const metadata = { title: 'Мастерская' }
 
@@ -234,12 +235,12 @@ export default async function AdminCompanyPage({
             <form action={setCompanyStatus}>
               <input type="hidden" name="id" value={company.company_id} />
               <input type="hidden" name="status" value="active" />
-              <button
-                type="submit"
-                className="press rounded-full bg-gold px-6 py-2.5 font-semibold text-white transition-colors hover:bg-gold-deep"
+              <SubmitButton
+                pendingLabel="Одобряем…"
+                className="rounded-full bg-gold px-6 py-2.5 font-semibold text-white hover:bg-gold-deep"
               >
                 Одобрить и показать в каталоге
-              </button>
+              </SubmitButton>
             </form>
           )}
 
@@ -252,12 +253,12 @@ export default async function AdminCompanyPage({
                 placeholder="Причина блокировки"
                 className="rounded-full bg-[#2a2a2a] px-4 py-2.5 text-sm text-white outline-none placeholder:text-[#6b6b6b] focus:ring-2 focus:ring-gold"
               />
-              <button
-                type="submit"
-                className="press rounded-full bg-[#2a2a2a] px-6 py-2.5 text-sm text-[#a8a8a8] transition-colors hover:bg-[#b91c1c] hover:text-white"
+              <SubmitButton
+                pendingLabel="Блокируем…"
+                className="rounded-full bg-[#2a2a2a] px-6 py-2.5 text-sm text-[#a8a8a8] hover:bg-[#b91c1c] hover:text-white"
               >
                 Заблокировать
-              </button>
+              </SubmitButton>
             </form>
           )}
 
@@ -265,12 +266,12 @@ export default async function AdminCompanyPage({
             <form action={setCompanyStatus}>
               <input type="hidden" name="id" value={company.company_id} />
               <input type="hidden" name="status" value="pending" />
-              <button
-                type="submit"
-                className="press rounded-full bg-[#2a2a2a] px-6 py-2.5 text-sm text-[#d6d6d6] transition-colors hover:bg-white hover:text-[#171717]"
+              <SubmitButton
+                pendingLabel="Снимаем…"
+                className="rounded-full bg-[#2a2a2a] px-6 py-2.5 text-sm text-[#d6d6d6] hover:bg-white hover:text-[#171717]"
               >
                 Снять блокировку — вернуть на проверку
-              </button>
+              </SubmitButton>
             </form>
           )}
         </div>
