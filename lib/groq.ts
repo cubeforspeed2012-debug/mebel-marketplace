@@ -3,13 +3,32 @@
  * Cloudflare: запрос уходит с сервера, в браузер ключ не попадает никогда.
  */
 
+import { getCloudflareContext } from '@opennextjs/cloudflare'
+
 const ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions'
 const MODEL = 'llama-3.3-70b-versatile'
 
 export type AiResult = { text?: string; error?: string }
 
+/**
+ * Ключ достаём двумя путями. На Cloudflare секреты лежат в окружении воркера,
+ * и не в каждой сборке они попадают в process.env — поэтому если там пусто,
+ * спрашиваем окружение напрямую. Иначе рабочий ключ выглядел бы как отсутствующий.
+ */
+async function readKey(): Promise<string | undefined> {
+  const fromProcess = process.env.GROQ_API_KEY
+  if (fromProcess) return fromProcess
+
+  try {
+    const { env } = getCloudflareContext()
+    return (env as unknown as { GROQ_API_KEY?: string }).GROQ_API_KEY
+  } catch {
+    return undefined
+  }
+}
+
 export async function askGroq(system: string, user: string): Promise<AiResult> {
-  const key = process.env.GROQ_API_KEY
+  const key = await readKey()
 
   if (!key) {
     return { error: 'Помощник ещё не подключён — нужен ключ Groq в настройках сайта' }
