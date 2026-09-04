@@ -37,6 +37,11 @@ async function readKey(): Promise<string | undefined> {
   }
 }
 
+/** Есть ли ключ. Само значение наружу не отдаём — только да или нет. */
+export async function hasAiKey(): Promise<boolean> {
+  return Boolean(await readKey())
+}
+
 export async function askGroq(system: string, user: string): Promise<AiResult> {
   const key = await readKey()
 

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { formatPhone, formatPrice, WORK_TYPES } from '@/lib/constants'
 import { requireAdmin } from '@/lib/session'
+import { hasAiKey } from '@/lib/groq'
 import { confirmPromotion } from './actions'
 import { ViewsChart } from './views-chart'
 
@@ -144,6 +145,9 @@ export default async function AdminPage({
   })
 
   const name = (profile?.full_name ?? '').split(' ')[0] || 'администратор'
+
+  // Само значение не показываем и не логируем — только факт наличия
+  const aiReady = await hasAiKey()
 
   return (
     <div className="space-y-6">
