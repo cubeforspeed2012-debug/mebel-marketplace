@@ -86,12 +86,6 @@ export function telHref(phone: string | null): string {
   return `tel:${normalizePhone(phone) ?? ''}`
 }
 
-/** Ссылка в WhatsApp по номеру: +998903198638 → wa.me/998903198638 */
-export function whatsappHref(phone: string | null): string | null {
-  const digits = normalizePhone(phone)?.replace(/\D/g, '')
-  return digits && digits.length >= 11 ? `https://wa.me/${digits}` : null
-}
-
 /** Ссылка в Telegram по нику мастера, с @ или без */
 export function telegramHref(username: string | null): string | null {
   const clean = username?.trim().replace(/^@/, '').replace(/^https?:\/\/t\.me\//, '')
