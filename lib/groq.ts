@@ -107,6 +107,11 @@ export async function askGroq(
           max_tokens: 900,
           // Просим сразу строгий JSON — тогда модель не рассуждает вслух
           ...(json ? { response_format: { type: 'json_object' } } : {}),
+          // Моделям, которые «думают вслух», велим прятать размышления,
+          // иначе они лезут в ответ вместо текста
+          ...(/gpt-oss|qwen|deepseek|reason/i.test(model)
+            ? { reasoning_format: 'hidden', reasoning_effort: 'low' }
+            : {}),
           messages: [
             { role: 'system', content: system },
             { role: 'user', content: user },

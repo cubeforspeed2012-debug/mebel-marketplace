@@ -98,6 +98,17 @@ export async function suggestDescription(
 
     if (!description) throw new Error('пустое описание')
 
+    /*
+     * Последняя проверка перед показом. Модели иногда отдают не текст,
+     * а свои размышления на английском — они длинные и без кириллицы.
+     * Такое до профиля мастера доходить не должно.
+     */
+    const cyrillic = (description.match(/[а-яё]/gi) ?? []).length
+    const looksRussian = cyrillic > description.length * 0.3
+    const rightSize = description.length <= 900
+
+    if (!looksRussian || !rightSize) throw new Error('ответ не похож на текст о мастерской')
+
     return { text: description.replace(/^["«»\']+|["«»\']+$/g, '').trim(), tips }
   } catch {
     // Разобрать не вышло — лучше честно попросить повторить, чем показать мусор
