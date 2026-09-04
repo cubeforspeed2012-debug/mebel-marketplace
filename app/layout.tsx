@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   },
 }
 
-function Header({ dict }: { dict: Dict }) {
+function Header({ dict, signedIn }: { dict: Dict; signedIn: boolean }) {
   return (
     <header className="sticky top-0 z-40 border-b border-line-dark bg-ink">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-4">
@@ -62,18 +62,30 @@ function Header({ dict }: { dict: Dict }) {
         </Suspense>
 
         <div className="ml-auto flex items-center gap-2">
-          <Link
-            href="/auth"
-            className="hidden rounded-[var(--radius)] px-4 py-2 text-sm text-on-dark-muted transition-colors hover:text-on-dark sm:block"
-          >
-            {dict.nav.signIn}
-          </Link>
-          <Link
-            href="/dashboard"
-            className="press whitespace-nowrap rounded-[var(--radius)] bg-gold px-3 py-2 text-[0.8125rem] font-semibold text-white transition-colors duration-200 hover:bg-gold-deep sm:px-4 sm:text-sm"
-          >
-            {dict.nav.postFurniture}
-          </Link>
+          {/* Вошедшему звать регистрироваться незачем — ведём в его кабинет */}
+          {signedIn ? (
+            <Link
+              href="/profile"
+              className="hidden rounded-[var(--radius)] px-4 py-2 text-sm text-on-dark-muted transition-colors hover:text-on-dark sm:block"
+            >
+              {dict.nav.profile}
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/auth"
+                className="hidden rounded-[var(--radius)] px-4 py-2 text-sm text-on-dark-muted transition-colors hover:text-on-dark sm:block"
+              >
+                {dict.nav.signIn}
+              </Link>
+              <Link
+                href="/dashboard"
+                className="press hidden whitespace-nowrap rounded-[var(--radius)] bg-gold px-3 py-2 text-[0.8125rem] font-semibold text-white transition-colors duration-200 hover:bg-gold-deep sm:block sm:px-4 sm:text-sm"
+              >
+                {dict.nav.postFurniture}
+              </Link>
+            </>
+          )}
           <LanguageSwitcher />
         </div>
       </div>
@@ -155,13 +167,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = await getLocale()
   const dict = getDict(locale)
 
-  // Администратору в нижнем меню нужна кнопка панели управления
+  // Администратору в нижнем меню нужна кнопка панели управления,
+  // а вошедшему человеку не нужны призывы зарегистрироваться
   let isAdmin = false
+  let signedIn = false
   try {
     const supabase = await createClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()
+
+    signedIn = Boolean(user)
 
     if (user) {
       const { data: profile } = await supabase
@@ -173,13 +189,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     }
   } catch {
     isAdmin = false
+    signedIn = false
   }
 
   return (
     <html lang={locale} className={`${inter.variable} ${manrope.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
         <LocaleProvider dict={dict}>
-          <Header dict={dict} />
+          <Header dict={dict} signedIn={signedIn} />
           {/* Предложение поставить на домашний экран — там, где его видно сразу */}
           <InstallApp />
           <main className="animate-page flex-1">{children}</main>

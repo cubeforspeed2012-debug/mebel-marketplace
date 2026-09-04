@@ -81,6 +81,19 @@ export const uz: typeof ru = {
     sellAction: 'Mebel joylashtirish',
   },
 
+  banner: {
+    buyerTitle: 'Mebel sotib olmoqchimisiz?',
+    buyerText:
+      "Turkumlar bo'yicha tanlang, ishlar va narxlarni solishtiring va ustaga to'g'ridan-to'g'ri qo'ng'iroq qiling. Kabinet oching — barcha arizalaringiz bir joyda bo'ladi.",
+    buyerAction: "Kirish yoki ro'yxatdan o'tish",
+    buyerNote: "Ro'yxatdan o'tish bepul, bir daqiqa vaqt oladi",
+    sellerTitle: 'Buyurtmaga mebel yasaysizmi?',
+    sellerText:
+      "Ustaxonangizni joylashtiring — nomi, telefoni, ish suratlari va narxlari. Toshkent mijozlari sizni katalogdan topib, vositachilarsiz qo'ng'iroq qiladi.",
+    sellerAction: "Maydonda usta bo'ling",
+    sellerNote: "Bepul, buyurtmalardan komissiyasiz",
+  },
+
   catalog: {
     title: 'Mebel katalogi',
     searchPlaceholder: 'Katalog bo‘yicha qidirish',

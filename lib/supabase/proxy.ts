@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { AUTH_COOKIE_OPTIONS } from './cookies'
 
 /** Страницы, куда пускаем только после входа. */
 const PROTECTED = ['/dashboard', '/admin', '/account']
@@ -29,6 +30,7 @@ export async function updateSession(request: NextRequest) {
     url,
     key,
     {
+      cookieOptions: AUTH_COOKIE_OPTIONS,
       cookies: {
         getAll() {
           return request.cookies.getAll()
@@ -37,7 +39,7 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           response = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
+            response.cookies.set(name, value, { ...AUTH_COOKIE_OPTIONS, ...options }),
           )
         },
       },

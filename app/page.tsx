@@ -41,8 +41,22 @@ async function getHomeData() {
   }
 }
 
+/** Вошёл человек или нет — от этого зависит, звать ли его регистрироваться. */
+async function isSignedIn() {
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    return Boolean(user)
+  } catch {
+    return false
+  }
+}
+
 export default async function HomePage() {
   const dict = await getDictionary()
+  const signedIn = await isSignedIn()
   const { categories, products } = await getHomeData()
 
   // Названия категорий в базе лежат на двух языках — берём по языку страницы
@@ -131,6 +145,48 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Две большие двери: купить мебель или стать мастером.
+          Вошедшему это не нужно — он уже внутри, и звать его некуда. */}
+      {!signedIn && (
+        <section className="mx-auto max-w-6xl px-4 pt-10">
+          <div className="stagger grid gap-4 lg:grid-cols-2">
+            <div className="rounded-[28px] bg-paper p-7 sm:p-9">
+              <div className="eyebrow text-gold">{dict.home.buyers}</div>
+              <h2 className="display mt-4 text-2xl leading-tight text-text sm:text-3xl">
+                {dict.banner.buyerTitle}
+              </h2>
+              <p className="mt-4 max-w-md leading-relaxed text-text-muted">
+                {dict.banner.buyerText}
+              </p>
+              <Link
+                href="/auth?role=buyer"
+                className="press mt-7 block rounded-full bg-gold px-8 py-4 text-center font-semibold text-white transition-colors hover:bg-gold-deep sm:inline-block"
+              >
+                {dict.banner.buyerAction}
+              </Link>
+              <p className="mt-3 text-xs text-text-muted">{dict.banner.buyerNote}</p>
+            </div>
+
+            <div className="rounded-[28px] bg-ink p-7 sm:p-9">
+              <div className="eyebrow text-gold">{dict.home.masters}</div>
+              <h2 className="display mt-4 text-2xl leading-tight text-on-dark sm:text-3xl">
+                {dict.banner.sellerTitle}
+              </h2>
+              <p className="mt-4 max-w-md leading-relaxed text-on-dark-muted">
+                {dict.banner.sellerText}
+              </p>
+              <Link
+                href="/auth"
+                className="press mt-7 block rounded-full bg-gold px-8 py-4 text-center font-semibold text-white transition-colors hover:bg-gold-deep sm:inline-block"
+              >
+                {dict.banner.sellerAction}
+              </Link>
+              <p className="mt-3 text-xs text-on-dark-muted">{dict.banner.sellerNote}</p>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Главная развилка покупателя */}
       <section className="mx-auto max-w-6xl px-4 py-14">
         <div className="stagger grid gap-4 sm:grid-cols-2">
@@ -189,7 +245,7 @@ export default async function HomePage() {
       </section>
 
       {/* Две стороны площадки */}
-      <section className="bg-ink">
+      <section className={signedIn ? 'hidden' : 'bg-ink'}>
         <div className="mx-auto max-w-6xl px-4 py-16">
           <div className="grid gap-6 sm:grid-cols-2">
             <div className="rounded-[var(--radius)] border border-line-dark p-8">
