@@ -24,7 +24,7 @@ export function ProductForm({
   )
 
   return (
-    <form action={action} className="space-y-6 rounded-[var(--radius)] border border-line bg-paper p-6">
+    <form action={action} className="space-y-6 rounded-3xl bg-paper p-6">
       {product && <input type="hidden" name="id" value={product.id} />}
       <input type="hidden" name="images" value={JSON.stringify(images)} />
 
@@ -51,7 +51,7 @@ export function ProductForm({
           <select
             name="category_id"
             defaultValue={product?.category_id ?? ''}
-            className="w-full rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-3xl bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
           >
             <option value="">Не выбрана</option>
             {categories.map((category) => (
@@ -113,7 +113,7 @@ export function ProductForm({
           <select
             name="status"
             defaultValue={product?.status ?? 'active'}
-            className="w-full rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-3xl bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
           >
             <option value="active">Показывать</option>
             <option value="hidden">Спрятать</option>

@@ -24,7 +24,7 @@ export function NewOrderForm() {
   }
 
   return (
-    <form action={action} className="w-full rounded-[var(--radius)] border border-line bg-paper p-5">
+    <form action={action} className="w-full rounded-3xl bg-paper p-5">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-semibold">Новый заказ</h3>
         <button
@@ -79,7 +79,7 @@ export function NewOrderForm() {
           <select
             name="source"
             defaultValue="phone"
-            className="w-full rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none focus:border-gold"
+            className="w-full rounded-3xl bg-paper px-4 py-2.5 outline-none focus:border-gold"
           >
             {Object.entries(ORDER_SOURCES).map(([value, label]) => (
               <option key={value} value={value}>

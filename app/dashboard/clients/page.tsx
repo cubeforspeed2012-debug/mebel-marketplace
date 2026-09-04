@@ -15,7 +15,7 @@ export default async function ClientsPage() {
     return (
       <div>
         <h2 className="display gold-rule text-xl">Клиенты</h2>
-        <div className="mt-7 rounded-[var(--radius)] border border-dashed border-line bg-paper p-10 text-center">
+        <div className="mt-7 rounded-3xl rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
           <p className="text-text-muted">Сначала создайте профиль мастерской.</p>
           <Link
             href="/dashboard/company"
@@ -45,13 +45,13 @@ export default async function ClientsPage() {
       </p>
 
       {clients.length === 0 ? (
-        <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-10 text-center">
+        <div className="rounded-3xl rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
           <p className="text-text-muted">
             Клиентов пока нет. Они появятся автоматически с первой заявкой.
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-[var(--radius)] border border-line bg-paper">
+        <div className="overflow-x-auto rounded-3xl bg-paper">
           <table className="w-full min-w-[540px] text-left text-sm">
             <thead className="border-b border-line text-xs font-semibold uppercase tracking-widest text-text-muted">
               <tr>

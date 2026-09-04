@@ -10,7 +10,7 @@ export function BoostForm({ products }: { products: { id: number; title: string 
   const [state, action, pending] = useActionState(requestBoost, EMPTY)
 
   return (
-    <form action={action} className="rounded-[var(--radius)] border border-line bg-paper p-6">
+    <form action={action} className="rounded-3xl bg-paper p-6">
       <fieldset>
         <legend className="mb-3 text-xs font-semibold uppercase tracking-widest text-text-muted">
           Тариф
@@ -42,7 +42,7 @@ export function BoostForm({ products }: { products: { id: number; title: string 
         </span>
         <select
           name="product_id"
-          className="w-full rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none focus:border-gold sm:max-w-md"
+          className="w-full rounded-3xl bg-paper px-4 py-2.5 outline-none focus:border-gold sm:max-w-md"
         >
           <option value="">Всю мастерскую</option>
           {products.map((product) => (

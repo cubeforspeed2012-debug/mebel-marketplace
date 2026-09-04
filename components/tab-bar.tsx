@@ -65,10 +65,11 @@ const TABS: (Omit<TabItem, 'label'> & {
     match: (p) => p.startsWith('/companies') || p.startsWith('/company'),
   },
   {
-    href: '/dashboard',
+    href: '/profile',
     key: 'profile',
     icon: IconProfile,
     match: (p) =>
+      p.startsWith('/profile') ||
       p.startsWith('/dashboard') ||
       p.startsWith('/account') ||
       p.startsWith('/admin') ||

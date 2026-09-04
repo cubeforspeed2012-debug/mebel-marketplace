@@ -18,14 +18,12 @@ function Stat({
   return (
     <Link
       href={href}
-      className={`block border p-5 transition-colors ${
-        accent ? 'border-gold bg-gold/10' : 'border-line bg-paper hover:border-gold'
+      className={`lift block rounded-3xl p-5 ${
+        accent ? 'bg-white text-[#171717]' : 'bg-paper'
       }`}
     >
-      <div className="text-xs font-semibold uppercase tracking-widest text-text-muted">
-        {label}
-      </div>
-      <div className="display mt-2 text-3xl">{value}</div>
+      <div className={`text-sm ${accent ? 'text-[#6b6b6b]' : 'text-text-muted'}`}>{label}</div>
+      <div className="mt-3 text-3xl font-semibold">{value}</div>
     </Link>
   )
 }
@@ -36,7 +34,7 @@ export default async function DashboardPage() {
   // Профиль не создан — первым делом отправляем его заполнять.
   if (!company) {
     return (
-      <div className="rounded-[var(--radius)] border border-line bg-paper p-8">
+      <div className="rounded-3xl bg-paper p-8">
         <h2 className="display gold-rule text-xl">Начнём</h2>
         <p className="mt-5 max-w-xl leading-relaxed text-text-muted">
           Чтобы вас нашли покупатели, заполните профиль мастерской: название, телефон,
@@ -44,7 +42,7 @@ export default async function DashboardPage() {
         </p>
         <Link
           href="/dashboard/company"
-          className="mt-6 inline-block bg-gold px-7 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
+          className="press mt-6 inline-block rounded-full bg-gold px-7 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
         >
           Заполнить профиль мастерской
         </Link>
@@ -68,8 +66,20 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
+      {company.status === 'blocked' && (
+        <div className="rounded-3xl bg-status-error/15 p-5">
+          <div className="font-semibold text-text">Мастерская скрыта из каталога</div>
+          <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
+            {company.moderation_note
+              ? `Причина: ${company.moderation_note}`
+              : 'Причину уточните у администратора площадки.'}{' '}
+            Исправьте профиль и напишите администратору — вас вернут в каталог.
+          </p>
+        </div>
+      )}
+
       {company.status === 'pending' && (
-        <div className="border border-gold bg-gold/10 p-5">
+        <div className="rounded-3xl bg-status-process/15 p-5">
           <div className="font-semibold">Мастерская на проверке</div>
           <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
             Администратор проверит профиль и откроет вас в каталоге. Пока можно добавить
@@ -91,7 +101,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Воронка одним взглядом */}
-      <div className="rounded-[var(--radius)] border border-line bg-paper p-6">
+      <div className="rounded-3xl bg-paper p-6">
         <h3 className="display gold-rule text-lg">Воронка</h3>
         <div className="mt-6 space-y-3">
           {(Object.keys(ORDER_STATUSES) as OrderStatus[]).map((status) => {
@@ -103,9 +113,9 @@ export default async function DashboardPage() {
                 <span className="w-32 shrink-0 text-sm text-text-muted">
                   {ORDER_STATUSES[status]}
                 </span>
-                <span className="h-2 flex-1 bg-cream">
+                <span className="h-2 flex-1 overflow-hidden rounded-full bg-cream">
                   <span
-                    className="block h-full bg-gold"
+                    className="block h-full rounded-full bg-gold"
                     style={{ width: `${share}%` }}
                     aria-hidden
                   />
@@ -120,7 +130,7 @@ export default async function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
           href="/dashboard/products/new"
-          className="rounded-[var(--radius)] border border-line bg-paper p-6 transition-colors hover:border-gold"
+          className="rounded-3xl bg-paper p-6 transition-colors hover:bg-sand"
         >
           <div className="font-semibold">Добавить мебель</div>
           <p className="mt-2 text-sm leading-relaxed text-text-muted">
@@ -130,7 +140,7 @@ export default async function DashboardPage() {
 
         <Link
           href="/dashboard/promotion"
-          className="rounded-[var(--radius)] border border-line bg-paper p-6 transition-colors hover:border-gold"
+          className="rounded-3xl bg-paper p-6 transition-colors hover:bg-sand"
         >
           <div className="font-semibold">Поднять в каталоге</div>
           <p className="mt-2 text-sm leading-relaxed text-text-muted">

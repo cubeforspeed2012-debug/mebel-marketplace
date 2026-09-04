@@ -29,7 +29,7 @@ export default async function OrdersPage({
     return (
       <div>
         <h2 className="display gold-rule text-xl">Заявки и заказы</h2>
-        <div className="mt-7 rounded-[var(--radius)] border border-dashed border-line bg-paper p-10 text-center">
+        <div className="mt-7 rounded-3xl rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
           <p className="text-text-muted">
             Заявки приходят на страницу мастерской. Сначала создайте её.
           </p>
@@ -99,7 +99,7 @@ export default async function OrdersPage({
 
       <div className="mt-7 space-y-4">
         {orders.length === 0 && (
-          <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-10 text-center">
+          <div className="rounded-3xl rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
             <p className="text-text-muted">
               Заявок пока нет. Они появятся здесь, как только покупатель оставит её
               на вашей странице — или добавьте заказ вручную.
@@ -108,7 +108,7 @@ export default async function OrdersPage({
         )}
 
         {orders.map((order) => (
-          <details key={order.id} className="rounded-[var(--radius)] border border-line bg-paper">
+          <details key={order.id} className="rounded-3xl bg-paper">
             <summary className="flex cursor-pointer flex-wrap items-center gap-3 p-4">
               <span
                 className={`px-3 py-1 text-xs font-semibold uppercase tracking-widest ${
@@ -228,7 +228,7 @@ export default async function OrdersPage({
                 <div className="flex gap-3 sm:col-span-2">
                   <button
                     type="submit"
-                    className="border border-line px-5 py-2.5 text-sm font-semibold transition-colors hover:border-gold"
+                    className="border border-line px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-sand"
                   >
                     Сохранить
                   </button>

@@ -193,12 +193,14 @@ export default async function AdminPage({
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
           <Funnel label="Новые заявки" value={newOrders} caption="ждут звонка мастера" tone="blue" />
           <Funnel label="В работе" value={inWork} caption="замер, договор, производство" tone="orange" />
-          <Funnel
-            label="Мастерские на проверке"
-            value={overview?.companies_pending ?? 0}
-            caption="нужно подтвердить"
-            tone="yellow"
-          />
+          <Link href="/admin/approvals" className="block">
+            <Funnel
+              label="Мастерские на проверке"
+              value={overview?.companies_pending ?? 0}
+              caption="нажмите, чтобы разобрать"
+              tone="yellow"
+            />
+          </Link>
           <Funnel label="Завершено" value={doneOrders} caption="мебель у клиента" tone="green" />
         </div>
       </div>

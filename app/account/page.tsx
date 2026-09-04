@@ -77,7 +77,7 @@ export default async function AccountPage() {
 
       <div className="mt-7 space-y-3">
         {orders.length === 0 ? (
-          <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-12 text-center">
+          <div className="rounded-3xl rounded-3xl border border-dashed border-line bg-paper p-12 text-center">
             <p className="text-text-muted">
               Заявок пока нет. Найдите мебель в каталоге и оставьте заявку мастеру —
               она появится здесь.
@@ -91,7 +91,7 @@ export default async function AccountPage() {
           </div>
         ) : (
           orders.map((order) => (
-            <div key={order.id} className="rounded-[var(--radius)] border border-line bg-paper p-5">
+            <div key={order.id} className="rounded-3xl bg-paper p-5">
               <div className="flex flex-wrap items-center gap-3">
                 <span
                   className={`px-3 py-1 text-xs font-semibold uppercase tracking-widest ${
@@ -115,7 +115,7 @@ export default async function AccountPage() {
                 {order.companies?.phone_public && (
                   <a
                     href={telHref(order.companies.phone_public)}
-                    className="border border-line px-4 py-2 text-sm transition-colors hover:border-gold"
+                    className="border border-line px-4 py-2 text-sm transition-colors hover:bg-sand"
                   >
                     {formatPhone(order.companies.phone_public)}
                   </a>

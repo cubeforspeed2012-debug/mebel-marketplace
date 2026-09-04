@@ -20,7 +20,7 @@ export default async function ProductsPage({
     return (
       <div>
         <h2 className="display gold-rule text-xl">Моя мебель</h2>
-        <div className="mt-7 rounded-[var(--radius)] border border-dashed border-line bg-paper p-10 text-center">
+        <div className="mt-7 rounded-3xl rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
           <p className="text-text-muted">
             Сначала заполните профиль мастерской — без него мебель некуда прикрепить.
           </p>
@@ -61,7 +61,7 @@ export default async function ProductsPage({
 
       <div className="mt-7 space-y-3">
         {products.length === 0 && (
-          <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-10 text-center">
+          <div className="rounded-3xl rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
             <p className="text-text-muted">
               Пока пусто. Добавьте первую работу — с фото её найдут в каталоге.
             </p>
@@ -76,7 +76,7 @@ export default async function ProductsPage({
           return (
             <div
               key={product.id}
-              className="flex flex-wrap items-center gap-4 rounded-[var(--radius)] border border-line bg-paper p-4"
+              className="flex flex-wrap items-center gap-4 rounded-3xl bg-paper p-4"
             >
               <div className="size-16 shrink-0 overflow-hidden bg-cream">
                 {cover ? (
@@ -110,7 +110,7 @@ export default async function ProductsPage({
               <div className="flex gap-2">
                 <Link
                   href={`/dashboard/products/${product.id}`}
-                  className="border border-line px-4 py-2 text-sm transition-colors hover:border-gold"
+                  className="border border-line px-4 py-2 text-sm transition-colors hover:bg-sand"
                 >
                   Изменить
                 </Link>
@@ -124,7 +124,7 @@ export default async function ProductsPage({
                   />
                   <button
                     type="submit"
-                    className="border border-line px-4 py-2 text-sm transition-colors hover:border-gold"
+                    className="border border-line px-4 py-2 text-sm transition-colors hover:bg-sand"
                   >
                     {product.status === 'active' ? 'Спрятать' : 'Показать'}
                   </button>

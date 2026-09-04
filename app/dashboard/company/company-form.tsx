@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react'
 import { ImageUpload } from '@/components/image-upload'
 import { DISTRICTS, WORK_TYPES } from '@/lib/constants'
 import type { Company } from '@/lib/types'
+import { AiDescription } from './ai-description'
 import { saveCompany, type FormState } from './actions'
 
 const EMPTY: FormState = {}
@@ -11,9 +12,12 @@ const EMPTY: FormState = {}
 export function CompanyForm({ company }: { company: Company | null }) {
   const [state, action, pending] = useActionState(saveCompany, EMPTY)
   const [logo, setLogo] = useState<string | null>(company?.logo_url ?? null)
+  const [name, setName] = useState(company?.name ?? '')
+  const [workType, setWorkType] = useState<string>(company?.work_type ?? 'both')
+  const [description, setDescription] = useState(company?.description ?? '')
 
   return (
-    <form action={action} className="space-y-6 rounded-[var(--radius)] border border-line bg-paper p-6">
+    <form action={action} className="space-y-6 rounded-3xl bg-paper p-6">
       <input type="hidden" name="logo_url" value={logo ?? ''} />
 
       <ImageUpload value={logo} onChange={setLogo} label="Логотип мастерской" />
@@ -25,9 +29,10 @@ export function CompanyForm({ company }: { company: Company | null }) {
         <input
           name="name"
           required
-          defaultValue={company?.name ?? ''}
+          value={name}
+          onChange={(event) => setName(event.target.value)}
           placeholder="Например: Rich Kitchen"
-          className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+          className="w-full rounded-2xl bg-cream px-4 py-2.5 outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
         />
       </label>
 
@@ -41,7 +46,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
           type="tel"
           defaultValue={company?.phone_public ?? ''}
           placeholder="+998 90 123-45-67"
-          className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+          className="w-full rounded-2xl bg-cream px-4 py-2.5 outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
         />
         <span className="mt-1 block text-xs text-text-muted">
           Этот номер увидят покупатели — на него пойдут звонки
@@ -59,10 +64,11 @@ export function CompanyForm({ company }: { company: Company | null }) {
                 type="radio"
                 name="work_type"
                 value={value}
-                defaultChecked={(company?.work_type ?? 'both') === value}
+                checked={workType === value}
+                onChange={() => setWorkType(value)}
                 className="peer sr-only"
               />
-              <span className="block border border-line px-4 py-2 text-sm transition-colors peer-checked:border-gold peer-checked:bg-gold peer-checked:font-semibold peer-checked:text-white">
+              <span className="press block rounded-full bg-cream px-4 py-2 text-sm transition-colors peer-checked:bg-gold peer-checked:font-semibold peer-checked:text-white">
                 {label}
               </span>
             </label>
@@ -76,12 +82,16 @@ export function CompanyForm({ company }: { company: Company | null }) {
         </span>
         <textarea
           name="description"
-          rows={4}
-          defaultValue={company?.description ?? ''}
+          rows={5}
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
           placeholder="Сколько лет работаете, что делаете лучше всего, какие материалы используете"
-          className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+          className="w-full rounded-2xl bg-cream px-4 py-2.5 outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
         />
       </label>
+
+      {/* Писать о себе трудно — помощник соберёт текст из коротких ответов */}
+      <AiDescription companyName={name} workType={workType} onUse={setDescription} />
 
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block">
@@ -91,7 +101,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
           <select
             name="district"
             defaultValue={company?.district ?? ''}
-            className="w-full rounded-[var(--radius)] border border-line bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-3xl bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
           >
             <option value="">Не указан</option>
             {DISTRICTS.map((district) => (
@@ -110,7 +120,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
             name="address"
             defaultValue={company?.address ?? ''}
             placeholder="Необязательно"
-            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-2xl bg-cream px-4 py-2.5 outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
           />
         </label>
 
@@ -122,7 +132,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
             name="instagram"
             defaultValue={company?.instagram ?? ''}
             placeholder="username"
-            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-2xl bg-cream px-4 py-2.5 outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
           />
         </label>
 
@@ -134,7 +144,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
             name="telegram"
             defaultValue={company?.telegram ?? ''}
             placeholder="username"
-            className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
+            className="w-full rounded-2xl bg-cream px-4 py-2.5 outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
           />
         </label>
       </div>
