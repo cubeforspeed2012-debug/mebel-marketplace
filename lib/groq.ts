@@ -43,6 +43,18 @@ async function discoverModel(key: string): Promise<string | null> {
 export type AiResult = { text?: string; error?: string }
 
 /**
+ * Вытаскивает объект JSON из ответа модели. Модели любят обернуть ответ
+ * в ```json, добавить «Вот ваш текст:» или размышления — берём то,
+ * что между первой { и последней }.
+ */
+export function extractJson(raw: string): string | null {
+  const start = raw.indexOf('{')
+  const end = raw.lastIndexOf('}')
+  if (start === -1 || end === -1 || end <= start) return null
+  return raw.slice(start, end + 1)
+}
+
+/**
  * Ключ достаём двумя путями. На Cloudflare секреты лежат в окружении воркера,
  * и не в каждой сборке они попадают в process.env — поэтому если там пусто,
  * спрашиваем окружение напрямую. Иначе рабочий ключ выглядел бы как отсутствующий.
@@ -64,7 +76,11 @@ export async function hasAiKey(): Promise<boolean> {
   return Boolean(await readKey())
 }
 
-export async function askGroq(system: string, user: string): Promise<AiResult> {
+export async function askGroq(
+  system: string,
+  user: string,
+  { json = false }: { json?: boolean } = {},
+): Promise<AiResult> {
   const key = await readKey()
 
   if (!key) {
@@ -89,6 +105,8 @@ export async function askGroq(system: string, user: string): Promise<AiResult> {
           model,
           temperature: 0.7,
           max_tokens: 900,
+          // Просим сразу строгий JSON — тогда модель не рассуждает вслух
+          ...(json ? { response_format: { type: 'json_object' } } : {}),
           messages: [
             { role: 'system', content: system },
             { role: 'user', content: user },
@@ -103,11 +121,17 @@ export async function askGroq(system: string, user: string): Promise<AiResult> {
           choices?: { message?: { content?: string; reasoning?: string } }[]
         }
         const message = data.choices?.[0]?.message
+        const content = (message?.content ?? '').trim()
 
-        // Часть моделей кладёт ответ не в content, а в reasoning — берём оба
-        const text = (message?.content || message?.reasoning || '').trim()
+        if (content) return { text: content }
 
-        if (text) return { text }
+        /*
+         * Пусто в content бывает у «рассуждающих» моделей: они пишут ход мыслей
+         * в reasoning. Показывать эти мысли человеку нельзя — но если внутри
+         * оказался готовый JSON, ответ можно спасти.
+         */
+        const rescued = json ? extractJson(message?.reasoning ?? '') : null
+        if (rescued) return { text: rescued }
 
         lastError = 'Помощник вернул пустой ответ. Попробуйте ещё раз'
         continue
