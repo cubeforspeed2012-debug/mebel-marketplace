@@ -37,6 +37,16 @@ function IconMasters(active: boolean) {
   )
 }
 
+function IconWorks(active: boolean) {
+  return (
+    <svg viewBox="0 0 24 24" className="size-[22px]" fill="none" strokeWidth={active ? 2.4 : 1.8}
+         stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M3.5 9.5 12 4l8.5 5.5v9L12 20l-8.5-1.5v-9Z" />
+      <path d="M3.5 9.5 12 13l8.5-3.5M12 13v7" />
+    </svg>
+  )
+}
+
 function IconPanel(active: boolean) {
   return (
     <svg viewBox="0 0 24 24" className="size-[22px]" fill="none" strokeWidth={active ? 2.4 : 1.8}
@@ -58,7 +68,7 @@ function IconProfile(active: boolean) {
 }
 
 const TABS: (Omit<TabItem, 'label'> & {
-  key: 'home' | 'catalog' | 'masters' | 'profile' | 'admin'
+  key: 'home' | 'catalog' | 'masters' | 'profile' | 'admin' | 'works'
   match: (path: string) => boolean
 })[] = [
   { href: '/', key: 'home', icon: IconHome, match: (p) => p === '/' },
@@ -91,25 +101,45 @@ const TABS: (Omit<TabItem, 'label'> & {
  * Нижнее меню на телефоне: стеклянная плашка, перетекающая капсула
  * и приподнятая кнопка главного действия посередине.
  */
-export function TabBar({ isAdmin = false }: { isAdmin?: boolean }) {
+export function TabBar({
+  isAdmin = false,
+  isSeller = false,
+}: {
+  isAdmin?: boolean
+  isSeller?: boolean
+}) {
   const dict = useDict()
   const pathname = usePathname()
   useSearchParams() // держим компонент в Suspense-границе вместе с навигацией
 
-  // У администратора вместо «Мастеров» — вход в панель управления:
-  // мастеров он и так видит внутри неё, а панель нужна каждый день.
-  const tabs = isAdmin
-    ? TABS.map((tab) =>
-        tab.key === 'masters'
-          ? {
-              href: '/admin',
-              key: 'admin' as const,
-              icon: IconPanel,
-              match: (p: string) => p.startsWith('/admin'),
-            }
-          : tab,
-      )
-    : TABS
+  /*
+   * Третья кнопка меняется под человека:
+   * администратору — панель управления, мастеру — его работы,
+   * покупателю остаются мастера города.
+   */
+  const tabs = TABS.map((tab) => {
+    if (tab.key !== 'masters') return tab
+
+    if (isAdmin) {
+      return {
+        href: '/admin',
+        key: 'admin' as const,
+        icon: IconPanel,
+        match: (p: string) => p.startsWith('/admin'),
+      }
+    }
+
+    if (isSeller) {
+      return {
+        href: '/dashboard/products',
+        key: 'works' as const,
+        icon: IconWorks,
+        match: (p: string) => p.startsWith('/dashboard/products'),
+      }
+    }
+
+    return tab
+  })
 
   const activeIndex = tabs.findIndex((tab) => tab.match(pathname))
 

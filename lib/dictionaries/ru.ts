@@ -24,6 +24,7 @@ export const ru = {
     home: 'Главная',
     profile: 'Профиль',
     admin: 'Панель',
+    works: 'Мои работы',
     signIn: 'Войти',
     postFurniture: 'Разместить мебель',
     add: 'Добавить',

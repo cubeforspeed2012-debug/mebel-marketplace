@@ -13,10 +13,32 @@ const ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions'
  * чтобы помощник не умирал молча в день, когда её отключили.
  */
 const MODELS = [
-  'llama-3.3-70b-versatile',
   'llama-3.1-8b-instant',
+  'llama-3.3-70b-versatile',
   'openai/gpt-oss-20b',
 ]
+
+/** Какие модели вообще доступны по этому ключу — на случай, если наши отключили. */
+async function discoverModel(key: string): Promise<string | null> {
+  try {
+    const response = await fetch('https://api.groq.com/openai/v1/models', {
+      headers: { Authorization: `Bearer ${key}` },
+      signal: AbortSignal.timeout(10000),
+    })
+    if (!response.ok) return null
+
+    const data = (await response.json()) as { data?: { id?: string }[] }
+    const ids = (data.data ?? []).map((model) => model.id ?? '')
+
+    // Отсеиваем распознавание речи и модели-цензоры — они текст не пишут
+    const chat = ids.find(
+      (id) => id && !/whisper|guard|tts|vision|embed/i.test(id) && !MODELS.includes(id),
+    )
+    return chat ?? null
+  } catch {
+    return null
+  }
+}
 
 export type AiResult = { text?: string; error?: string }
 
@@ -51,7 +73,11 @@ export async function askGroq(system: string, user: string): Promise<AiResult> {
 
   let lastError = 'Помощник не ответил. Попробуйте ещё раз'
 
-  for (const model of MODELS) {
+  // Если Groq отключил все знакомые модели — спрашиваем у него живой список
+  const discovered = await discoverModel(key)
+  const models = discovered ? [...MODELS, discovered] : MODELS
+
+  for (const model of models) {
     try {
       const response = await fetch(ENDPOINT, {
         method: 'POST',
@@ -74,9 +100,12 @@ export async function askGroq(system: string, user: string): Promise<AiResult> {
 
       if (response.ok) {
         const data = (await response.json()) as {
-          choices?: { message?: { content?: string } }[]
+          choices?: { message?: { content?: string; reasoning?: string } }[]
         }
-        const text = data.choices?.[0]?.message?.content?.trim()
+        const message = data.choices?.[0]?.message
+
+        // Часть моделей кладёт ответ не в content, а в reasoning — берём оба
+        const text = (message?.content || message?.reasoning || '').trim()
 
         if (text) return { text }
 

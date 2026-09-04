@@ -170,6 +170,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Администратору в нижнем меню нужна кнопка панели управления,
   // а вошедшему человеку не нужны призывы зарегистрироваться
   let isAdmin = false
+  let isSeller = false
   let signedIn = false
   try {
     const supabase = await createClient()
@@ -186,9 +187,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         .eq('id', user.id)
         .maybeSingle()
       isAdmin = profile?.role === 'admin'
+
+      // Кнопка «Мои работы» появляется, когда мастерская уже заведена:
+      // раньше вести туда некуда — сначала профиль мастерской
+      if (profile?.role === 'seller') {
+        const { count } = await supabase
+          .from('companies')
+          .select('id', { count: 'exact', head: true })
+          .eq('owner_user_id', user.id)
+        isSeller = (count ?? 0) > 0
+      }
     }
   } catch {
     isAdmin = false
+    isSeller = false
     signedIn = false
   }
 
@@ -204,7 +216,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           {/* Нижнее меню на телефоне */}
           <Suspense fallback={null}>
-            <TabBar isAdmin={isAdmin} />
+            <TabBar isAdmin={isAdmin} isSeller={isSeller} />
           </Suspense>
         </LocaleProvider>
       </body>
