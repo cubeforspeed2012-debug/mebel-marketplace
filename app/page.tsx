@@ -29,7 +29,7 @@ async function getHomeData() {
         .eq('status', 'active')
         .order('boosted_until', { ascending: false, nullsFirst: false })
         .order('created_at', { ascending: false })
-        .limit(8),
+        .limit(12),
     ])
 
     return {
@@ -72,83 +72,72 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Первый экран: тёплый песочный свет, крупная типографика, поиск в центре внимания */}
-      <section
-        className="relative overflow-hidden border-b border-line"
-        style={{
-          background:
-            'radial-gradient(120% 80% at 15% 0%, #262626 0%, #181818 45%, #101010 100%)',
-        }}
-      >
-        {/* Мягкое тёплое пятно света — как от лампы в шоуруме */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-24 -top-24 size-[420px] rounded-full opacity-60 blur-3xl"
-          style={{ background: 'radial-gradient(circle, rgba(138,112,83,0.35) 0%, transparent 70%)' }}
-        />
+      {/* Наверху — поиск и категории. Дальше сразу мебель: люди пришли смотреть
+          работы мастеров, а не читать про площадку. */}
+      <section className="border-b border-line bg-ink">
+        <div className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+          <form action="/catalog" className="flex gap-2">
+            <input
+              type="search"
+              name="q"
+              placeholder={dict.home.searchPlaceholder}
+              aria-label={dict.home.searchLabel}
+              className="min-w-0 flex-1 rounded-full bg-paper px-5 py-3.5 text-on-dark outline-none transition-shadow duration-200 focus:shadow-[0_0_0_2px_var(--gold)]"
+            />
+            <button
+              type="submit"
+              className="press shrink-0 rounded-full bg-gold px-6 py-3.5 font-semibold text-white transition-colors duration-200 hover:bg-gold-deep"
+            >
+              {dict.common.search}
+            </button>
+          </form>
 
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
-          <div>
-            <div className="eyebrow">{dict.home.city}</div>
-
-            <h1 className="display mt-4 text-[2.6rem] leading-[1.05] text-text sm:text-6xl">
-              {dict.home.titleTop}
-              <br />
-              <span className="text-gold">{dict.home.titleAccent}</span>
-            </h1>
-
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-text-muted">
-              {dict.home.lead}
-            </p>
-
-            <form action="/catalog" className="mt-9 flex max-w-lg gap-2">
-              <input
-                type="search"
-                name="q"
-                placeholder={dict.home.searchPlaceholder}
-                aria-label={dict.home.searchLabel}
-                className="min-w-0 flex-1 rounded-full border border-line bg-paper px-6 py-4 shadow-[0_2px_10px_rgba(0,0,0,0.35)] outline-none transition-shadow duration-200 focus:shadow-[0_0_0_2px_var(--gold)]"
-              />
-              <button
-                type="submit"
-                className="press rounded-full bg-gold px-8 py-4 font-semibold text-white shadow-[0_6px_18px_rgba(138,112,83,0.35)] transition-colors duration-200 hover:bg-gold-deep"
+          <div className="mt-4 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {categoryLinks.map((category) => (
+              <Link
+                key={category.slug}
+                href={`/catalog?category=${category.slug}`}
+                className="press shrink-0 rounded-full bg-paper px-5 py-2.5 text-sm text-on-dark-muted transition-colors duration-200 hover:text-gold"
               >
-                {dict.common.search}
-              </button>
-            </form>
-
-            <div className="stagger mt-6 flex flex-wrap gap-2">
-              {categoryLinks.map((category) => (
-                <Link
-                  key={category.slug}
-                  href={`/catalog?category=${category.slug}`}
-                  className="press rounded-full border border-line bg-paper/70 px-5 py-2.5 text-sm text-text-muted transition-colors duration-200 hover:border-gold hover:text-gold"
-                >
-                  {category.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Что даёт площадка — три коротких обещания */}
-          <div className="stagger grid gap-3">
-            {dict.home.promises.map(([title, text]) => (
-              <div
-                key={title}
-                className="lift rounded-2xl border border-line bg-paper/80 p-5 backdrop-blur-sm"
-              >
-                <div className="font-semibold text-text">{title}</div>
-                <div className="mt-1 text-sm leading-relaxed text-text-muted">{text}</div>
-              </div>
+                {category.name}
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Мебель мастеров — главное, ради чего человек открыл площадку */}
+      <section className="mx-auto max-w-6xl px-4 pt-8">
+        <div className="mb-5 flex items-end justify-between gap-3">
+          <h1 className="display text-2xl text-text">{dict.home.freshTitle}</h1>
+          <Link href="/catalog" className="text-sm font-semibold text-gold hover:underline">
+            {dict.home.allCatalog}
+          </Link>
+        </div>
+
+        {products.length > 0 ? (
+          <div className="stagger grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-3xl border border-dashed border-line bg-paper p-12 text-center">
+            <p className="text-text-muted">{dict.home.empty}</p>
+            <Link
+              href="/dashboard"
+              className="press mt-5 inline-block rounded-full bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
+            >
+              {dict.home.emptyAction}
+            </Link>
+          </div>
+        )}
+      </section>
+
       {/* Две большие двери: купить мебель или стать мастером.
           Вошедшему это не нужно — он уже внутри, и звать его некуда. */}
       {!signedIn && (
-        <section className="mx-auto max-w-6xl px-4 pt-10">
+        <section className="mx-auto max-w-6xl px-4 pt-12">
           <div className="stagger grid gap-4 lg:grid-cols-2">
             <div className="rounded-[28px] bg-paper p-7 sm:p-9">
               <div className="eyebrow text-gold">{dict.home.buyers}</div>
@@ -214,34 +203,6 @@ export default async function HomePage() {
             <span className="mt-6 inline-block font-semibold text-gold">{dict.home.customLink}</span>
           </Link>
         </div>
-      </section>
-
-      {/* Свежие работы */}
-      <section className="mx-auto max-w-6xl px-4 pb-14">
-        <div className="mb-7 flex items-end justify-between">
-          <h2 className="display gold-rule text-2xl text-text">{dict.home.freshTitle}</h2>
-          <Link href="/catalog" className="text-sm font-semibold text-gold hover:underline">
-            {dict.home.allCatalog}
-          </Link>
-        </div>
-
-        {products.length > 0 ? (
-          <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-12 text-center">
-            <p className="text-text-muted">{dict.home.empty}</p>
-            <Link
-              href="/dashboard"
-              className="press mt-5 inline-block rounded-[var(--radius)] bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
-            >
-              {dict.home.emptyAction}
-            </Link>
-          </div>
-        )}
       </section>
 
       {/* Две стороны площадки */}
