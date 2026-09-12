@@ -36,29 +36,6 @@ const SECTIONS = [
     ),
   },
   {
-    href: '/dashboard',
-    label: 'Кабинет мастера',
-    icon: (
-      <>
-        <rect x="3.5" y="3.5" width="7" height="7" rx="1.8" />
-        <rect x="13.5" y="3.5" width="7" height="7" rx="1.8" />
-        <rect x="3.5" y="13.5" width="7" height="7" rx="1.8" />
-        <rect x="13.5" y="13.5" width="7" height="7" rx="1.8" />
-      </>
-    ),
-  },
-  {
-    href: '/companies',
-    label: 'Мастера на сайте',
-    icon: (
-      <>
-        <circle cx="9" cy="8" r="3.2" />
-        <path d="M3 19.5c0-3.2 2.7-5.2 6-5.2s6 2 6 5.2" />
-        <path d="M16.5 6.2a3 3 0 0 1 0 5.6M18 19.5c0-2.3-.9-4-2.4-5" />
-      </>
-    ),
-  },
-  {
     href: '/profile',
     label: 'Мой профиль',
     icon: (

@@ -67,81 +67,104 @@ function IconProfile(active: boolean) {
   )
 }
 
-const TABS: (Omit<TabItem, 'label'> & {
-  key: 'home' | 'catalog' | 'masters' | 'profile' | 'admin' | 'works'
-  match: (path: string) => boolean
-})[] = [
-  { href: '/', key: 'home', icon: IconHome, match: (p) => p === '/' },
-  {
-    href: '/catalog',
-    key: 'catalog',
-    icon: IconSearch,
-    match: (p) => p.startsWith('/catalog') || p.startsWith('/product'),
-  },
-  {
-    href: '/companies',
-    key: 'masters',
-    icon: IconMasters,
-    match: (p) => p.startsWith('/companies') || p.startsWith('/company'),
-  },
-  {
-    href: '/profile',
-    key: 'profile',
-    icon: IconProfile,
-    match: (p) =>
-      p.startsWith('/profile') ||
-      p.startsWith('/dashboard') ||
-      p.startsWith('/account') ||
-      p.startsWith('/admin') ||
-      p.startsWith('/auth'),
-  },
-]
+type TabKey =
+  | 'home'
+  | 'catalog'
+  | 'masters'
+  | 'profile'
+  | 'overview'
+  | 'orders'
+  | 'portfolio'
+  | 'approvals'
+  | 'accounts'
+
+type Tab = Omit<TabItem, 'label'> & { key: TabKey; match: (path: string) => boolean }
+
+function IconChart(active: boolean) {
+  return (
+    <svg viewBox="0 0 24 24" className="size-[22px]" fill="none" strokeWidth={active ? 2.4 : 1.8}
+         stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M4 19.5h16" />
+      <path d="M7 16v-5M12 16V7M17 16v-3" />
+    </svg>
+  )
+}
+
+function IconOrders(active: boolean) {
+  return (
+    <svg viewBox="0 0 24 24" className="size-[22px]" fill="none" strokeWidth={active ? 2.4 : 1.8}
+         stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="4" y="3.5" width="16" height="17" rx="2.5" />
+      <path d="M8 9h8M8 13h8M8 17h4" />
+    </svg>
+  )
+}
+
+function IconCheck(active: boolean) {
+  return (
+    <svg viewBox="0 0 24 24" className="size-[22px]" fill="none" strokeWidth={active ? 2.6 : 2}
+         stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M4 12.5 9.5 18 20 6.5" />
+    </svg>
+  )
+}
+
+const HOME: Tab = { href: '/', key: 'home', icon: IconHome, match: (p) => p === '/' }
+const CATALOG: Tab = {
+  href: '/catalog',
+  key: 'catalog',
+  icon: IconSearch,
+  match: (p) => p.startsWith('/catalog') || p.startsWith('/product'),
+}
+const MASTERS: Tab = {
+  href: '/companies',
+  key: 'masters',
+  icon: IconMasters,
+  match: (p) => p.startsWith('/companies') || p.startsWith('/company'),
+}
+const PROFILE: Tab = {
+  href: '/profile',
+  key: 'profile',
+  icon: IconProfile,
+  match: (p) => p.startsWith('/profile') || p.startsWith('/account') || p.startsWith('/auth'),
+}
+
+/*
+ * У каждого своё меню, и в нём только то, чем он пользуется каждый день.
+ * Гость и покупатель смотрят и ищут. Мастер работает: заказы, портфолио,
+ * цифры. Администратор разбирает очередь и следит за площадкой.
+ */
+const SETS: Record<'guest' | 'buyer' | 'seller' | 'admin', Tab[]> = {
+  guest: [HOME, CATALOG, MASTERS, PROFILE],
+  buyer: [HOME, CATALOG, MASTERS, PROFILE],
+  seller: [
+    { href: '/dashboard', key: 'overview', icon: IconChart, match: (p) => p === '/dashboard' || p.startsWith('/dashboard/clients') || p.startsWith('/dashboard/promotion') || p.startsWith('/dashboard/company') },
+    { href: '/dashboard/orders', key: 'orders', icon: IconOrders, match: (p) => p.startsWith('/dashboard/orders') },
+    { href: '/dashboard/products', key: 'portfolio', icon: IconWorks, match: (p) => p.startsWith('/dashboard/products') },
+    PROFILE,
+  ],
+  admin: [
+    { href: '/admin', key: 'overview', icon: IconPanel, match: (p) => p === '/admin' || p.startsWith('/admin/company') },
+    { href: '/admin/approvals', key: 'approvals', icon: IconCheck, match: (p) => p.startsWith('/admin/approvals') },
+    { href: '/admin/users', key: 'accounts', icon: IconMasters, match: (p) => p.startsWith('/admin/users') },
+    { ...PROFILE, match: (p) => p.startsWith('/profile') || p.startsWith('/account') || p.startsWith('/dashboard') },
+  ],
+}
 
 /**
  * Нижнее меню на телефоне: стеклянная плашка, перетекающая капсула
  * и приподнятая кнопка главного действия посередине.
  */
-export function TabBar({
-  isAdmin = false,
-  isSeller = false,
-}: {
-  isAdmin?: boolean
-  isSeller?: boolean
-}) {
+export function TabBar({ role = 'guest' }: { role?: 'guest' | 'buyer' | 'seller' | 'admin' }) {
   const dict = useDict()
   const pathname = usePathname()
   useSearchParams() // держим компонент в Suspense-границе вместе с навигацией
 
-  /*
-   * Третья кнопка меняется под человека:
-   * администратору — панель управления, мастеру — его работы,
-   * покупателю остаются мастера города.
-   */
-  const tabs = TABS.map((tab) => {
-    if (tab.key !== 'masters') return tab
-
-    if (isAdmin) {
-      return {
-        href: '/admin',
-        key: 'admin' as const,
-        icon: IconPanel,
-        match: (p: string) => p.startsWith('/admin'),
-      }
-    }
-
-    if (isSeller) {
-      return {
-        href: '/dashboard/products',
-        key: 'works' as const,
-        icon: IconWorks,
-        match: (p: string) => p.startsWith('/dashboard/products'),
-      }
-    }
-
-    return tab
-  })
-
+  const tabs = SETS[role]
   const activeIndex = tabs.findIndex((tab) => tab.match(pathname))
+
+  // Кнопка «+» — только тем, кому есть что добавлять: работу в портфолио
+  const canAdd = role === 'seller' || role === 'admin'
 
   return (
     <nav
@@ -155,6 +178,7 @@ export function TabBar({
         />
 
         {/* Главное действие — приподнятая кнопка по центру */}
+        {canAdd && (
         <Link
           href="/dashboard/products/new"
           aria-label={dict.nav.add}
@@ -165,6 +189,7 @@ export function TabBar({
             <path d="M12 5v14M5 12h14" />
           </svg>
         </Link>
+        )}
       </div>
     </nav>
   )

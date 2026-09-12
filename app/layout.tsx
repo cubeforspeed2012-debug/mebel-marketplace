@@ -193,6 +193,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let isAdmin = false
   let isSeller = false
   let signedIn = false
+  let role: 'guest' | 'buyer' | 'seller' | 'admin' = 'guest'
   try {
     const supabase = await createClient()
     const {
@@ -208,6 +209,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         .eq('id', user.id)
         .maybeSingle()
       isAdmin = profile?.role === 'admin'
+      role = profile?.role === 'admin' ? 'admin' : profile?.role === 'seller' ? 'seller' : 'buyer'
 
       // Кнопка «Мои работы» появляется, когда мастерская уже заведена:
       // раньше вести туда некуда — сначала профиль мастерской
@@ -223,6 +225,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     isAdmin = false
     isSeller = false
     signedIn = false
+    role = 'guest'
   }
 
   return (
@@ -244,7 +247,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           {/* Нижнее меню на телефоне */}
           <Suspense fallback={null}>
-            <TabBar isAdmin={isAdmin} isSeller={isSeller} />
+            {/* Мастер без мастерской видит меню покупателя: его разделов ещё нет */}
+            <TabBar role={role === 'seller' && !isSeller ? 'buyer' : role} />
           </Suspense>
         </LocaleProvider>
       </body>

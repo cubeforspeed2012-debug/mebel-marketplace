@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { RequestForm } from '@/components/request-form'
 import { ContactButtons } from '@/components/contact-buttons'
+import { ProductCard } from '@/components/product-card'
 import { formatPrice } from '@/lib/constants'
 import { districtIn, priceIn } from '@/lib/i18n'
 import { getDictionary } from '@/lib/locale'
@@ -35,6 +36,51 @@ async function getProduct(id: string) {
   }
 }
 
+/**
+ * Мастер целиком и его другие работы. Человек нажал на одну кухню —
+ * ему нужно сразу понять, кто её сделал и что ещё умеет.
+ */
+async function getMaster(companyId: number, excludeProductId: number) {
+  try {
+    const supabase = await createClient()
+
+    const [companyResult, othersResult, countResult] = await Promise.all([
+      supabase
+        .from('companies')
+        .select('id, name, slug, district, work_type, description, logo_url, created_at')
+        .eq('id', companyId)
+        .maybeSingle(),
+      supabase
+        .from('products')
+        .select(
+          `id, company_id, category_id, slug, title, description, type, price,
+           price_from, currency, status, boosted_until, views_count, created_at,
+           companies (id, name, slug, district, phone_public, work_type),
+           product_images (id, product_id, url, sort_order),
+           categories (id, name, slug)`,
+        )
+        .eq('company_id', companyId)
+        .eq('status', 'active')
+        .neq('id', excludeProductId)
+        .order('created_at', { ascending: false })
+        .limit(4),
+      supabase
+        .from('products')
+        .select('id', { count: 'exact', head: true })
+        .eq('company_id', companyId)
+        .eq('status', 'active'),
+    ])
+
+    return {
+      master: companyResult.data,
+      others: (othersResult.data ?? []) as unknown as ProductCardType[],
+      worksCount: countResult.count ?? 0,
+    }
+  } catch {
+    return { master: null, others: [] as ProductCardType[], worksCount: 0 }
+  }
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const product = await getProduct(id)
@@ -59,6 +105,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
   const images = [...(product.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order)
   const company = product.companies
+  const { master, others, worksCount } = company
+    ? await getMaster(company.id, product.id)
+    : { master: null, others: [], worksCount: 0 }
 
   // Считаем просмотр товара — попадёт в статистику мастера и площадки
   await bumpViews('product', product.id)
@@ -132,21 +181,46 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               <div className="text-xs font-semibold uppercase tracking-widest text-text-muted">
                 {dict.product.master}
               </div>
+
+              {/* Кто сделал: лицо мастерской, а не одна строка с названием */}
               <Link
                 href={`/company/${company.slug ?? company.id}`}
-                className="mt-2 block text-lg font-semibold hover:text-gold-deep"
+                className="mt-3 flex items-center gap-4"
               >
-                {company.name}
-              </Link>
-              <div className="mt-1 text-sm text-text-muted">
-                {company.work_type && dict.workTypes[company.work_type]}
-                {company.district && (
-                  <span>
-                    {' · '}
-                    {districtIn(dict, company.district)} {dict.companies.district}
+                <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-cream text-xl font-semibold text-gold">
+                  {master?.logo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={master.logo_url} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    company.name.charAt(0)
+                  )}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-lg font-semibold hover:text-gold-deep">
+                    {company.name}
                   </span>
-                )}
-              </div>
+                  <span className="block text-sm text-text-muted">
+                    {company.work_type && dict.workTypes[company.work_type]}
+                    {company.district && (
+                      <>
+                        {' · '}
+                        {districtIn(dict, company.district)} {dict.companies.district}
+                      </>
+                    )}
+                  </span>
+                  {worksCount > 0 && (
+                    <span className="mt-0.5 block text-xs text-gold">
+                      {worksCount} {dict.product.worksCount}
+                    </span>
+                  )}
+                </span>
+              </Link>
+
+              {master?.description && (
+                <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-text-muted">
+                  {master.description}
+                </p>
+              )}
 
               <div className="mt-5">
                 <ContactButtons
@@ -158,9 +232,16 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 />
               </div>
 
-              <div className="mt-3">
+              <div className="mt-3 flex flex-wrap items-center gap-3">
                 <RequestForm companyId={company.id} productId={product.id} compact />
               </div>
+
+              <Link
+                href={`/company/${company.slug ?? company.id}`}
+                className="press mt-4 block rounded-full bg-sand px-5 py-3 text-center text-sm font-semibold text-text transition-colors hover:bg-gold hover:text-white"
+              >
+                {dict.product.portfolio} →
+              </Link>
             </div>
           )}
 
@@ -173,9 +254,29 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
+      {/* Другие работы того же мастера — чтобы не уходить в каталог за сравнением */}
+      {others.length > 0 && company && (
+        <section className="mt-14">
+          <div className="mb-6 flex items-end justify-between gap-3">
+            <h2 className="display gold-rule text-2xl text-text">{dict.product.similar}</h2>
+            <Link
+              href={`/company/${company.slug ?? company.id}`}
+              className="text-sm font-semibold text-gold hover:underline"
+            >
+              {dict.product.portfolio} →
+            </Link>
+          </div>
+          <div className="stagger grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {others.map((item) => (
+              <ProductCard key={item.id} product={item} />
+            ))}
+          </div>
+        </section>
+      )}
+
       <div className="mt-12">
         <Link href="/catalog" className="font-semibold text-gold-deep hover:underline">
-          ← Вернуться в каталог
+          {dict.company.backToCatalog}
         </Link>
       </div>
     </div>

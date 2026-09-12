@@ -60,10 +60,10 @@ const ICONS: Record<string, React.ReactNode> = {
 }
 
 const NAV = [
-  { href: '/dashboard', label: 'Обзор', icon: 'overview' },
-  { href: '/dashboard/orders', label: 'Заявки и заказы', icon: 'orders' },
+  { href: '/dashboard', label: 'Аналитика', icon: 'overview' },
+  { href: '/dashboard/orders', label: 'Заказы', icon: 'orders' },
   { href: '/dashboard/clients', label: 'Клиенты', icon: 'clients' },
-  { href: '/dashboard/products', label: 'Моя мебель', icon: 'products' },
+  { href: '/dashboard/products', label: 'Портфолио', icon: 'products' },
   { href: '/dashboard/company', label: 'Мастерская', icon: 'company' },
   { href: '/dashboard/promotion', label: 'Продвижение', icon: 'promotion' },
 ]
