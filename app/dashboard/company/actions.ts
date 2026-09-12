@@ -52,6 +52,34 @@ export async function saveCompany(_prev: FormState, formData: FormData): Promise
     updated_at: new Date().toISOString(),
   }
 
+  /*
+   * Логотип может прийти и файлом — прямо в форме. Загрузка из браузера
+   * работает не на всех телефонах, а обычное поле файла работает везде.
+   */
+  const logo = formData.get('logo_file')
+  if (logo instanceof File && logo.size > 0) {
+    if (logo.size > 5 * 1024 * 1024) {
+      return { error: 'Логотип больше 5 МБ — уменьшите и попробуйте снова' }
+    }
+
+    const ext = logo.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const path = `${user.id}/${crypto.randomUUID()}.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('company-media')
+      .upload(path, logo, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: logo.type || 'image/jpeg',
+      })
+
+    if (uploadError) {
+      return { error: `Не удалось загрузить логотип: ${uploadError.message}` }
+    }
+
+    fields.logo_url = supabase.storage.from('company-media').getPublicUrl(path).data.publicUrl
+  }
+
   const { data: existing } = await supabase
     .from('companies')
     .select('id, slug')

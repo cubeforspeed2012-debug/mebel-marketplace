@@ -30,6 +30,27 @@ export function ProductForm({
 
       <GalleryUpload value={images} onChange={setImages} />
 
+      {/*
+        Второй способ добавить фото — обычное поле файла внутри формы.
+        Оно уходит на сервер вместе с товаром и работает на любом телефоне,
+        даже если загрузка прямо из браузера не сработала.
+      */}
+      <label className="block rounded-2xl border border-dashed border-line p-4">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-widest text-text-muted">
+          Не получилось добавить фото выше? Выберите их здесь
+        </span>
+        <input
+          type="file"
+          name="photos"
+          accept="image/*"
+          multiple
+          className="block w-full text-sm text-text-muted file:mr-3 file:cursor-pointer file:rounded-full file:border-0 file:bg-gold file:px-5 file:py-2.5 file:text-sm file:font-semibold file:text-white"
+        />
+        <span className="mt-2 block text-xs text-text-muted">
+          Эти фото загрузятся при нажатии «Сохранить». До 5 МБ каждое.
+        </span>
+      </label>
+
       {images.length === 0 && (
         <p className="rounded-2xl bg-status-process/15 px-4 py-3 text-sm text-status-process">
           Без фото карточку почти никто не открывает. Добавьте хотя бы одну — лучше готовую

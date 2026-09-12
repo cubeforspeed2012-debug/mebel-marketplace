@@ -34,6 +34,11 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
   const { supabase, company } = await getOwnCompany()
   if (!company) return { error: 'Сначала создайте профиль мастерской' }
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: 'Сессия истекла — войдите заново' }
+
   const id = formData.get('id') ? Number(formData.get('id')) : null
   const title = String(formData.get('title') ?? '').trim()
   if (title.length < 2) return { error: 'Укажите название' }
@@ -52,7 +57,7 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
     updated_at: new Date().toISOString(),
   }
 
-  // Фото пришли из браузера уже загруженными — здесь только их ссылки.
+  // Фото, которые браузер успел загрузить сам — здесь только их ссылки.
   let images: string[] = []
   try {
     const raw = String(formData.get('images') ?? '[]')
@@ -61,6 +66,39 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
   } catch {
     images = []
   }
+
+  /*
+   * Запасной и главный путь: файлы приходят прямо в форме.
+   * Загрузка из браузера работает не во всех телефонах, а форма —
+   * везде, поэтому то, что пришло файлами, кладём в хранилище здесь.
+   */
+  const files = formData
+    .getAll('photos')
+    .filter((entry): entry is File => entry instanceof File && entry.size > 0)
+
+  for (const file of files.slice(0, 12 - images.length)) {
+    if (file.size > 5 * 1024 * 1024) {
+      return { error: `Фото «${file.name}» больше 5 МБ — уменьшите и попробуйте снова` }
+    }
+
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const path = `${user.id}/${crypto.randomUUID()}.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('company-media')
+      .upload(path, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type || 'image/jpeg',
+      })
+
+    if (uploadError) {
+      return { error: `Не удалось загрузить «${file.name}»: ${uploadError.message}` }
+    }
+
+    images.push(supabase.storage.from('company-media').getPublicUrl(path).data.publicUrl)
+  }
+
 
   let productId = id
 

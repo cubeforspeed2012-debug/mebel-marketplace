@@ -22,6 +22,22 @@ export function CompanyForm({ company }: { company: Company | null }) {
 
       <ImageUpload value={logo} onChange={setLogo} label="Логотип мастерской" />
 
+      {/* Запасной путь — обычное поле файла, работает на любом телефоне */}
+      <label className="block rounded-2xl border border-dashed border-line p-4">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-widest text-text-muted">
+          Не получилось загрузить логотип? Выберите файл здесь
+        </span>
+        <input
+          type="file"
+          name="logo_file"
+          accept="image/*"
+          className="block w-full text-sm text-text-muted file:mr-3 file:cursor-pointer file:rounded-full file:border-0 file:bg-gold file:px-5 file:py-2.5 file:text-sm file:font-semibold file:text-white"
+        />
+        <span className="mt-2 block text-xs text-text-muted">
+          Загрузится при нажатии «Сохранить». До 5 МБ.
+        </span>
+      </label>
+
       <label className="block">
         <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
           Название мастерской
