@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 const MAX_MB = 5
@@ -22,7 +22,6 @@ export function ImageUpload({
 }) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
 
   async function handleFile(file: File) {
     setError(null)
@@ -70,7 +69,7 @@ export function ImageUpload({
 
       <div className="flex items-start gap-4">
         <div
-          className={`shrink-0 overflow-hidden border border-line bg-cream ${
+          className={`shrink-0 overflow-hidden rounded-2xl border border-line bg-cream ${
             shape === 'wide' ? 'h-24 w-40' : 'size-24'
           }`}
         >
@@ -85,26 +84,24 @@ export function ImageUpload({
         </div>
 
         <div className="flex flex-col gap-2">
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (file) handleFile(file)
-              e.target.value = ''
-            }}
-          />
-
-          <button
-            type="button"
-            disabled={uploading}
-            onClick={() => inputRef.current?.click()}
-            className="border border-line bg-paper px-4 py-2 text-sm font-semibold transition-colors hover:border-gold disabled:opacity-60"
+          <label
+            className={`press inline-flex cursor-pointer items-center gap-2 rounded-full bg-gold px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-gold-deep ${
+              uploading ? 'pointer-events-none opacity-60' : ''
+            }`}
           >
             {uploading ? 'Загружаем…' : value ? 'Заменить фото' : 'Загрузить фото'}
-          </button>
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploading}
+              className="sr-only"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) handleFile(file)
+                e.target.value = ''
+              }}
+            />
+          </label>
 
           {value && (
             <button

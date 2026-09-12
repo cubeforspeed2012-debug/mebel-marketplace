@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { CategoryIcon, FurnitureScene } from '@/components/furniture-icons'
 import { ProductCard } from '@/components/product-card'
 import { FALLBACK_CATEGORIES } from '@/lib/constants'
 import { getDictionary } from '@/lib/locale'
@@ -82,7 +83,7 @@ export default async function HomePage() {
               name="q"
               placeholder={dict.home.searchPlaceholder}
               aria-label={dict.home.searchLabel}
-              className="min-w-0 flex-1 rounded-full bg-paper px-5 py-3.5 text-on-dark outline-none transition-shadow duration-200 focus:shadow-[0_0_0_2px_var(--gold)]"
+              className="min-w-0 flex-1 rounded-full bg-paper px-5 py-3.5 text-text outline-none transition-shadow duration-200 placeholder:text-text-muted focus:shadow-[0_0_0_2px_var(--gold)]"
             />
             <button
               type="submit"
@@ -97,8 +98,9 @@ export default async function HomePage() {
               <Link
                 key={category.slug}
                 href={`/catalog?category=${category.slug}`}
-                className="press shrink-0 rounded-full bg-paper px-5 py-2.5 text-sm text-on-dark-muted transition-colors duration-200 hover:text-gold"
+                className="press flex shrink-0 items-center gap-2 rounded-full bg-paper px-4 py-2.5 text-sm text-text-muted transition-colors duration-200 hover:text-gold"
               >
+                <CategoryIcon slug={category.slug} className="size-4.5" />
                 {category.name}
               </Link>
             ))}
@@ -123,7 +125,8 @@ export default async function HomePage() {
           </div>
         ) : (
           <div className="rounded-3xl border border-dashed border-line bg-paper p-12 text-center">
-            <p className="text-text-muted">{dict.home.empty}</p>
+            <FurnitureScene className="mx-auto h-28 w-auto text-text-muted opacity-70" />
+            <p className="mt-5 text-text-muted">{dict.home.empty}</p>
             <Link
               href="/dashboard"
               className="press mt-5 inline-block rounded-full bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"

@@ -15,6 +15,7 @@ export const ru = {
     share: 'Поделиться',
     shareCopied: 'Ссылка скопирована',
     loading: 'Загружаем…',
+    noPhoto: 'Фото скоро',
   },
 
   nav: {

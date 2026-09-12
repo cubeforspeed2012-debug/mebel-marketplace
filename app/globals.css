@@ -4,7 +4,10 @@
    Дизайн-система Mebel — строгая B2B-палитра из брифа.
    Холодный светлый интерфейс, тёмная навигация, приглушённый акцент.
    --------------------------------------------------------------- */
-:root {
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
   /* Тёмная основа — как в кабинете управления: спокойный графит, без черноты */
   --ink: #171717;          /* панели: шапка, футер, меню */
   --ink-deep: #0f0f0f;     /* самый глубокий слой */
@@ -36,6 +39,37 @@
   --radius: 16px;
 }
 
+/*
+ * Светлая тема — тёплая, как выставочный зал: лён, светлое дерево, бумага.
+ * Шапка и подвал остаются тёмными: так витрина держит форму, а мебель
+ * на светлом фоне смотрится как в каталоге.
+ */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --ink: #2b2520;
+  --ink-deep: #1f1a16;
+  --cream: #f7f2ea;
+  --paper: #ffffff;
+  --sand: #efe6d8;
+
+  --gold: #8a7053;
+  --gold-deep: #6f5941;    /* темнее: наведение на светлом */
+  --gold-soft: #e8dccb;
+
+  --line: #e5d9c8;
+  --line-dark: #3b332b;
+
+  --text: #2b2520;
+  --text-muted: #7c7062;
+  --text-on-dark: #f8f4ee;
+  --text-on-dark-muted: #b6a894;
+
+  --status-done: #15803d;
+  --status-process: #b45309;
+  --status-error: #b91c1c;
+}
+
 @theme inline {
   --color-ink: var(--ink);
   --color-ink-deep: var(--ink-deep);
@@ -58,12 +92,6 @@
   --radius-card: var(--radius);
   --font-display: var(--font-manrope);
   --font-sans: var(--font-inter);
-}
-
-/* Тема тёмная во всём приложении — говорим об этом браузеру,
-   иначе он подставляет светлые поля ввода и полосы прокрутки. */
-:root {
-  color-scheme: dark;
 }
 
 body {
@@ -124,6 +152,19 @@ summary {
   box-shadow:
     0 1px 2px rgb(0 0 0 / 0.3),
     0 8px 24px rgb(0 0 0 / 0.45);
+}
+[data-theme="light"] .glass {
+  box-shadow:
+    0 1px 2px rgb(59 51 43 / 0.06),
+    0 8px 24px rgb(59 51 43 / 0.12);
+}
+
+/* Мягкое свечение фона на страницах входа — в цветах текущей темы */
+.page-glow {
+  background: radial-gradient(120% 90% at 50% 0%, var(--sand) 0%, var(--cream) 45%, var(--ink-deep) 100%);
+}
+[data-theme="light"] .page-glow {
+  background: radial-gradient(120% 90% at 50% 0%, #fffdf9 0%, var(--cream) 45%, var(--sand) 100%);
 }
 
 .glass-dark {
@@ -189,6 +230,9 @@ summary {
 .lift:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 22px rgb(0 0 0 / 0.45);
+}
+[data-theme="light"] .lift:hover {
+  box-shadow: 0 8px 24px rgb(59 51 43 / 0.12);
 }
 
 /* Полоса перехода: быстро бежит вперёд и притормаживает, ожидая страницу */

@@ -81,13 +81,18 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
   if (productId) {
     await supabase.from('product_images').delete().eq('product_id', productId)
     if (images.length) {
-      await supabase.from('product_images').insert(
+      const { error: imagesError } = await supabase.from('product_images').insert(
         images.slice(0, 12).map((url, index) => ({
           product_id: productId,
           url,
           sort_order: index,
         })),
       )
+
+      // Товар уже сохранён, но без фото — скажем прямо, а не сделаем вид, что всё хорошо
+      if (imagesError) {
+        return { error: `Товар сохранён, но фото не записались: ${imagesError.message}` }
+      }
     }
   }
 

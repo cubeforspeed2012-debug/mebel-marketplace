@@ -19,10 +19,10 @@ function Stat({
     <Link
       href={href}
       className={`lift block rounded-3xl p-5 ${
-        accent ? 'bg-white text-[#171717]' : 'bg-paper'
+        accent ? 'bg-text text-cream' : 'bg-paper'
       }`}
     >
-      <div className={`text-sm ${accent ? 'text-[#6b6b6b]' : 'text-text-muted'}`}>{label}</div>
+      <div className={`text-sm ${accent ? 'text-cream/70' : 'text-text-muted'}`}>{label}</div>
       <div className="mt-3 text-3xl font-semibold">{value}</div>
     </Link>
   )

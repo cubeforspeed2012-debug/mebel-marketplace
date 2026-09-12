@@ -21,7 +21,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   })
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] p-3 sm:p-5">
+    <div data-theme="dark" className="min-h-screen bg-[#0f0f0f] p-3 sm:p-5">
       <div className="mx-auto flex max-w-[1400px] gap-4">
         <Suspense fallback={<div className="hidden w-[68px] shrink-0 rounded-3xl bg-[#171717] lg:block" />}>
           <AdminRail pending={pending} />

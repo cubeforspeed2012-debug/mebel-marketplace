@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { CategoryIcon, FurnitureScene } from '@/components/furniture-icons'
 import { ProductCard } from '@/components/product-card'
 import { DISTRICTS, FALLBACK_CATEGORIES, PRODUCT_TYPES } from '@/lib/constants'
 import { districtIn } from '@/lib/i18n'
@@ -104,7 +105,7 @@ function FilterChip({
       href={href}
       className={`press rounded-[var(--radius)] border px-4 py-2 text-sm transition-colors duration-200 ${
         active
-          ? 'border-ink bg-ink font-semibold text-on-dark'
+          ? 'border-gold bg-gold font-semibold text-white'
           : 'border-line bg-paper text-text-muted hover:border-gold hover:text-gold'
       }`}
     >
@@ -174,7 +175,10 @@ export default async function CatalogPage({
                   href={filterHref(params, 'category', category.slug)}
                   active={params.category === category.slug}
                 >
-                  {category.name}
+                  <span className="inline-flex items-center gap-2">
+                    <CategoryIcon slug={category.slug} className="size-4" />
+                    {category.name}
+                  </span>
                 </FilterChip>
               ))}
             </div>
@@ -233,7 +237,8 @@ export default async function CatalogPage({
             </>
           ) : (
             <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-14 text-center">
-              <p className="text-text-muted">{dict.catalog.empty}</p>
+              <FurnitureScene className="mx-auto h-28 w-auto text-text-muted opacity-70" />
+              <p className="mt-5 text-text-muted">{dict.catalog.empty}</p>
               <Link
                 href="/catalog"
                 className="mt-3 inline-block font-semibold text-gold hover:underline"

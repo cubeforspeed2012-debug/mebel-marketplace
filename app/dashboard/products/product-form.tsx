@@ -30,6 +30,13 @@ export function ProductForm({
 
       <GalleryUpload value={images} onChange={setImages} />
 
+      {images.length === 0 && (
+        <p className="rounded-2xl bg-status-process/15 px-4 py-3 text-sm text-status-process">
+          Без фото карточку почти никто не открывает. Добавьте хотя бы одну — лучше готовую
+          работу у клиента дома.
+        </p>
+      )}
+
       <label className="block">
         <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
           Название

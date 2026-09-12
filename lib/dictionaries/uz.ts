@@ -14,6 +14,7 @@ export const uz: typeof ru = {
     share: 'Ulashish',
     shareCopied: 'Havola nusxalandi',
     loading: 'Yuklanmoqda…',
+    noPhoto: 'Surat tez orada',
   },
 
   nav: {

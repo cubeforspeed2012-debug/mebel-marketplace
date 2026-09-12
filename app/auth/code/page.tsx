@@ -12,10 +12,7 @@ export default async function CodePage({
 
   return (
     <div
-      className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-14"
-      style={{
-        background: 'radial-gradient(120% 90% at 50% 0%, #242424 0%, #181818 45%, #101010 100%)',
-      }}
+      className="page-glow flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-14"
     >
       <div className="animate-page w-full max-w-md">
         <div className="mb-7 text-center text-[0.6875rem] font-semibold uppercase tracking-[0.35em] text-text-muted">

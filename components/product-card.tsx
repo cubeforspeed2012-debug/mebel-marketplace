@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { IconArmchair } from '@/components/furniture-icons'
 import { useDict } from '@/components/locale-provider'
 import { districtIn, priceIn } from '@/lib/i18n'
 import type { ProductCard as ProductCardType } from '@/lib/types'
@@ -30,8 +31,9 @@ export function ProductCard({ product }: { product: ProductCardType }) {
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-text-muted">
-            {dict.common.loading}
+          <div className="flex h-full flex-col items-center justify-center gap-2 text-text-muted">
+            <IconArmchair className="size-10 opacity-60" strokeWidth={1.3} />
+            <span className="text-xs">{dict.common.noPhoto}</span>
           </div>
         )}
 

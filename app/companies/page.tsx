@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { CompanyCard } from '@/components/company-card'
+import { FurnitureScene } from '@/components/furniture-icons'
 import { DISTRICTS, WORK_TYPES } from '@/lib/constants'
 import { districtIn } from '@/lib/i18n'
 import { getDictionary } from '@/lib/locale'
@@ -68,7 +69,7 @@ function Chip({
       href={href}
       className={`press rounded-[var(--radius)] border px-4 py-2 text-sm transition-colors duration-200 ${
         active
-          ? 'border-ink bg-ink font-semibold text-on-dark'
+          ? 'border-gold bg-gold font-semibold text-white'
           : 'border-line bg-paper text-text-muted hover:border-gold hover:text-gold'
       }`}
     >
@@ -146,7 +147,8 @@ export default async function CompaniesPage({
             </div>
           ) : (
             <div className="rounded-[var(--radius)] border border-dashed border-line bg-paper p-14 text-center">
-              <p className="text-text-muted">{dict.companies.empty}</p>
+              <FurnitureScene className="mx-auto h-28 w-auto text-text-muted opacity-70" />
+              <p className="mt-5 text-text-muted">{dict.companies.empty}</p>
               <Link
                 href="/dashboard"
                 className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"

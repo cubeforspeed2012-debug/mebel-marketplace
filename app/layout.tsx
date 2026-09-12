@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 import { Inter, Manrope } from 'next/font/google'
 import Link from 'next/link'
 import { Suspense } from 'react'
@@ -7,6 +8,7 @@ import { InstallApp } from '@/components/install-app'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { LocaleProvider } from '@/components/locale-provider'
 import { RouteProgress } from '@/components/route-progress'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { TabBar } from '@/components/tab-bar'
 import type { Dict } from '@/lib/i18n'
 import { getLocale } from '@/lib/locale'
@@ -50,7 +52,15 @@ export const metadata: Metadata = {
   },
 }
 
-function Header({ dict, signedIn }: { dict: Dict; signedIn: boolean }) {
+function Header({
+  dict,
+  signedIn,
+  theme,
+}: {
+  dict: Dict
+  signedIn: boolean
+  theme: 'dark' | 'light'
+}) {
   return (
     <header className="sticky top-0 z-40 border-b border-line-dark bg-ink">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-4">
@@ -88,6 +98,7 @@ function Header({ dict, signedIn }: { dict: Dict; signedIn: boolean }) {
             </>
           )}
           <LanguageSwitcher />
+          <ThemeToggle initial={theme} />
         </div>
       </div>
     </header>
@@ -168,6 +179,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = await getLocale()
   const dict = getDict(locale)
 
+  // Тема из куки — страница сразу приходит в нужном цвете, без мигания
+  let theme: 'dark' | 'light' = 'dark'
+  try {
+    const store = await cookies()
+    if (store.get('theme')?.value === 'light') theme = 'light'
+  } catch {
+    theme = 'dark'
+  }
+
   // Администратору в нижнем меню нужна кнопка панели управления,
   // а вошедшему человеку не нужны призывы зарегистрироваться
   let isAdmin = false
@@ -206,13 +226,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <html lang={locale} className={`${inter.variable} ${manrope.variable} h-full antialiased`}>
+    <html
+      lang={locale}
+      data-theme={theme}
+      className={`${inter.variable} ${manrope.variable} h-full antialiased`}
+    >
       <body className="flex min-h-full flex-col font-sans">
         <LocaleProvider dict={dict}>
           <Suspense fallback={null}>
             <RouteProgress />
           </Suspense>
-          <Header dict={dict} signedIn={signedIn} />
+          <Header dict={dict} signedIn={signedIn} theme={theme} />
           {/* Предложение поставить на домашний экран — там, где его видно сразу */}
           <InstallApp />
           <main className="animate-page flex-1">{children}</main>

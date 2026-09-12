@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 const MAX_MB = 5
@@ -19,7 +19,7 @@ export function GalleryUpload({
 }) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [progress, setProgress] = useState<string | null>(null)
 
   async function handleFiles(files: FileList) {
     setError(null)
@@ -40,8 +40,15 @@ export function GalleryUpload({
       } = await supabase.auth.getUser()
       if (!user) throw new Error('Сессия истекла — войдите заново')
 
-      for (const file of Array.from(files).slice(0, room)) {
-        if (!file.type.startsWith('image/')) continue
+      const list = Array.from(files).slice(0, room)
+
+      for (const [index, file] of list.entries()) {
+        setProgress(`Загружаем ${index + 1} из ${list.length}…`)
+
+        // Телефоны иногда не ставят тип файла — судим и по расширению
+        const looksLikeImage =
+          file.type.startsWith('image/') || /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name)
+        if (!looksLikeImage) continue
         if (file.size > MAX_MB * 1024 * 1024) {
           setError(`«${file.name}» больше ${MAX_MB} МБ — пропущен`)
           continue
@@ -52,9 +59,13 @@ export function GalleryUpload({
 
         const { error: uploadError } = await supabase.storage
           .from('company-media')
-          .upload(path, file, { cacheControl: '3600', upsert: false })
+          .upload(path, file, {
+            cacheControl: '3600',
+            upsert: false,
+            contentType: file.type || 'image/jpeg',
+          })
 
-        if (uploadError) throw uploadError
+        if (uploadError) throw new Error(`Не удалось загрузить «${file.name}»: ${uploadError.message}`)
 
         uploaded.push(supabase.storage.from('company-media').getPublicUrl(path).data.publicUrl)
       }
@@ -64,6 +75,7 @@ export function GalleryUpload({
       setError(e instanceof Error ? e.message : 'Не удалось загрузить фото')
     } finally {
       setUploading(false)
+      setProgress(null)
     }
   }
 
@@ -84,7 +96,7 @@ export function GalleryUpload({
       {value.length > 0 && (
         <div className="mb-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {value.map((url, index) => (
-            <div key={url} className="relative border border-line bg-cream">
+            <div key={url} className="relative overflow-hidden rounded-2xl border border-line bg-cream">
               <div className="aspect-square overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={url} alt="" className="h-full w-full object-cover" />
@@ -129,26 +141,33 @@ export function GalleryUpload({
         </div>
       )}
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        className="hidden"
-        onChange={(e) => {
-          if (e.target.files?.length) handleFiles(e.target.files)
-          e.target.value = ''
-        }}
-      />
-
-      <button
-        type="button"
-        disabled={uploading || value.length >= MAX_PHOTOS}
-        onClick={() => inputRef.current?.click()}
-        className="border border-line bg-paper px-5 py-2.5 text-sm font-semibold transition-colors hover:border-gold disabled:opacity-60"
+      {/*
+        Настоящая подпись к полю, а не кнопка с искусственным кликом:
+        на телефонах скрытое поле файла через .click() открывается не везде,
+        а label открывает выбор файла в любом браузере.
+      */}
+      <label
+        className={`press inline-flex cursor-pointer items-center gap-2 rounded-full bg-gold px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gold-deep ${
+          uploading || value.length >= MAX_PHOTOS ? 'pointer-events-none opacity-60' : ''
+        }`}
       >
-        {uploading ? 'Загружаем…' : 'Добавить фото'}
-      </button>
+        <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2}
+             strokeLinecap="round" aria-hidden>
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        {uploading ? (progress ?? 'Загружаем…') : 'Добавить фото'}
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          disabled={uploading || value.length >= MAX_PHOTOS}
+          className="sr-only"
+          onChange={(e) => {
+            if (e.target.files?.length) handleFiles(e.target.files)
+            e.target.value = ''
+          }}
+        />
+      </label>
 
       <span className="ml-3 text-xs text-text-muted">
         До {MAX_PHOTOS} фото, каждое до {MAX_MB} МБ. Первое станет обложкой.

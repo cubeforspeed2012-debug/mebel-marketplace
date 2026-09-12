@@ -92,7 +92,7 @@ function Item({
       aria-current={active ? 'page' : undefined}
       className={`press flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm transition-colors duration-200 ${
         active
-          ? 'bg-white font-semibold text-[#171717]'
+          ? 'bg-text font-semibold text-cream'
           : 'text-text-muted hover:bg-sand hover:text-text'
       }`}
     >
@@ -106,7 +106,7 @@ function Item({
       {badge && badge > 0 ? (
         <span
           className={`min-w-5 rounded-full px-1.5 py-0.5 text-center text-xs font-semibold ${
-            active ? 'bg-[#171717] text-white' : 'bg-gold text-white'
+            active ? 'bg-gold text-white' : 'bg-gold text-white'
           }`}
         >
           {badge}
