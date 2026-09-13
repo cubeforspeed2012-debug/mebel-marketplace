@@ -30,6 +30,12 @@ async function getCompany(slug: string) {
 
     if (!company) return null
 
+    const { data: portfolio } = await supabase
+      .from('portfolio_photos')
+      .select('id, url')
+      .eq('company_id', company.id)
+      .order('sort_order')
+
     const { data: products } = await supabase
       .from('products')
       .select(
@@ -45,6 +51,7 @@ async function getCompany(slug: string) {
 
     return {
       company: company as Company,
+      portfolio: (portfolio ?? []) as { id: number; url: string }[],
       products: (products ?? []) as unknown as ProductCardType[],
     }
   } catch {
@@ -74,11 +81,22 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
   const data = await getCompany(slug)
   if (!data) notFound()
 
-  const { company, products } = data
+  const { company, portfolio, products } = data
   const favorites = await getFavoriteIds()
 
-  // Все фотографии работ одним списком — так их удобнее листать
-  const works: Work[] = products.flatMap((product) =>
+  /*
+   * Сначала портфолио — то, что мастер выбрал показать в первую очередь,
+   * потом фотографии из карточек товаров.
+   */
+  const works: Work[] = [
+    ...portfolio.map((photo) => ({
+      url: photo.url,
+      title: company.name,
+      productId: 0,
+      price: null,
+      priceFrom: false,
+    })),
+    ...products.flatMap((product) =>
     (product.product_images ?? [])
       .slice()
       .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
@@ -89,7 +107,8 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
         price: product.price,
         priceFrom: product.price_from,
       })),
-  )
+    ),
+  ]
 
   // Считаем просмотр — мастер видит его у себя, площадка в статистике
   await bumpViews('company', company.id)

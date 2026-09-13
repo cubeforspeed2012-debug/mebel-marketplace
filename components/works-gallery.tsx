@@ -158,12 +158,15 @@ export function WorksGallery({ works }: { works: Work[] }) {
                   </button>
                 </>
               )}
-              <Link
-                href={`/product/${current.productId}`}
-                className="press rounded-full bg-gold px-5 py-2 font-semibold text-white transition-colors hover:bg-gold-deep"
-              >
-                {dict.gallery.openWork}
-              </Link>
+              {/* У фотографий портфолио карточки товара нет — и кнопки тоже */}
+              {current.productId > 0 && (
+                <Link
+                  href={`/product/${current.productId}`}
+                  className="press rounded-full bg-gold px-5 py-2 font-semibold text-white transition-colors hover:bg-gold-deep"
+                >
+                  {dict.gallery.openWork}
+                </Link>
+              )}
             </div>
           </div>
         </div>

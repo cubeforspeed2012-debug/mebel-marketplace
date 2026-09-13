@@ -3,6 +3,7 @@ import { formatPrice, PRODUCT_TYPES } from '@/lib/constants'
 import { getSellerContext } from '@/lib/session'
 import type { Product, ProductImage } from '@/lib/types'
 import { deleteProduct, toggleProductStatus } from './actions'
+import { Portfolio, type PortfolioPhoto } from './portfolio'
 
 export const metadata = { title: 'Мои работы' }
 
@@ -26,7 +27,7 @@ export default async function ProductsPage({
           </p>
           <Link
             href="/profile"
-            className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
+            className="press mt-5 inline-block rounded-full bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
           >
             Заполнить профиль
           </Link>
@@ -35,33 +36,44 @@ export default async function ProductsPage({
     )
   }
 
-  const { data } = await supabase
-    .from('products')
-    .select('*, product_images (id, product_id, url, sort_order)')
-    .eq('company_id', company.id)
-    .order('created_at', { ascending: false })
+  const [productsResult, portfolioResult] = await Promise.all([
+    supabase
+      .from('products')
+      .select('*, product_images (id, product_id, url, sort_order)')
+      .eq('company_id', company.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('portfolio_photos')
+      .select('id, url')
+      .eq('company_id', company.id)
+      .order('sort_order'),
+  ])
 
-  const products = (data ?? []) as unknown as Row[]
+  const products = (productsResult.data ?? []) as unknown as Row[]
+  const portfolio = (portfolioResult.data ?? []) as PortfolioPhoto[]
 
   return (
-    <div>
+    <div className="space-y-6">
+      {/* Портфолио — первое, что видят на странице мастера */}
+      <Portfolio photos={portfolio} />
+
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="display gold-rule text-xl">Мои работы</h2>
+        <h2 className="display gold-rule text-xl">Мебель в каталоге</h2>
         <Link
           href="/dashboard/products/new"
-          className="bg-gold px-6 py-2.5 font-semibold text-white transition-colors hover:bg-gold-deep"
+          className="press rounded-full bg-gold px-6 py-2.5 font-semibold text-white transition-colors hover:bg-gold-deep"
         >
           Добавить мебель
         </Link>
       </div>
 
       {saved && (
-        <p className="mt-6 border border-line bg-cream px-4 py-3 text-sm">Сохранено</p>
+        <p className="rounded-2xl bg-status-done/15 px-4 py-3 text-sm text-status-done">Сохранено</p>
       )}
 
       <div className="mt-7 space-y-3">
         {products.length === 0 && (
-          <div className="rounded-3xl rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
+          <div className="rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
             <p className="text-text-muted">
               Пока пусто. Добавьте первую работу — с фото её найдут в каталоге.
             </p>
