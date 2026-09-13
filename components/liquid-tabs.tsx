@@ -23,10 +23,13 @@ export function LiquidTabs({
   items,
   activeIndex,
   variant = 'bar',
+  tight = false,
 }: {
   items: TabItem[]
   activeIndex: number
   variant?: 'bar' | 'inline'
+  /** Кнопок больше четырёх — ужимаем подписи, чтобы влезли на телефоне */
+  tight?: boolean
 }) {
   const listRef = useRef<HTMLDivElement>(null)
   const pillRef = useRef<HTMLSpanElement>(null)
@@ -125,16 +128,16 @@ export function LiquidTabs({
             aria-current={active ? 'page' : undefined}
             className={
               bar
-                ? `press relative z-10 flex flex-1 flex-col items-center gap-1 rounded-full px-1 py-2 text-[0.625rem] font-medium transition-colors duration-200 ${
-                    active ? 'text-white' : 'text-text-muted'
-                  }`
+                ? `press relative z-10 flex min-w-0 flex-1 flex-col items-center gap-1 rounded-full py-2 font-medium transition-colors duration-200 ${
+                    tight ? 'px-0.5 text-[0.5625rem]' : 'px-1 text-[0.625rem]'
+                  } ${active ? 'text-white' : 'text-text-muted'}`
                 : `relative z-10 rounded-full px-4 py-2 text-sm transition-colors duration-200 ${
                     active ? 'font-semibold text-gold' : 'text-text-muted hover:text-text'
                   }`
             }
           >
             {item.icon?.(active)}
-            {item.label}
+            <span className="max-w-full truncate">{item.label}</span>
           </Link>
         )
       })}
