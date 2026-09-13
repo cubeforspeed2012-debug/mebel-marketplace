@@ -76,6 +76,10 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
     .getAll('photos')
     .filter((entry): entry is File => entry instanceof File && entry.size > 0)
 
+  if (files.length === 0 && images.length === 0) {
+    // Не ошибка: товар можно завести и без фото, просто предупредим в форме
+  }
+
   for (const file of files.slice(0, 12 - images.length)) {
     if (file.size > 5 * 1024 * 1024) {
       return { error: `Фото «${file.name}» больше 5 МБ — уменьшите и попробуйте снова` }

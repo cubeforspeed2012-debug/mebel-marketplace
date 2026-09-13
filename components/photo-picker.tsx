@@ -1,20 +1,19 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { IconPhotos } from '@/components/ui-icons'
 
-const MAX_PHOTOS = 12
 const MAX_MB = 5
 
-type Picked = { file: File; preview: string }
+type Batch = { id: number; previews: string[]; names: string[] }
 
 /**
  * Выбор фотографий работы.
  *
- * Один способ вместо двух: человек нажимает «Добавить фото», выбирает
- * снимки — и сразу видит их здесь же. Сами файлы остаются в поле формы
- * и уходят на сервер при нажатии «Сохранить»: так работает на любом
- * телефоне, в отличие от загрузки прямо из браузера.
+ * Важно: файлы никуда не перекладываются программно — каждая партия живёт
+ * в своём поле формы и уходит на сервер как есть. Раньше выбор собирался
+ * в один список через DataTransfer, а его не умеет Safari на айфоне:
+ * выбор ломался молча, и фото не доходили.
  */
 export function PhotoPicker({
   saved,
@@ -23,39 +22,21 @@ export function PhotoPicker({
   saved: string[]
   onChangeSaved: (urls: string[]) => void
 }) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [picked, setPicked] = useState<Picked[]>([])
+  const [batches, setBatches] = useState<Batch[]>([])
+  const [slots, setSlots] = useState<number[]>([0])
   const [error, setError] = useState<string | null>(null)
 
-  // Ссылки на предпросмотр держат файл в памяти — отпускаем их за собой
+  // Ссылки на предпросмотр держат файлы в памяти — отпускаем их за собой
   useEffect(() => {
-    return () => picked.forEach((item) => URL.revokeObjectURL(item.preview))
-  }, [picked])
+    return () => batches.forEach((b) => b.previews.forEach(URL.revokeObjectURL))
+  }, [batches])
 
-  const total = saved.length + picked.length
-
-  /** Складываем выбранное обратно в поле формы, иначе на сервер уйдёт только последний выбор. */
-  function syncInput(next: Picked[]) {
-    if (!inputRef.current) return
-
-    const bag = new DataTransfer()
-    next.forEach((item) => bag.items.add(item.file))
-    inputRef.current.files = bag.files
-  }
-
-  function add(files: FileList) {
+  function pick(slotId: number, files: FileList) {
     setError(null)
 
-    const room = MAX_PHOTOS - total
-    if (room <= 0) {
-      setError(`Больше ${MAX_PHOTOS} фото не нужно`)
-      return
-    }
+    const accepted: File[] = []
 
-    const accepted: Picked[] = []
-
-    for (const file of Array.from(files).slice(0, room)) {
-      // Телефоны иногда не проставляют тип файла — смотрим и на расширение
+    for (const file of Array.from(files)) {
       const looksLikeImage =
         file.type.startsWith('image/') || /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name)
 
@@ -64,25 +45,35 @@ export function PhotoPicker({
         continue
       }
       if (file.size > MAX_MB * 1024 * 1024) {
-        setError(`«${file.name}» больше ${MAX_MB} МБ`)
+        setError(`«${file.name}» больше ${MAX_MB} МБ — выберите фото полегче`)
         continue
       }
 
-      accepted.push({ file, preview: URL.createObjectURL(file) })
+      accepted.push(file)
     }
 
     if (accepted.length === 0) return
 
-    const next = [...picked, ...accepted]
-    setPicked(next)
-    syncInput(next)
+    setBatches((current) => [
+      ...current.filter((b) => b.id !== slotId),
+      {
+        id: slotId,
+        previews: accepted.map((file) => URL.createObjectURL(file)),
+        names: accepted.map((file) => file.name),
+      },
+    ])
+
+    // Даём следующее пустое поле — чтобы можно было добавить ещё
+    setSlots((current) => (current.includes(slotId + 1) ? current : [...current, slotId + 1]))
   }
 
-  function removePicked(index: number) {
-    const next = picked.filter((_, i) => i !== index)
-    URL.revokeObjectURL(picked[index].preview)
-    setPicked(next)
-    syncInput(next)
+  function dropBatch(slotId: number) {
+    setBatches((current) => {
+      current.find((b) => b.id === slotId)?.previews.forEach(URL.revokeObjectURL)
+      return current.filter((b) => b.id !== slotId)
+    })
+    // Убираем и само поле: вместе с ним из формы уйдут выбранные в нём файлы
+    setSlots((current) => current.filter((id) => id !== slotId))
   }
 
   function moveSaved(index: number, direction: -1 | 1) {
@@ -93,15 +84,16 @@ export function PhotoPicker({
     onChangeSaved(next)
   }
 
+  const pickedCount = batches.reduce((sum, b) => sum + b.previews.length, 0)
+
   return (
     <div>
       <span className="mb-2 block text-xs font-semibold uppercase tracking-widest text-text-muted">
         Фото работы
       </span>
 
-      {total > 0 && (
+      {(saved.length > 0 || pickedCount > 0) && (
         <div className="mb-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
-          {/* Уже сохранённые: их можно переставить и удалить */}
           {saved.map((url, index) => (
             <div key={url} className="relative overflow-hidden rounded-2xl border border-line bg-cream">
               <div className="aspect-square overflow-hidden">
@@ -146,58 +138,71 @@ export function PhotoPicker({
             </div>
           ))}
 
-          {/* Только что выбранные: видно сразу, загрузятся при сохранении */}
-          {picked.map((item, index) => (
-            <div
-              key={item.preview}
-              className="relative overflow-hidden rounded-2xl border border-gold bg-cream"
-            >
-              <div className="aspect-square overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.preview} alt="" className="h-full w-full object-cover" />
-              </div>
-
-              <span className="absolute left-0 top-0 rounded-br-xl bg-gold px-2 py-0.5 text-xs font-semibold text-white">
-                Новое
-              </span>
-
-              <button
-                type="button"
-                onClick={() => removePicked(index)}
-                aria-label="Убрать"
-                className="block w-full border-t border-line py-1.5 text-xs transition-colors hover:bg-status-error/15 hover:text-status-error"
+          {batches.map((batch) =>
+            batch.previews.map((preview, index) => (
+              <div
+                key={preview}
+                className="relative overflow-hidden rounded-2xl border border-gold bg-cream"
               >
-                ✕ убрать
-              </button>
-            </div>
-          ))}
+                <div className="aspect-square overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={preview} alt="" className="h-full w-full object-cover" />
+                </div>
+
+                <span className="absolute left-0 top-0 rounded-br-xl bg-gold px-2 py-0.5 text-xs font-semibold text-white">
+                  Новое
+                </span>
+
+                {index === 0 && (
+                  <button
+                    type="button"
+                    onClick={() => dropBatch(batch.id)}
+                    className="block w-full border-t border-line py-1.5 text-xs transition-colors hover:bg-status-error/15 hover:text-status-error"
+                  >
+                    ✕ убрать
+                  </button>
+                )}
+              </div>
+            )),
+          )}
         </div>
       )}
 
-      {/* Подпись к полю, а не кнопка с искусственным кликом: открывается везде */}
-      <label
-        className={`press inline-flex cursor-pointer items-center gap-2 rounded-full bg-gold px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-gold-deep ${
-          total >= MAX_PHOTOS ? 'pointer-events-none opacity-60' : ''
-        }`}
-      >
-        <IconPhotos className="size-5" />
-        Добавить фото
-        <input
-          ref={inputRef}
-          type="file"
-          name="photos"
-          accept="image/*"
-          multiple
-          className="sr-only"
-          onChange={(event) => {
-            if (event.target.files?.length) add(event.target.files)
-          }}
-        />
-      </label>
+      {/*
+        Каждое поле — своя партия фото. Подпись к полю открывает выбор
+        в любом браузере, в отличие от кнопки с искусственным нажатием.
+      */}
+      {slots.map((slotId) => {
+        const filled = batches.some((b) => b.id === slotId)
+
+        return (
+          <label
+            key={slotId}
+            className={`press mr-2 inline-flex cursor-pointer items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors ${
+              filled
+                ? 'hidden'
+                : 'bg-gold text-white hover:bg-gold-deep'
+            }`}
+          >
+            <IconPhotos className="size-5" />
+            {saved.length > 0 || pickedCount > 0 ? 'Добавить ещё' : 'Добавить фото'}
+            <input
+              type="file"
+              name="photos"
+              accept="image/*"
+              multiple
+              className="sr-only"
+              onChange={(event) => {
+                if (event.target.files?.length) pick(slotId, event.target.files)
+              }}
+            />
+          </label>
+        )
+      })}
 
       <p className="mt-2 text-xs leading-relaxed text-text-muted">
-        До {MAX_PHOTOS} фото, каждое до {MAX_MB} МБ. Первое станет обложкой в каталоге.
-        {picked.length > 0 && ' Новые загрузятся, когда нажмёте «Сохранить».'}
+        Каждое фото до {MAX_MB} МБ. Первое станет обложкой в каталоге.
+        {pickedCount > 0 && ' Новые загрузятся, когда нажмёте «Сохранить».'}
       </p>
 
       {error && <p className="mt-2 text-sm text-status-error">{error}</p>}
