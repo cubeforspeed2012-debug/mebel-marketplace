@@ -120,6 +120,7 @@ export default async function ProfilePage() {
             badge={newOrders}
           />
           <SettingsRow href="/dashboard" icon={<IconChart />} label="Аналитика" />
+          <SettingsRow href="/dashboard/clients" icon={<IconRequests />} label="Клиенты" />
           <SettingsRow href="/dashboard/promotion" icon={<IconRocket />} label="Продвижение" />
         </SettingsGroup>
       )}

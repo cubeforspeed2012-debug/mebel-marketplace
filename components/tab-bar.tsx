@@ -154,10 +154,20 @@ const SETS: Record<'guest' | 'buyer' | 'seller' | 'admin', Tab[]> = {
   guest: [HOME, CATALOG, FAVORITES, PROFILE],
   buyer: [HOME, CATALOG, FAVORITES, PROFILE],
   seller: [
-    { href: '/dashboard', key: 'overview', icon: IconChart, match: (p) => p === '/dashboard' || p.startsWith('/dashboard/clients') || p.startsWith('/dashboard/promotion') || p.startsWith('/dashboard/company') },
+    // Мастеру каталог нужен не меньше: посмотреть чужие работы и цены
+    CATALOG,
     { href: '/dashboard/orders', key: 'orders', icon: IconOrders, match: (p) => p.startsWith('/dashboard/orders') },
     { href: '/dashboard/products', key: 'portfolio', icon: IconWorks, match: (p) => p.startsWith('/dashboard/products') },
-    PROFILE,
+    {
+      ...PROFILE,
+      match: (p) =>
+        p.startsWith('/profile') ||
+        p.startsWith('/account') ||
+        p.startsWith('/auth') ||
+        p === '/dashboard' ||
+        p.startsWith('/dashboard/clients') ||
+        p.startsWith('/dashboard/promotion'),
+    },
   ],
   admin: [
     { href: '/admin', key: 'overview', icon: IconPanel, match: (p) => p === '/admin' || p.startsWith('/admin/company') },
