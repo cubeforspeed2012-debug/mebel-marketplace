@@ -73,7 +73,7 @@ export function AdminRail({ pending = 0 }: { pending?: number }) {
   return (
     <nav
       aria-label="Разделы управления"
-      className="hidden w-[68px] shrink-0 flex-col items-center gap-2 rounded-3xl bg-[#171717] py-5 lg:flex"
+      className="hidden w-[68px] shrink-0 flex-col items-center gap-2 rounded-3xl bg-paper py-5 lg:flex"
     >
       <Link
         href="/"
@@ -91,8 +91,8 @@ export function AdminRail({ pending = 0 }: { pending?: number }) {
           aria-label={item.label}
           className={`press relative flex size-11 items-center justify-center rounded-2xl transition-colors duration-200 ${
             isActive(item.href)
-              ? 'bg-white text-[#171717]'
-              : 'text-[#8f8f8f] hover:bg-white/8 hover:text-white'
+              ? 'bg-gold text-white'
+              : 'text-text-muted hover:bg-sand hover:text-text'
           }`}
         >
           <Icon>{item.icon}</Icon>
@@ -123,8 +123,8 @@ export function AdminMobileNav({ pending = 0 }: { pending?: number }) {
           href={item.href}
           className={`press flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-sm transition-colors duration-200 ${
             isActive(item.href)
-              ? 'bg-white font-semibold text-[#171717]'
-              : 'bg-[#232323] text-[#a8a8a8]'
+              ? 'bg-gold font-semibold text-white'
+              : 'bg-sand text-text-muted'
           }`}
         >
           <Icon>{item.icon}</Icon>

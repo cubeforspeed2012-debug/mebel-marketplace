@@ -40,9 +40,9 @@ type Detail = {
 
 function Metric({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-3xl bg-[#1f1f1f] p-5">
-      <div className="text-sm text-[#8f8f8f]">{label}</div>
-      <div className="mt-3 text-2xl font-semibold text-white">{value}</div>
+    <div className="rounded-3xl bg-paper p-5">
+      <div className="text-sm text-text-muted">{label}</div>
+      <div className="mt-3 text-2xl font-semibold text-text">{value}</div>
     </div>
   )
 }
@@ -73,20 +73,20 @@ export default async function AdminCompanyPage({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link href="/admin" className="text-sm text-[#8f8f8f] hover:text-white">
+        <Link href="/admin" className="text-sm text-text-muted hover:text-text">
           ← Все мастерские
         </Link>
         <Link
           href="/admin/users"
-          className="press rounded-full bg-[#2a2a2a] px-4 py-2 text-xs text-[#d6d6d6] transition-colors hover:bg-white hover:text-[#171717]"
+          className="press rounded-full bg-sand px-4 py-2 text-xs text-text transition-colors hover:bg-gold hover:text-white"
         >
           Аккаунт владельца
         </Link>
       </div>
 
       {/* Кто это */}
-      <section className="flex flex-wrap items-start gap-5 rounded-3xl bg-[#1f1f1f] p-6">
-        <div className="size-20 shrink-0 overflow-hidden rounded-2xl bg-[#2a2a2a]">
+      <section className="flex flex-wrap items-start gap-5 rounded-3xl bg-paper p-6">
+        <div className="size-20 shrink-0 overflow-hidden rounded-2xl bg-sand">
           {company.logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={company.logo_url} alt="" className="h-full w-full object-cover" />
@@ -98,8 +98,8 @@ export default async function AdminCompanyPage({
         </div>
 
         <div className="min-w-0 flex-1">
-          <h2 className="text-xl font-semibold text-white">{company.name}</h2>
-          <div className="mt-2 text-sm text-[#8f8f8f]">
+          <h2 className="text-xl font-semibold text-text">{company.name}</h2>
+          <div className="mt-2 text-sm text-text-muted">
             {company.work_type && WORK_TYPES[company.work_type]}
             {company.district && ` · ${company.district} район`}
             {' · на площадке с '}
@@ -112,7 +112,7 @@ export default async function AdminCompanyPage({
                 {formatPhone(company.phone_public)}
               </a>
             )}
-            {company.owner_email && <span className="text-[#8f8f8f]">{company.owner_email}</span>}
+            {company.owner_email && <span className="text-text-muted">{company.owner_email}</span>}
             {company.instagram && (
               <a
                 href={`https://instagram.com/${company.instagram}`}
@@ -126,7 +126,7 @@ export default async function AdminCompanyPage({
           </div>
 
           {company.description && (
-            <p className="mt-4 max-w-2xl leading-relaxed text-[#a8a8a8]">{company.description}</p>
+            <p className="mt-4 max-w-2xl leading-relaxed text-text-muted">{company.description}</p>
           )}
         </div>
 
@@ -134,10 +134,10 @@ export default async function AdminCompanyPage({
           <span
             className={`rounded-full px-3 py-1 text-xs font-medium ${
               company.status === 'active'
-                ? 'bg-[#4b9d63]/20 text-[#7fd39a]'
+                ? 'bg-status-done/15 text-status-done'
                 : company.status === 'blocked'
-                  ? 'bg-[#b91c1c]/20 text-[#f0908f]'
-                  : 'bg-[#e8c14a]/20 text-[#e8c14a]'
+                  ? 'bg-status-error/15 text-status-error'
+                  : 'bg-status-process/15 text-status-process'
             }`}
           >
             {company.status === 'active'
@@ -160,7 +160,7 @@ export default async function AdminCompanyPage({
 
       {/* Цифры */}
       <section>
-        <h3 className="mb-4 text-lg font-semibold text-white">Показатели</h3>
+        <h3 className="mb-4 text-lg font-semibold text-text">Показатели</h3>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Metric label="Просмотры страницы" value={company.views_count} />
           <Metric label="Клиентов" value={company.clients_count} />
@@ -171,21 +171,21 @@ export default async function AdminCompanyPage({
           />
         </div>
 
-        <p className="mt-3 text-xs text-[#6b6b6b]">
+        <p className="mt-3 text-xs text-text-muted">
           Контакты клиентов мастера площадке не видны — это его база. Здесь только счёт.
         </p>
       </section>
 
       {/* Воронка */}
       <section>
-        <h3 className="mb-4 text-lg font-semibold text-white">Как идут заявки</h3>
+        <h3 className="mb-4 text-lg font-semibold text-text">Как идут заявки</h3>
 
         {company.orders_total === 0 ? (
-          <p className="rounded-3xl border border-dashed border-[#3a3a3a] p-8 text-center text-[#8f8f8f]">
+          <p className="rounded-3xl border border-dashed border-line p-8 text-center text-text-muted">
             Заявок пока не было.
           </p>
         ) : (
-          <div className="space-y-3 rounded-3xl bg-[#1f1f1f] p-6">
+          <div className="space-y-3 rounded-3xl bg-paper p-6">
             {funnel.map(([status, count]) => {
               const share = company.orders_total
                 ? Math.round((count / company.orders_total) * 100)
@@ -193,17 +193,17 @@ export default async function AdminCompanyPage({
 
               return (
                 <div key={status} className="flex items-center gap-4">
-                  <span className="w-32 shrink-0 text-sm text-[#8f8f8f]">
+                  <span className="w-32 shrink-0 text-sm text-text-muted">
                     {ORDER_STATUSES[status]}
                   </span>
-                  <span className="h-2 flex-1 overflow-hidden rounded-full bg-[#2a2a2a]">
+                  <span className="h-2 flex-1 overflow-hidden rounded-full bg-sand">
                     <span
                       className="block h-full rounded-full bg-gold"
                       style={{ width: `${share}%` }}
                       aria-hidden
                     />
                   </span>
-                  <span className="w-8 shrink-0 text-right text-sm font-semibold text-white">
+                  <span className="w-8 shrink-0 text-right text-sm font-semibold text-text">
                     {count}
                   </span>
                 </div>
@@ -211,7 +211,7 @@ export default async function AdminCompanyPage({
             })}
 
             {company.revenue_done > 0 && (
-              <div className="mt-5 border-t border-[#2c2c2c] pt-4 text-sm text-[#a8a8a8]">
+              <div className="mt-5 border-t border-line pt-4 text-sm text-text-muted">
                 Сумма завершённых заказов:{' '}
                 <strong className="text-gold">{formatPrice(company.revenue_done)}</strong>
               </div>
@@ -222,10 +222,10 @@ export default async function AdminCompanyPage({
 
       {/* Решения по мастерской */}
       <section>
-        <h3 className="mb-4 text-lg font-semibold text-white">Действия</h3>
+        <h3 className="mb-4 text-lg font-semibold text-text">Действия</h3>
 
         {company.moderation_note && (
-          <p className="mb-4 rounded-2xl bg-[#1f1f1f] px-4 py-3 text-sm text-[#a8a8a8]">
+          <p className="mb-4 rounded-2xl bg-paper px-4 py-3 text-sm text-text-muted">
             Заметка модератора: {company.moderation_note}
           </p>
         )}
@@ -251,11 +251,11 @@ export default async function AdminCompanyPage({
               <input
                 name="note"
                 placeholder="Причина блокировки"
-                className="rounded-full bg-[#2a2a2a] px-4 py-2.5 text-sm text-white outline-none placeholder:text-[#6b6b6b] focus:ring-2 focus:ring-gold"
+                className="rounded-full bg-sand px-4 py-2.5 text-sm text-text outline-none placeholder:text-text-muted focus:ring-2 focus:ring-gold"
               />
               <SubmitButton
                 pendingLabel="Блокируем…"
-                className="rounded-full bg-[#2a2a2a] px-6 py-2.5 text-sm text-[#a8a8a8] hover:bg-[#b91c1c] hover:text-white"
+                className="rounded-full bg-sand px-6 py-2.5 text-sm text-text-muted hover:bg-status-error hover:text-white"
               >
                 Заблокировать
               </SubmitButton>
@@ -268,7 +268,7 @@ export default async function AdminCompanyPage({
               <input type="hidden" name="status" value="pending" />
               <SubmitButton
                 pendingLabel="Снимаем…"
-                className="rounded-full bg-[#2a2a2a] px-6 py-2.5 text-sm text-[#d6d6d6] hover:bg-white hover:text-[#171717]"
+                className="rounded-full bg-sand px-6 py-2.5 text-sm text-text hover:bg-gold hover:text-white"
               >
                 Снять блокировку — вернуть на проверку
               </SubmitButton>

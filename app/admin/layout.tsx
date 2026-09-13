@@ -21,34 +21,34 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   })
 
   return (
-    <div data-theme="dark" className="min-h-screen bg-[#0f0f0f] p-3 sm:p-5">
+    <div className="min-h-screen bg-cream p-3 sm:p-5">
       <div className="mx-auto flex max-w-[1400px] gap-4">
-        <Suspense fallback={<div className="hidden w-[68px] shrink-0 rounded-3xl bg-[#171717] lg:block" />}>
+        <Suspense fallback={<div className="hidden w-[68px] shrink-0 rounded-3xl bg-paper lg:block" />}>
           <AdminRail pending={pending} />
         </Suspense>
 
-        <div className="min-w-0 flex-1 rounded-3xl bg-[#171717] p-5 sm:p-7">
+        <div className="min-w-0 flex-1 rounded-3xl bg-paper p-5 sm:p-7">
           {/* Верхняя строка: дата, выход, профиль */}
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-            <div className="text-sm text-[#8f8f8f]">Сегодня, {today}</div>
+            <div className="text-sm text-text-muted">Сегодня, {today}</div>
 
             <div className="flex flex-wrap items-center gap-2">
               <Link
                 href="/"
-                className="press rounded-full bg-[#232323] px-4 py-2 text-sm text-[#d6d6d6] transition-colors hover:bg-[#2c2c2c]"
+                className="press rounded-full bg-sand px-4 py-2 text-sm text-text transition-colors hover:bg-gold-soft"
               >
                 На сайт
               </Link>
               <Link
                 href="/dashboard"
-                className="press rounded-full bg-[#232323] px-4 py-2 text-sm text-[#d6d6d6] transition-colors hover:bg-[#2c2c2c]"
+                className="press rounded-full bg-sand px-4 py-2 text-sm text-text transition-colors hover:bg-gold-soft"
               >
                 Кабинет мастера
               </Link>
               <form action={signOut}>
                 <button
                   type="submit"
-                  className="press rounded-full bg-[#232323] px-4 py-2 text-sm text-[#8f8f8f] transition-colors hover:bg-[#2c2c2c] hover:text-white"
+                  className="press rounded-full bg-sand px-4 py-2 text-sm text-text-muted transition-colors hover:bg-gold-soft hover:text-text"
                 >
                   Выйти
                 </button>

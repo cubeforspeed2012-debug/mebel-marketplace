@@ -60,13 +60,13 @@ function Stat({
   return (
     <div
       className={`rounded-3xl p-5 transition-transform duration-200 hover:-translate-y-0.5 ${
-        highlight ? 'bg-white text-[#171717]' : 'bg-[#1f1f1f] text-white'
+        highlight ? 'bg-gold text-white' : 'bg-paper text-text'
       }`}
     >
-      <div className={`text-sm ${highlight ? 'text-[#6b6b6b]' : 'text-[#8f8f8f]'}`}>{label}</div>
+      <div className={`text-sm ${highlight ? 'text-white/80' : 'text-text-muted'}`}>{label}</div>
       <div className="mt-3 text-3xl font-semibold">{value}</div>
       {hint && (
-        <div className={`mt-2 text-xs ${highlight ? 'text-[#8a8a8a]' : 'text-[#6b6b6b]'}`}>
+        <div className={`mt-2 text-xs ${highlight ? 'text-white/70' : 'text-text-muted'}`}>
           {hint}
         </div>
       )}
@@ -154,8 +154,8 @@ export default async function AdminPage({
     <div className="space-y-6">
       {/* Приветствие */}
       <div>
-        <h1 className="text-2xl font-semibold text-white sm:text-3xl">Привет, {name} 👋</h1>
-        <p className="mt-2 text-sm text-[#8f8f8f]">
+        <h1 className="text-2xl font-semibold text-text sm:text-3xl">Привет, {name} 👋</h1>
+        <p className="mt-2 text-sm text-text-muted">
           Вся площадка перед вами: посещения, мастерские и заявки.
         </p>
       </div>
@@ -189,7 +189,7 @@ export default async function AdminPage({
       <div className="grid gap-4 xl:grid-cols-3">
         <div className="xl:col-span-2">
           <ViewsChart days={days} />
-          <p className="mt-3 text-xs leading-relaxed text-[#6b6b6b]">
+          <p className="mt-3 text-xs leading-relaxed text-text-muted">
             Просмотры считаются при каждом открытии страницы мастера или товара —
             это не уникальные люди, а обращения к площадке.
           </p>
@@ -198,10 +198,10 @@ export default async function AdminPage({
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <Link
               href="/admin/approvals"
-              className="rounded-3xl bg-[#1f1f1f] p-5 transition-colors hover:bg-[#242424]"
+              className="rounded-3xl bg-paper p-5 transition-colors hover:bg-sand"
             >
-              <div className="font-semibold text-white">Одобрение мастерских</div>
-              <p className="mt-1.5 text-sm leading-relaxed text-[#8f8f8f]">
+              <div className="font-semibold text-text">Одобрение мастерских</div>
+              <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
                 {(overview?.companies_pending ?? 0) > 0
                   ? `Ждут решения: ${overview?.companies_pending}`
                   : 'Очередь разобрана'}
@@ -210,33 +210,33 @@ export default async function AdminPage({
 
             <Link
               href="/admin/users"
-              className="rounded-3xl bg-[#1f1f1f] p-5 transition-colors hover:bg-[#242424]"
+              className="rounded-3xl bg-paper p-5 transition-colors hover:bg-sand"
             >
-              <div className="font-semibold text-white">Аккаунты</div>
-              <p className="mt-1.5 text-sm leading-relaxed text-[#8f8f8f]">
+              <div className="font-semibold text-text">Аккаунты</div>
+              <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
                 Всего людей на площадке: {overview?.users_total ?? 0}
               </p>
             </Link>
 
             {/* Видит ли сайт ключ помощника. Само значение не показываем и не пишем в логи */}
-            <div className="rounded-3xl bg-[#1f1f1f] p-5 sm:col-span-2">
+            <div className="rounded-3xl bg-paper p-5 sm:col-span-2">
               <div className="flex flex-wrap items-center gap-3">
                 <span
-                  className={`size-2.5 rounded-full ${aiReady ? 'bg-[#4b9d63]' : 'bg-[#b91c1c]'}`}
+                  className={`size-2.5 rounded-full ${aiReady ? 'bg-status-done' : 'bg-status-error'}`}
                   aria-hidden
                 />
-                <span className="font-semibold text-white">Помощник для мастеров</span>
+                <span className="font-semibold text-text">Помощник для мастеров</span>
                 <span
                   className={`rounded-full px-3 py-1 text-xs font-medium ${
                     aiReady
-                      ? 'bg-[#4b9d63]/20 text-[#7fd39a]'
-                      : 'bg-[#b91c1c]/20 text-[#f0908f]'
+                      ? 'bg-status-done/15 text-status-done'
+                      : 'bg-status-error/15 text-status-error'
                   }`}
                 >
                   {aiReady ? 'Работает' : 'Ключа нет'}
                 </span>
               </div>
-              <p className="mt-2 text-sm leading-relaxed text-[#8f8f8f]">
+              <p className="mt-2 text-sm leading-relaxed text-text-muted">
                 {aiReady
                   ? 'Мастера могут нажать «Помочь с текстом» в профиле мастерской: помощник напишет описание и подскажет, что доделать, чтобы звонили чаще.'
                   : 'Добавьте ключ Groq в настройках воркера как Secret с именем GROQ_API_KEY — и помощник заработает.'}
@@ -262,19 +262,19 @@ export default async function AdminPage({
 
       {/* Ждут подтверждения оплаты */}
       {promotions.length > 0 && (
-        <section className="rounded-3xl bg-[#1f1f1f] p-6">
-          <h2 className="text-lg font-semibold text-white">Продвижение ждёт оплаты</h2>
+        <section className="rounded-3xl bg-paper p-6">
+          <h2 className="text-lg font-semibold text-text">Продвижение ждёт оплаты</h2>
           <div className="mt-4 space-y-3">
             {promotions.map((promo) => (
               <div
                 key={promo.id}
-                className="flex flex-wrap items-center gap-4 rounded-2xl bg-[#171717] p-4"
+                className="flex flex-wrap items-center gap-4 rounded-2xl bg-paper p-4"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-white">
+                  <div className="font-semibold text-text">
                     {(promo.companies as { name?: string } | null)?.name ?? 'Мастерская'}
                   </div>
-                  <div className="text-sm text-[#8f8f8f]">
+                  <div className="text-sm text-text-muted">
                     {promo.hours} ч · {formatPrice(promo.amount)} ·{' '}
                     {new Date(promo.created_at).toLocaleDateString('ru-RU')}
                   </div>
@@ -295,17 +295,17 @@ export default async function AdminPage({
       )}
 
       {/* Мастерские */}
-      <section className="rounded-3xl bg-[#1f1f1f] p-6">
+      <section className="rounded-3xl bg-paper p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-white">Мастерские</h2>
+          <h2 className="text-lg font-semibold text-text">Мастерские</h2>
 
           <div className="flex flex-wrap gap-2">
             <Link
               href="/admin"
               className={`press rounded-full px-4 py-2 text-sm transition-colors ${
                 !filter
-                  ? 'bg-white font-semibold text-[#171717]'
-                  : 'bg-[#2a2a2a] text-[#a8a8a8] hover:text-white'
+                  ? 'bg-gold font-semibold text-white'
+                  : 'bg-sand text-text-muted hover:text-text'
               }`}
             >
               Все
@@ -316,8 +316,8 @@ export default async function AdminPage({
                 href={`/admin?status=${value}`}
                 className={`press rounded-full px-4 py-2 text-sm transition-colors ${
                   filter === value
-                    ? 'bg-white font-semibold text-[#171717]'
-                    : 'bg-[#2a2a2a] text-[#a8a8a8] hover:text-white'
+                    ? 'bg-gold font-semibold text-white'
+                    : 'bg-sand text-text-muted hover:text-text'
                 }`}
               >
                 {label}
@@ -327,13 +327,13 @@ export default async function AdminPage({
         </div>
 
         {companies.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-[#3a3a3a] p-12 text-center text-[#8f8f8f]">
+          <div className="mt-6 rounded-2xl border border-dashed border-line p-12 text-center text-text-muted">
             Мастерских пока нет.
           </div>
         ) : (
           <div className="mt-5 overflow-x-auto">
             <table className="w-full min-w-[760px] text-left text-sm">
-              <thead className="text-xs text-[#6b6b6b]">
+              <thead className="text-xs text-text-muted">
                 <tr>
                   <th className="px-4 py-3 font-normal">Мастерская</th>
                   <th className="px-4 py-3 font-normal">Статус</th>
@@ -348,16 +348,16 @@ export default async function AdminPage({
                 {companies.map((company) => (
                   <tr
                     key={company.company_id}
-                    className="border-t border-[#2c2c2c] transition-colors hover:bg-[#242424]"
+                    className="border-t border-line transition-colors hover:bg-sand"
                   >
                     <td className="px-4 py-4">
                       <Link
                         href={`/admin/company/${company.company_id}`}
-                        className="font-semibold text-white hover:text-gold"
+                        className="font-semibold text-text hover:text-gold"
                       >
                         {company.name}
                       </Link>
-                      <div className="mt-0.5 text-xs text-[#8f8f8f]">
+                      <div className="mt-0.5 text-xs text-text-muted">
                         {company.work_type && WORK_TYPES[company.work_type]}
                         {company.district && ` · ${company.district}`}
                         {company.phone_public && ` · ${formatPhone(company.phone_public)}`}
@@ -367,19 +367,19 @@ export default async function AdminPage({
                       <span
                         className={`rounded-full px-3 py-1 text-xs font-medium ${
                           company.status === 'active'
-                            ? 'bg-[#4b9d63]/20 text-[#7fd39a]'
+                            ? 'bg-status-done/15 text-status-done'
                             : company.status === 'blocked'
-                              ? 'bg-[#b91c1c]/20 text-[#f0908f]'
-                              : 'bg-[#e8c14a]/20 text-[#e8c14a]'
+                              ? 'bg-status-error/15 text-status-error'
+                              : 'bg-status-process/15 text-status-process'
                         }`}
                       >
                         {STATUS_LABEL[company.status]}
                       </span>
                     </td>
-                    <td className="px-4 py-4 text-right text-[#d6d6d6]">{company.views_count}</td>
-                    <td className="px-4 py-4 text-right text-[#d6d6d6]">{company.products_count}</td>
-                    <td className="px-4 py-4 text-right text-[#d6d6d6]">{company.clients_count}</td>
-                    <td className="px-4 py-4 text-right text-[#d6d6d6]">
+                    <td className="px-4 py-4 text-right text-text">{company.views_count}</td>
+                    <td className="px-4 py-4 text-right text-text">{company.products_count}</td>
+                    <td className="px-4 py-4 text-right text-text">{company.clients_count}</td>
+                    <td className="px-4 py-4 text-right text-text">
                       {company.orders_count}
                       {company.new_orders > 0 && (
                         <span className="ml-1.5 rounded-full bg-[#3f6fd8] px-2 py-0.5 text-xs font-semibold text-white">
@@ -390,7 +390,7 @@ export default async function AdminPage({
                     <td className="px-4 py-4 text-right">
                       <Link
                         href={`/admin/company/${company.company_id}`}
-                        className="press rounded-full bg-[#2a2a2a] px-4 py-2 text-xs text-[#d6d6d6] transition-colors hover:bg-white hover:text-[#171717]"
+                        className="press rounded-full bg-sand px-4 py-2 text-xs text-text transition-colors hover:bg-gold hover:text-white"
                       >
                         Открыть
                       </Link>

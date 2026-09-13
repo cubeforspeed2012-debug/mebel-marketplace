@@ -19,7 +19,7 @@ export function UserActions({
   canManage: boolean
 }) {
   if (!canManage) {
-    return <span className="text-xs text-[#6b6b6b]">Это вы</span>
+    return <span className="text-xs text-text-muted">Это вы</span>
   }
 
   return (
@@ -32,7 +32,7 @@ export function UserActions({
           className={`rounded-full px-4 py-2 text-xs ${
             blocked
               ? 'bg-[#4b9d63] text-white hover:bg-[#3f8654]'
-              : 'bg-[#2a2a2a] text-[#d6d6d6] hover:bg-[#e8c14a] hover:text-[#3b2f10]'
+              : 'bg-sand text-text hover:bg-[#e8c14a] hover:text-[#3b2f10]'
           }`}
         >
           {blocked ? 'Разблокировать' : 'Заблокировать'}
@@ -51,7 +51,7 @@ export function UserActions({
         <input type="hidden" name="user_id" value={userId} />
         <SubmitButton
           pendingLabel="Удаляем…"
-          className="rounded-full bg-[#2a2a2a] px-4 py-2 text-xs text-[#8f8f8f] hover:bg-[#b91c1c] hover:text-white"
+          className="rounded-full bg-sand px-4 py-2 text-xs text-text-muted hover:bg-status-error hover:text-white"
         >
           Удалить
         </SubmitButton>

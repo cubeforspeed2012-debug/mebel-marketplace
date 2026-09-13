@@ -64,8 +64,8 @@ export default async function AdminUsersPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-white">Аккаунты</h1>
-        <p className="mt-2 text-sm text-[#8f8f8f]">
+        <h1 className="text-2xl font-semibold text-text">Аккаунты</h1>
+        <p className="mt-2 text-sm text-text-muted">
           Все, кто зарегистрирован на площадке. Отсюда можно закрыть вход или удалить аккаунт.
         </p>
       </div>
@@ -84,9 +84,9 @@ export default async function AdminUsersPage({
         <p className="rounded-2xl bg-[#b91c1c]/15 px-4 py-3 text-sm text-[#f0908f]">{error}</p>
       )}
 
-      <section className="rounded-3xl bg-[#1f1f1f] p-6">
+      <section className="rounded-3xl bg-paper p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="text-sm text-[#8f8f8f]">
+          <div className="text-sm text-text-muted">
             Всего: {all.length} · показано: {users.length}
           </div>
 
@@ -99,8 +99,8 @@ export default async function AdminUsersPage({
                   href={item.value ? `/admin/users?role=${item.value}` : '/admin/users'}
                   className={`press rounded-full px-4 py-2 text-sm transition-colors ${
                     active
-                      ? 'bg-white font-semibold text-[#171717]'
-                      : 'bg-[#2a2a2a] text-[#a8a8a8] hover:text-white'
+                      ? 'bg-gold font-semibold text-white'
+                      : 'bg-sand text-text-muted hover:text-text'
                   }`}
                 >
                   {item.label}
@@ -111,13 +111,13 @@ export default async function AdminUsersPage({
         </div>
 
         {users.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-[#3a3a3a] p-12 text-center text-[#8f8f8f]">
+          <div className="mt-6 rounded-2xl border border-dashed border-line p-12 text-center text-text-muted">
             Никого нет.
           </div>
         ) : (
           <div className="mt-5 overflow-x-auto">
             <table className="w-full min-w-[860px] text-left text-sm">
-              <thead className="text-xs text-[#6b6b6b]">
+              <thead className="text-xs text-text-muted">
                 <tr>
                   <th className="px-4 py-3 font-normal">Человек</th>
                   <th className="px-4 py-3 font-normal">Роль</th>
@@ -134,7 +134,7 @@ export default async function AdminUsersPage({
                   return (
                     <tr
                       key={user.user_id}
-                      className="border-t border-[#2c2c2c] transition-colors hover:bg-[#242424]"
+                      className="border-t border-line transition-colors hover:bg-sand"
                     >
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
@@ -142,7 +142,7 @@ export default async function AdminUsersPage({
                             {(user.full_name ?? user.email ?? '?').charAt(0).toUpperCase()}
                           </span>
                           <div className="min-w-0">
-                            <div className="font-semibold text-white">
+                            <div className="font-semibold text-text">
                               {user.full_name ?? 'Без имени'}
                               {blocked && (
                                 <span className="ml-2 rounded-full bg-[#b91c1c]/20 px-2 py-0.5 text-xs font-medium text-[#f0908f]">
@@ -150,7 +150,7 @@ export default async function AdminUsersPage({
                                 </span>
                               )}
                             </div>
-                            <div className="mt-0.5 truncate text-xs text-[#8f8f8f]">
+                            <div className="mt-0.5 truncate text-xs text-text-muted">
                               {user.email}
                               {user.phone && ` · ${formatPhone(user.phone)}`}
                             </div>
@@ -162,10 +162,10 @@ export default async function AdminUsersPage({
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-medium ${
                             user.role === 'admin'
-                              ? 'bg-[#3f6fd8]/20 text-[#9ab6f5]'
+                              ? 'bg-[#3f6fd8]/15 text-[#2f56ad]'
                               : user.role === 'seller'
                                 ? 'bg-gold/20 text-gold'
-                                : 'bg-[#2a2a2a] text-[#a8a8a8]'
+                                : 'bg-sand text-text-muted'
                           }`}
                         >
                           {ROLE_LABEL[user.role] ?? user.role}
@@ -176,20 +176,20 @@ export default async function AdminUsersPage({
                         {user.company_id ? (
                           <Link
                             href={`/admin/company/${user.company_id}`}
-                            className="text-[#d6d6d6] hover:text-gold"
+                            className="text-text hover:text-gold"
                           >
                             {user.company_name}
-                            <span className="block text-xs text-[#6b6b6b]">
+                            <span className="block text-xs text-text-muted">
                               заявок {user.orders_count} · клиентов {user.clients_count}
                             </span>
                           </Link>
                         ) : (
-                          <span className="text-[#6b6b6b]">—</span>
+                          <span className="text-text-muted">—</span>
                         )}
                       </td>
 
-                      <td className="px-4 py-4 text-[#8f8f8f]">{shortDate(user.created_at)}</td>
-                      <td className="px-4 py-4 text-[#8f8f8f]">
+                      <td className="px-4 py-4 text-text-muted">{shortDate(user.created_at)}</td>
+                      <td className="px-4 py-4 text-text-muted">
                         {shortDate(user.last_sign_in_at)}
                       </td>
 
@@ -209,7 +209,7 @@ export default async function AdminUsersPage({
           </div>
         )}
 
-        <p className="mt-5 text-xs leading-relaxed text-[#6b6b6b]">
+        <p className="mt-5 text-xs leading-relaxed text-text-muted">
           Блокировка закрывает вход, но всё содержимое остаётся — доступ можно вернуть.
           Удаление стирает аккаунт вместе с мастерской, товарами, заявками и клиентами, и вернуть его нельзя.
           Администраторов ни заблокировать, ни удалить отсюда нельзя — это защита от случайной потери доступа к площадке.

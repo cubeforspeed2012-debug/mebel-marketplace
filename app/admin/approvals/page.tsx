@@ -41,21 +41,21 @@ export default async function ApprovalsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-white">Одобрение мастерских</h1>
-        <p className="mt-2 text-sm text-[#8f8f8f]">
+        <h1 className="text-2xl font-semibold text-text">Одобрение мастерских</h1>
+        <p className="mt-2 text-sm text-text-muted">
           Новые мастерские не попадают в каталог, пока вы их не откроете.
         </p>
       </div>
 
       {pending.length === 0 ? (
-        <div className="rounded-3xl bg-[#1f1f1f] p-12 text-center">
-          <div className="text-lg font-semibold text-white">Очередь пуста</div>
-          <p className="mt-2 text-sm text-[#8f8f8f]">
+        <div className="rounded-3xl bg-paper p-12 text-center">
+          <div className="text-lg font-semibold text-text">Очередь пуста</div>
+          <p className="mt-2 text-sm text-text-muted">
             Все заявки разобраны. Новые появятся здесь сами.
           </p>
           <Link
             href="/admin"
-            className="press mt-6 inline-block rounded-full bg-[#2a2a2a] px-5 py-2.5 text-sm text-[#d6d6d6] transition-colors hover:bg-white hover:text-[#171717]"
+            className="press mt-6 inline-block rounded-full bg-sand px-5 py-2.5 text-sm text-text transition-colors hover:bg-gold hover:text-white"
           >
             К сводке
           </Link>
@@ -63,9 +63,9 @@ export default async function ApprovalsPage() {
       ) : (
         <div className="space-y-4">
           {pending.map((company) => (
-            <div key={company.id} className="rounded-3xl bg-[#1f1f1f] p-5 sm:p-6">
+            <div key={company.id} className="rounded-3xl bg-paper p-5 sm:p-6">
               <div className="flex flex-wrap items-start gap-4">
-                <div className="size-16 shrink-0 overflow-hidden rounded-2xl bg-[#2a2a2a]">
+                <div className="size-16 shrink-0 overflow-hidden rounded-2xl bg-sand">
                   {company.logo_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={company.logo_url} alt="" className="h-full w-full object-cover" />
@@ -77,8 +77,8 @@ export default async function ApprovalsPage() {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <div className="text-lg font-semibold text-white">{company.name}</div>
-                  <div className="mt-1 text-sm text-[#8f8f8f]">
+                  <div className="text-lg font-semibold text-text">{company.name}</div>
+                  <div className="mt-1 text-sm text-text-muted">
                     {company.work_type && WORK_TYPES[company.work_type]}
                     {company.district && ` · ${company.district} район`}
                     {' · подал(а) '}
@@ -93,13 +93,13 @@ export default async function ApprovalsPage() {
                     ) : (
                       <span className="text-status-error">Телефон не указан</span>
                     )}
-                    <span className="text-[#8f8f8f]">
+                    <span className="text-text-muted">
                       Работ выложено: {counts.get(company.id) ?? 0}
                     </span>
                   </div>
 
                   {company.description ? (
-                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#a8a8a8]">
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-text-muted">
                       {company.description}
                     </p>
                   ) : (
@@ -110,7 +110,7 @@ export default async function ApprovalsPage() {
                 </div>
               </div>
 
-              <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-[#2c2c2c] pt-5">
+              <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-line pt-5">
                 <form action={setCompanyStatus}>
                   <input type="hidden" name="id" value={company.id} />
                   <input type="hidden" name="status" value="active" />
@@ -128,11 +128,11 @@ export default async function ApprovalsPage() {
                   <input
                     name="note"
                     placeholder="Причина отказа"
-                    className="rounded-full bg-[#2a2a2a] px-4 py-2.5 text-sm text-white outline-none placeholder:text-[#6b6b6b] focus:ring-2 focus:ring-gold"
+                    className="rounded-full bg-sand px-4 py-2.5 text-sm text-text outline-none placeholder:text-text-muted focus:ring-2 focus:ring-gold"
                   />
                   <SubmitButton
                     pendingLabel="Отклоняем…"
-                    className="rounded-full bg-[#2a2a2a] px-5 py-2.5 text-sm text-[#a8a8a8] hover:bg-status-error hover:text-white"
+                    className="rounded-full bg-sand px-5 py-2.5 text-sm text-text-muted hover:bg-status-error hover:text-white"
                   >
                     Отклонить
                   </SubmitButton>
@@ -140,7 +140,7 @@ export default async function ApprovalsPage() {
 
                 <Link
                   href={`/admin/company/${company.id}`}
-                  className="press ml-auto rounded-full bg-[#2a2a2a] px-5 py-2.5 text-sm text-[#d6d6d6] transition-colors hover:bg-white hover:text-[#171717]"
+                  className="press ml-auto rounded-full bg-sand px-5 py-2.5 text-sm text-text transition-colors hover:bg-gold hover:text-white"
                 >
                   Подробнее
                 </Link>
@@ -150,7 +150,7 @@ export default async function ApprovalsPage() {
         </div>
       )}
 
-      <p className="text-xs leading-relaxed text-[#6b6b6b]">
+      <p className="text-xs leading-relaxed text-text-muted">
         Одобрение открывает мастерскую в каталоге. Отклонение прячет её и сохраняет
         причину — мастер увидит её у себя в кабинете и сможет исправить.
       </p>
