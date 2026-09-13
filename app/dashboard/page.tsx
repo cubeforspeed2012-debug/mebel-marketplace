@@ -52,7 +52,7 @@ export default async function DashboardPage() {
           смогут вас найти. Потом добавите фото работ.
         </p>
         <Link
-          href="/profile"
+          href="/profile/company"
           className="press mt-6 inline-block rounded-full bg-gold px-7 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
         >
           Заполнить профиль

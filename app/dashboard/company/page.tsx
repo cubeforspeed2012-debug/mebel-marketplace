@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 
-/** Мастерская теперь редактируется на одном экране с профилем — там всё вместе. */
+/** Мастерская переехала в профиль — там она вместе с остальными данными. */
 export default function CompanyPage() {
-  redirect('/profile')
+  redirect('/profile/company')
 }

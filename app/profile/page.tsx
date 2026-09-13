@@ -1,16 +1,29 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { signOut } from '@/app/auth/actions'
-import { CompanyForm } from '@/app/dashboard/company/company-form'
+import { SettingsGroup, SettingsRow } from '@/components/settings-list'
+import {
+  IconChart,
+  IconDoc,
+  IconGear,
+  IconHelp,
+  IconOrders,
+  IconPanel,
+  IconPhotos,
+  IconRequests,
+  IconRocket,
+  IconShield,
+  IconStore,
+  IconUser,
+} from '@/components/ui-icons'
+import { formatPhone } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
-import type { Company } from '@/lib/types'
-import { ProfileForm } from './profile-form'
 
 export const metadata = { title: 'Профиль' }
 
 /**
- * Один экран про человека и его мастерскую. Имя и телефон — сверху,
- * мастерская со всеми контактами — ниже. Ничего не спрятано по разделам.
+ * Профиль — оглавление приложения. Список понятных пунктов: нажал —
+ * открылся отдельный экран. Так устроены все приложения, которыми
+ * человек пользуется каждый день, и учить тут нечего.
  */
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -29,99 +42,124 @@ export default async function ProfilePage() {
   const role = profile?.role ?? 'buyer'
   const isMaster = role === 'seller' || role === 'admin'
 
-  let company: Company | null = null
+  // Мастеру показываем его дела с живыми цифрами, чтобы не заходить наугад
+  let company: { id: number; name: string; status: string } | null = null
+  let newOrders = 0
+  let works = 0
+
   if (isMaster) {
     const { data } = await supabase
       .from('companies')
-      .select('*')
+      .select('id, name, status')
       .eq('owner_user_id', user.id)
       .maybeSingle()
-    company = (data as Company | null) ?? null
+    company = data
+
+    if (company) {
+      const [orders, products] = await Promise.all([
+        supabase
+          .from('orders')
+          .select('id', { count: 'exact', head: true })
+          .eq('company_id', company.id)
+          .eq('status', 'new'),
+        supabase
+          .from('products')
+          .select('id', { count: 'exact', head: true })
+          .eq('company_id', company.id),
+      ])
+      newOrders = orders.count ?? 0
+      works = products.count ?? 0
+    }
   }
 
+  const statusLabel =
+    company?.status === 'active'
+      ? 'В каталоге'
+      : company?.status === 'blocked'
+        ? 'Скрыта'
+        : company
+          ? 'На проверке'
+          : 'Не заполнена'
+
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
+    <div className="mx-auto max-w-2xl px-4 py-6 pb-10">
       {/* Кто вы */}
-      <div className="mb-5 flex items-center gap-4">
+      <div className="flex items-center gap-4 rounded-3xl bg-paper p-5">
         <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-gold text-xl font-semibold text-white">
           {(profile?.full_name ?? user.email ?? 'М').charAt(0).toUpperCase()}
         </span>
         <div className="min-w-0">
-          <h1 className="display truncate text-xl text-text">{profile?.full_name ?? 'Без имени'}</h1>
-          <div className="mt-0.5 truncate text-sm text-text-muted">{user.email}</div>
+          <div className="display truncate text-lg text-text">
+            {profile?.full_name ?? 'Без имени'}
+          </div>
+          <div className="mt-0.5 truncate text-sm text-text-muted">
+            {profile?.phone ? formatPhone(profile.phone) : user.email}
+          </div>
         </div>
       </div>
 
-      <ProfileForm fullName={profile?.full_name ?? ''} phone={profile?.phone ?? ''} />
-
-      {/* Мастерская — всё, что видят покупатели */}
+      {/* Дела мастера */}
       {isMaster && (
-        <section className="mt-6">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="display text-lg text-text">Моя мастерская</h2>
-            {company?.status === 'active' && (
-              <Link
-                href={`/company/${company.slug ?? company.id}`}
-                className="text-sm text-gold hover:underline"
-              >
-                Как видят покупатели →
-              </Link>
-            )}
-          </div>
-
-          {!company && (
-            <p className="mb-4 text-sm leading-relaxed text-text-muted">
-              Заполните — и вы появитесь в каталоге. Телефон, Telegram и Instagram отсюда
-              покупатели увидят на вашей странице.
-            </p>
-          )}
-
-          {company?.status === 'blocked' && (
-            <p className="mb-4 rounded-2xl bg-status-error/15 px-4 py-3 text-sm text-status-error">
-              Мастерская скрыта из каталога.{' '}
-              {company.moderation_note ?? 'Свяжитесь с администратором площадки.'}
-            </p>
-          )}
-
-          <CompanyForm company={company} />
-        </section>
+        <SettingsGroup title="Моё дело">
+          <SettingsRow
+            href="/profile/company"
+            icon={<IconStore />}
+            label="Моя мастерская"
+            value={statusLabel}
+          />
+          <SettingsRow
+            href="/dashboard/products"
+            icon={<IconPhotos />}
+            label="Мои работы"
+            value={works > 0 ? String(works) : undefined}
+          />
+          <SettingsRow
+            href="/dashboard/orders"
+            icon={<IconOrders />}
+            label="Заказы"
+            badge={newOrders}
+          />
+          <SettingsRow href="/dashboard" icon={<IconChart />} label="Аналитика" />
+          <SettingsRow href="/dashboard/promotion" icon={<IconRocket />} label="Продвижение" />
+        </SettingsGroup>
       )}
 
-      {/* Покупателю — его заявки */}
-      {role === 'buyer' && (
-        <Link
-          href="/account"
-          className="lift mt-4 block rounded-3xl bg-paper p-5 transition-colors hover:bg-sand"
-        >
-          <div className="font-semibold text-text">Мои заявки</div>
-          <div className="mt-1 text-sm text-text-muted">Что я заказывал у мастеров</div>
-        </Link>
+      {/* Покупателю — его заявки и приглашение стать мастером */}
+      {!isMaster && (
+        <SettingsGroup>
+          <SettingsRow href="/account" icon={<IconRequests />} label="Мои заявки" />
+          <SettingsRow href="/profile/company" icon={<IconStore />} label="Стать мастером" />
+        </SettingsGroup>
       )}
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {role === 'admin' && (
-          <Link href="/admin" className="lift rounded-3xl bg-paper p-5 transition-colors hover:bg-sand">
-            <div className="font-semibold text-text">Панель управления</div>
-            <div className="mt-1 text-sm text-text-muted">Вся площадка</div>
-          </Link>
-        )}
-        <Link
-          href="/auth/new-password"
-          className="lift rounded-3xl bg-paper p-5 transition-colors hover:bg-sand"
-        >
-          <div className="font-semibold text-text">Сменить пароль</div>
-          <div className="mt-1 text-sm text-text-muted">Безопасность входа</div>
-        </Link>
-      </div>
+      {/* Управление площадкой */}
+      {role === 'admin' && (
+        <SettingsGroup title="Площадка">
+          <SettingsRow href="/admin" icon={<IconPanel />} label="Панель управления" />
+        </SettingsGroup>
+      )}
 
-      <form action={signOut} className="mt-4">
+      <SettingsGroup>
+        <SettingsRow href="/profile/edit" icon={<IconUser />} label="Личные данные" />
+        <SettingsRow href="/profile/settings" icon={<IconGear />} label="Настройки" />
+      </SettingsGroup>
+
+      <SettingsGroup>
+        <SettingsRow href="/terms" icon={<IconDoc />} label="Условия" />
+        <SettingsRow href="/privacy" icon={<IconShield />} label="Конфиденциальность" />
+        <SettingsRow href="/profile/help" icon={<IconHelp />} label="Помощь и связь" />
+      </SettingsGroup>
+
+      <form action={signOut} className="mt-6">
         <button
           type="submit"
-          className="press w-full rounded-3xl bg-paper p-5 text-left font-semibold text-status-error transition-colors hover:bg-status-error/10"
+          className="press w-full rounded-full bg-gold py-4 font-semibold text-white transition-colors hover:bg-gold-deep"
         >
-          Выйти из аккаунта
+          Выйти
         </button>
       </form>
+
+      <p className="mt-5 text-center text-xs text-text-muted">Mebel · Ташкент · версия 1.0</p>
     </div>
   )
 }
