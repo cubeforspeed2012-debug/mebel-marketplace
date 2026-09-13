@@ -154,13 +154,12 @@ const SETS: Record<'guest' | 'buyer' | 'seller' | 'admin', Tab[]> = {
   guest: [HOME, CATALOG, FAVORITES, PROFILE],
   buyer: [HOME, CATALOG, FAVORITES, PROFILE],
   /*
-   * У мастера шесть кнопок: он и продаёт, и сам смотрит чужие работы.
-   * Приподнятого «+» тут нет — он перекрыл бы среднюю кнопку, а добавить
-   * работу можно прямо в разделе «Работы».
+   * У мастера пять кнопок: каталог посмотреть чужие работы, а дальше его
+   * дело. Приподнятого «+» тут нет — он перекрыл бы среднюю кнопку,
+   * а добавить работу можно прямо в разделе «Работы».
    */
   seller: [
     CATALOG,
-    FAVORITES,
     { href: '/dashboard', key: 'overview', icon: IconChart, match: (p) => p === '/dashboard' || p.startsWith('/dashboard/clients') || p.startsWith('/dashboard/promotion') },
     { href: '/dashboard/orders', key: 'orders', icon: IconOrders, match: (p) => p.startsWith('/dashboard/orders') },
     { href: '/dashboard/products', key: 'portfolio', icon: IconWorks, match: (p) => p.startsWith('/dashboard/products') },
