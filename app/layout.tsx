@@ -76,10 +76,10 @@ function Header({
           {/* Вошедшему звать регистрироваться незачем — ведём в его кабинет */}
           {signedIn ? (
             <Link
-              href="/profile"
-              className="hidden rounded-[var(--radius)] px-4 py-2 text-sm text-on-dark-muted transition-colors hover:text-on-dark sm:block"
+              href="/catalog"
+              className="press rounded-full bg-white/8 px-4 py-2 text-sm text-on-dark transition-colors hover:bg-white/14 md:hidden"
             >
-              {dict.nav.profile}
+              {dict.nav.catalog}
             </Link>
           ) : (
             <>

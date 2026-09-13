@@ -109,7 +109,7 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
 
   revalidatePath('/', 'layout')
   // Мастера ведём заполнять мастерскую, покупателя — сразу в каталог.
-  redirect(role === 'buyer' ? '/catalog' : '/dashboard/company')
+  redirect(role === 'buyer' ? '/catalog' : '/profile')
 }
 
 export async function signOut() {

@@ -6,7 +6,7 @@ import type { OrderWithClient } from '@/lib/types'
 import { deleteOrder, updateOrderDetails, updateOrderStatus } from './actions'
 import { NewOrderForm } from './new-order-form'
 
-export const metadata = { title: 'Заявки и заказы' }
+export const metadata = { title: 'Заказы' }
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ru-RU', {
@@ -28,13 +28,13 @@ export default async function OrdersPage({
   if (!company) {
     return (
       <div>
-        <h2 className="display gold-rule text-xl">Заявки и заказы</h2>
+        <h2 className="display gold-rule text-xl">Заказы</h2>
         <div className="mt-7 rounded-3xl rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
           <p className="text-text-muted">
             Заявки приходят на страницу мастерской. Сначала создайте её.
           </p>
           <Link
-            href="/dashboard/company"
+            href="/profile"
             className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
           >
             Заполнить профиль
@@ -63,7 +63,7 @@ export default async function OrdersPage({
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="display gold-rule text-xl">Заявки и заказы</h2>
+        <h2 className="display gold-rule text-xl">Заказы</h2>
         <NewOrderForm />
       </div>
 

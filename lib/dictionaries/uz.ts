@@ -27,7 +27,7 @@ export const uz: typeof ru = {
     works: 'Ishlarim',
     overview: 'Tahlil',
     orders: 'Buyurtmalar',
-    portfolio: 'Portfolio',
+    portfolio: 'Ishlarim',
     approvals: 'Tasdiqlash',
     accounts: 'Akkauntlar',
     signIn: 'Kirish',

@@ -1,13 +1,15 @@
 import Link from 'next/link'
-import { signOut } from '@/app/auth/actions'
-import { RoleSwitcher } from '@/components/role-switcher'
 import { getSellerContext } from '@/lib/session'
-import { DashboardNav } from './dashboard-nav'
+import { CabinetTabs } from './cabinet-tabs'
 
+/**
+ * Кабинет мастера — четыре экрана и ничего лишнего:
+ * Аналитика, Заказы, Мои работы, Профиль. На телефоне между ними
+ * переключает нижнее меню, на компьютере — та же полоса сверху.
+ */
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { supabase, company, profile } = await getSellerContext()
+  const { supabase, company } = await getSellerContext()
 
-  // Счётчик новых заявок — показываем прямо в меню, чтобы не пропустить клиента.
   let newOrders = 0
   if (company) {
     const { count } = await supabase
@@ -18,64 +20,34 @@ export default async function DashboardLayout({ children }: { children: React.Re
     newOrders = count ?? 0
   }
 
-  const today = new Date().toLocaleDateString('ru-RU', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'long',
-  })
-
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
-      {/* Верхняя строка кабинета */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div className="mx-auto max-w-5xl px-4 py-5 sm:py-6">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <div className="text-sm text-text-muted">Сегодня, {today}</div>
-          <h1 className="display mt-1 truncate text-xl text-text">
-            {company?.name ?? profile?.full_name ?? 'Новый мастер'}
-          </h1>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {profile?.role === 'admin' && <RoleSwitcher current="/dashboard" />}
-
+          <h1 className="display truncate text-xl text-text">{company?.name ?? 'Моя мастерская'}</h1>
           {company?.status === 'pending' && (
-            <span className="rounded-full bg-status-process/20 px-4 py-2 text-xs font-medium text-status-process">
-              На проверке
-            </span>
+            <div className="mt-1 text-sm text-status-process">На проверке — скоро появится в каталоге</div>
           )}
           {company?.status === 'blocked' && (
-            <span className="rounded-full bg-status-error/20 px-4 py-2 text-xs font-medium text-status-error">
-              Заблокирована
-            </span>
+            <div className="mt-1 text-sm text-status-error">Скрыта из каталога</div>
           )}
           {company?.status === 'active' && (
             <Link
               href={`/company/${company.slug ?? company.id}`}
-              className="press rounded-full bg-sand px-4 py-2 text-sm text-text transition-colors hover:bg-gold hover:text-white"
+              className="mt-1 inline-block text-sm text-gold hover:underline"
             >
-              Моя страница →
+              Посмотреть мою страницу →
             </Link>
           )}
-
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="press rounded-full bg-sand px-4 py-2 text-sm text-text-muted transition-colors hover:bg-paper hover:text-text"
-            >
-              Выйти
-            </button>
-          </form>
-
-          <span className="flex size-10 items-center justify-center rounded-full bg-gold text-sm font-semibold text-white">
-            {(company?.name ?? profile?.full_name ?? 'М').charAt(0)}
-          </span>
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[248px_1fr]">
-        <DashboardNav newOrders={newOrders} />
-        <div className="min-w-0">{children}</div>
+      {/* На компьютере нижнего меню нет — те же четыре кнопки сверху */}
+      <div className="mb-6 hidden md:block">
+        <CabinetTabs newOrders={newOrders} />
       </div>
+
+      <div className="min-w-0">{children}</div>
     </div>
   )
 }

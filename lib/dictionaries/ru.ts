@@ -28,7 +28,7 @@ export const ru = {
     works: 'Мои работы',
     overview: 'Аналитика',
     orders: 'Заказы',
-    portfolio: 'Портфолио',
+    portfolio: 'Мои работы',
     approvals: 'Одобрение',
     accounts: 'Аккаунты',
     signIn: 'Войти',

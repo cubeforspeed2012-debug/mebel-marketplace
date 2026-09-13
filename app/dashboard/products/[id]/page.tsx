@@ -12,7 +12,7 @@ export default async function EditProductPage({
 }) {
   const { id } = await params
   const { supabase, company } = await getSellerContext()
-  if (!company) redirect('/dashboard/company')
+  if (!company) redirect('/profile')
   if (!/^\d+$/.test(id)) notFound()
 
   const [productResult, categoriesResult] = await Promise.all([

@@ -18,7 +18,7 @@ export default async function ClientsPage() {
         <div className="mt-7 rounded-3xl rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
           <p className="text-text-muted">Сначала создайте профиль мастерской.</p>
           <Link
-            href="/dashboard/company"
+            href="/profile"
             className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
           >
             Заполнить профиль

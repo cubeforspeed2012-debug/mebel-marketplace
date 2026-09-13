@@ -4,7 +4,7 @@ import { getSellerContext } from '@/lib/session'
 import type { Product, ProductImage } from '@/lib/types'
 import { deleteProduct, toggleProductStatus } from './actions'
 
-export const metadata = { title: 'Моя мебель' }
+export const metadata = { title: 'Мои работы' }
 
 type Row = Product & { product_images: ProductImage[] }
 
@@ -19,13 +19,13 @@ export default async function ProductsPage({
   if (!company) {
     return (
       <div>
-        <h2 className="display gold-rule text-xl">Моя мебель</h2>
+        <h2 className="display gold-rule text-xl">Мои работы</h2>
         <div className="mt-7 rounded-3xl rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
           <p className="text-text-muted">
             Сначала заполните профиль мастерской — без него мебель некуда прикрепить.
           </p>
           <Link
-            href="/dashboard/company"
+            href="/profile"
             className="mt-5 inline-block bg-gold px-6 py-3 font-semibold text-white transition-colors hover:bg-gold-deep"
           >
             Заполнить профиль
@@ -46,7 +46,7 @@ export default async function ProductsPage({
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="display gold-rule text-xl">Моя мебель</h2>
+        <h2 className="display gold-rule text-xl">Мои работы</h2>
         <Link
           href="/dashboard/products/new"
           className="bg-gold px-6 py-2.5 font-semibold text-white transition-colors hover:bg-gold-deep"

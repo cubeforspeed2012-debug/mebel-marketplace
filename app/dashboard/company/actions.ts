@@ -90,7 +90,7 @@ export async function saveCompany(_prev: FormState, formData: FormData): Promise
     const { error } = await supabase.from('companies').update(fields).eq('id', existing.id)
     if (error) return { error: error.message }
 
-    revalidatePath('/dashboard/company')
+    revalidatePath('/profile')
     revalidatePath(`/company/${existing.slug ?? existing.id}`)
     return { message: 'Профиль сохранён' }
   }

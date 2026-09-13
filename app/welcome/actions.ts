@@ -58,5 +58,5 @@ export async function completeProfile(
   if (failure) return { error: failure }
 
   revalidatePath('/', 'layout')
-  redirect(role === 'seller' ? '/dashboard/company' : '/catalog')
+  redirect(role === 'seller' ? '/profile' : '/catalog')
 }

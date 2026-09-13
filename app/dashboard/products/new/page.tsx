@@ -7,7 +7,7 @@ export const metadata = { title: 'Новая мебель' }
 
 export default async function NewProductPage() {
   const { supabase, company } = await getSellerContext()
-  if (!company) redirect('/dashboard/company')
+  if (!company) redirect('/profile')
 
   const { data } = await supabase
     .from('categories')

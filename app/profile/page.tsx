@@ -1,18 +1,17 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { signOut } from '@/app/auth/actions'
+import { CompanyForm } from '@/app/dashboard/company/company-form'
 import { createClient } from '@/lib/supabase/server'
+import type { Company } from '@/lib/types'
 import { ProfileForm } from './profile-form'
 
-export const metadata = { title: 'Мой профиль' }
+export const metadata = { title: 'Профиль' }
 
-const ROLE_LABEL: Record<string, string> = {
-  admin: 'Администратор площадки',
-  seller: 'Мастер',
-  buyer: 'Покупатель',
-}
-
-/** Профиль человека — один для всех: и мастера, и покупателя, и администратора. */
+/**
+ * Один экран про человека и его мастерскую. Имя и телефон — сверху,
+ * мастерская со всеми контактами — ниже. Ничего не спрятано по разделам.
+ */
 export default async function ProfilePage() {
   const supabase = await createClient()
 
@@ -27,85 +26,92 @@ export default async function ProfilePage() {
     .eq('id', user.id)
     .maybeSingle()
 
-  const { data: company } = await supabase
-    .from('companies')
-    .select('id, name, slug, status')
-    .eq('owner_user_id', user.id)
-    .maybeSingle()
-
   const role = profile?.role ?? 'buyer'
+  const isMaster = role === 'seller' || role === 'admin'
 
-  const links = [
-    role === 'admin' && { href: '/admin', label: 'Панель управления', hint: 'Вся площадка' },
-    (role === 'seller' || role === 'admin') && {
-      href: '/dashboard',
-      label: 'Кабинет мастера',
-      hint: 'Заявки, клиенты, мебель',
-    },
-    { href: '/account', label: 'Мои заявки', hint: 'Что я заказывал у мастеров' },
-    { href: '/catalog', label: 'Каталог мебели', hint: 'Найти мебель' },
-    { href: '/auth/new-password', label: 'Сменить пароль', hint: 'Безопасность входа' },
-  ].filter(Boolean) as { href: string; label: string; hint: string }[]
+  let company: Company | null = null
+  if (isMaster) {
+    const { data } = await supabase
+      .from('companies')
+      .select('*')
+      .eq('owner_user_id', user.id)
+      .maybeSingle()
+    company = (data as Company | null) ?? null
+  }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <div className="mb-6 flex items-center gap-4">
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
+      {/* Кто вы */}
+      <div className="mb-5 flex items-center gap-4">
         <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-gold text-xl font-semibold text-white">
           {(profile?.full_name ?? user.email ?? 'М').charAt(0).toUpperCase()}
         </span>
         <div className="min-w-0">
-          <h1 className="display truncate text-xl text-text">
-            {profile?.full_name ?? 'Без имени'}
-          </h1>
-          <div className="mt-0.5 truncate text-sm text-text-muted">
-            {ROLE_LABEL[role]} · {user.email}
-          </div>
+          <h1 className="display truncate text-xl text-text">{profile?.full_name ?? 'Без имени'}</h1>
+          <div className="mt-0.5 truncate text-sm text-text-muted">{user.email}</div>
         </div>
       </div>
 
       <ProfileForm fullName={profile?.full_name ?? ''} phone={profile?.phone ?? ''} />
 
-      {company && (
-        <div className="mt-4 rounded-3xl bg-paper p-6">
-          <div className="text-sm text-text-muted">Моя мастерская</div>
-          <div className="mt-1 flex flex-wrap items-center gap-3">
-            <span className="font-semibold text-text">{company.name}</span>
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-medium ${
-                company.status === 'active'
-                  ? 'bg-status-done/20 text-status-done'
-                  : company.status === 'blocked'
-                    ? 'bg-status-error/20 text-status-error'
-                    : 'bg-status-process/20 text-status-process'
-              }`}
-            >
-              {company.status === 'active'
-                ? 'В каталоге'
-                : company.status === 'blocked'
-                  ? 'Заблокирована'
-                  : 'На проверке'}
-            </span>
+      {/* Мастерская — всё, что видят покупатели */}
+      {isMaster && (
+        <section className="mt-6">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="display text-lg text-text">Моя мастерская</h2>
+            {company?.status === 'active' && (
+              <Link
+                href={`/company/${company.slug ?? company.id}`}
+                className="text-sm text-gold hover:underline"
+              >
+                Как видят покупатели →
+              </Link>
+            )}
           </div>
-          <Link
-            href="/dashboard/company"
-            className="press mt-4 inline-block rounded-full bg-sand px-5 py-2.5 text-sm text-text transition-colors hover:bg-gold hover:text-white"
-          >
-            Изменить мастерскую
-          </Link>
-        </div>
+
+          {!company && (
+            <p className="mb-4 text-sm leading-relaxed text-text-muted">
+              Заполните — и вы появитесь в каталоге. Телефон, Telegram и Instagram отсюда
+              покупатели увидят на вашей странице.
+            </p>
+          )}
+
+          {company?.status === 'blocked' && (
+            <p className="mb-4 rounded-2xl bg-status-error/15 px-4 py-3 text-sm text-status-error">
+              Мастерская скрыта из каталога.{' '}
+              {company.moderation_note ?? 'Свяжитесь с администратором площадки.'}
+            </p>
+          )}
+
+          <CompanyForm company={company} />
+        </section>
+      )}
+
+      {/* Покупателю — его заявки */}
+      {role === 'buyer' && (
+        <Link
+          href="/account"
+          className="lift mt-4 block rounded-3xl bg-paper p-5 transition-colors hover:bg-sand"
+        >
+          <div className="font-semibold text-text">Мои заявки</div>
+          <div className="mt-1 text-sm text-text-muted">Что я заказывал у мастеров</div>
+        </Link>
       )}
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {links.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="lift rounded-3xl bg-paper p-5 transition-colors hover:bg-sand"
-          >
-            <div className="font-semibold text-text">{link.label}</div>
-            <div className="mt-1 text-sm text-text-muted">{link.hint}</div>
+        {role === 'admin' && (
+          <Link href="/admin" className="lift rounded-3xl bg-paper p-5 transition-colors hover:bg-sand">
+            <div className="font-semibold text-text">Панель управления</div>
+            <div className="mt-1 text-sm text-text-muted">Вся площадка</div>
           </Link>
-        ))}
+        )}
+        <Link
+          href="/auth/new-password"
+          className="lift rounded-3xl bg-paper p-5 transition-colors hover:bg-sand"
+        >
+          <div className="font-semibold text-text">Сменить пароль</div>
+          <div className="mt-1 text-sm text-text-muted">Безопасность входа</div>
+        </Link>
       </div>
 
       <form action={signOut} className="mt-4">
