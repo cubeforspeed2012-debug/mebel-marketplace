@@ -105,7 +105,7 @@ export function LiquidTabs({
         ref={pillRef}
         aria-hidden
         className={`pointer-events-none absolute left-0 top-0 rounded-full opacity-0 ${
-          bar ? 'bg-gold shadow-[0_6px_18px_rgba(138,112,83,0.4)]' : 'bg-white/12'
+          bar ? 'bg-gold shadow-[0_6px_18px_rgba(156,90,34,0.35)]' : 'bg-gold-soft'
         }`}
         style={{ transformOrigin: 'center', willChange: 'transform' }}
       />
@@ -129,7 +129,7 @@ export function LiquidTabs({
                     active ? 'text-white' : 'text-text-muted'
                   }`
                 : `relative z-10 rounded-full px-4 py-2 text-sm transition-colors duration-200 ${
-                    active ? 'text-on-dark' : 'text-on-dark-muted hover:text-on-dark'
+                    active ? 'font-semibold text-gold' : 'text-text-muted hover:text-text'
                   }`
             }
           >

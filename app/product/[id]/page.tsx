@@ -2,10 +2,12 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { RequestForm } from '@/components/request-form'
 import { ContactButtons } from '@/components/contact-buttons'
+import { FavoriteButton } from '@/components/favorite-button'
 import { ProductCard } from '@/components/product-card'
 import { formatPrice } from '@/lib/constants'
 import { districtIn, priceIn } from '@/lib/i18n'
 import { getDictionary } from '@/lib/locale'
+import { getFavoriteIds } from '@/lib/favorites'
 import { createClient } from '@/lib/supabase/server'
 import type { ProductCard as ProductCardType } from '@/lib/types'
 import { bumpViews } from '@/lib/views'
@@ -105,6 +107,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
 
   const images = [...(product.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order)
   const company = product.companies
+  const favorites = await getFavoriteIds()
   const { master, others, worksCount } = company
     ? await getMaster(company.id, product.id)
     : { master: null, others: [], worksCount: 0 }
@@ -159,7 +162,14 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             {product.type && <span>· {dict.productTypes[product.type]}</span>}
           </div>
 
-          <h1 className="display mt-3 text-2xl leading-tight sm:text-3xl">{product.title}</h1>
+          <div className="mt-3 flex items-start justify-between gap-4">
+            <h1 className="display text-2xl leading-tight sm:text-3xl">{product.title}</h1>
+            <FavoriteButton
+              productId={product.id}
+              active={favorites.has(product.id)}
+              size="large"
+            />
+          </div>
 
           <div className="mt-5 border-y border-line py-5">
             <div className="display text-3xl text-gold-deep">
@@ -268,7 +278,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           </div>
           <div className="stagger grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {others.map((item) => (
-              <ProductCard key={item.id} product={item} />
+              <ProductCard key={item.id} product={item} favorite={favorites.has(item.id)} />
             ))}
           </div>
         </section>

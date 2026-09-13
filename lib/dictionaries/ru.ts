@@ -26,6 +26,7 @@ export const ru = {
     profile: 'Профиль',
     admin: 'Панель',
     works: 'Мои работы',
+    favorites: 'Любимое',
     overview: 'Аналитика',
     orders: 'Заказы',
     portfolio: 'Мои работы',

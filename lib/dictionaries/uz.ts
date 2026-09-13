@@ -25,6 +25,7 @@ export const uz: typeof ru = {
     profile: 'Profil',
     admin: 'Boshqaruv',
     works: 'Ishlarim',
+    favorites: 'Saralangan',
     overview: 'Tahlil',
     orders: 'Buyurtmalar',
     portfolio: 'Ishlarim',

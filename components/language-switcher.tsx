@@ -24,7 +24,7 @@ export function LanguageSwitcher({ tone = 'dark' }: { tone?: 'dark' | 'light' })
   return (
     <div
       className={`flex items-center gap-0.5 rounded-full p-0.5 ${
-        tone === 'dark' ? 'bg-white/8' : 'bg-cream'
+        tone === 'dark' ? 'bg-sand' : 'bg-cream'
       } ${pending ? 'opacity-60' : ''}`}
     >
       {LOCALES.map((locale) => {
@@ -37,7 +37,7 @@ export function LanguageSwitcher({ tone = 'dark' }: { tone?: 'dark' | 'light' })
             onClick={() => choose(locale)}
             aria-pressed={active}
             className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-colors duration-200 ${
-              active ? 'bg-gold text-white' : 'text-on-dark-muted hover:text-on-dark'
+              active ? 'bg-gold text-white' : 'text-text-muted hover:text-text'
             }`}
           >
             {LABELS[locale]}

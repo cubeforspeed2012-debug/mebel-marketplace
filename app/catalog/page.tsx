@@ -4,6 +4,7 @@ import { ProductCard } from '@/components/product-card'
 import { DISTRICTS, FALLBACK_CATEGORIES, PRODUCT_TYPES } from '@/lib/constants'
 import { districtIn } from '@/lib/i18n'
 import { getDictionary } from '@/lib/locale'
+import { getFavoriteIds } from '@/lib/favorites'
 import { createClient } from '@/lib/supabase/server'
 import type { Category, ProductCard as ProductCardType } from '@/lib/types'
 
@@ -122,6 +123,7 @@ export default async function CatalogPage({
   const params = await searchParams
   const dict = await getDictionary()
   const { categories, products } = await getCatalog(params)
+  const favorites = await getFavoriteIds()
 
   const categoryList = categories.length
     ? categories.map((c) => ({
@@ -231,7 +233,11 @@ export default async function CatalogPage({
               </div>
               <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard
+                key={product.id}
+                product={product}
+                favorite={favorites.has(product.id)}
+              />
                 ))}
               </div>
             </>

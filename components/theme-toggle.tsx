@@ -18,7 +18,7 @@ export function ThemeToggle({ initial }: { initial: Theme }) {
     document.documentElement.dataset.theme = theme
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', theme === 'light' ? '#2b2520' : '#0f0f0f')
+      ?.setAttribute('content', theme === 'light' ? '#ffffff' : '#0f0f0f')
   }, [theme])
 
   function toggle() {
@@ -35,7 +35,7 @@ export function ThemeToggle({ initial }: { initial: Theme }) {
       onClick={toggle}
       aria-label={light ? 'Включить тёмную тему' : 'Включить светлую тему'}
       title={light ? 'Тёмная тема' : 'Светлая тема'}
-      className="press flex size-8 items-center justify-center rounded-full bg-white/8 text-on-dark-muted transition-colors duration-200 hover:text-on-dark"
+      className="press flex size-8 items-center justify-center rounded-full bg-sand text-text-muted transition-colors duration-200 hover:text-text"
     >
       {light ? (
         <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={1.8}

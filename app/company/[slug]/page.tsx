@@ -8,6 +8,7 @@ import { WorksGallery, type Work } from '@/components/works-gallery'
 import { WORK_TYPES } from '@/lib/constants'
 import { districtIn } from '@/lib/i18n'
 import { getDictionary } from '@/lib/locale'
+import { getFavoriteIds } from '@/lib/favorites'
 import { createClient } from '@/lib/supabase/server'
 import type { Company, ProductCard as ProductCardType } from '@/lib/types'
 import { bumpViews } from '@/lib/views'
@@ -74,6 +75,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
   if (!data) notFound()
 
   const { company, products } = data
+  const favorites = await getFavoriteIds()
 
   // Все фотографии работ одним списком — так их удобнее листать
   const works: Work[] = products.flatMap((product) =>
@@ -167,7 +169,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
         ) : products.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} favorite={favorites.has(product.id)} />
             ))}
           </div>
         ) : (
@@ -181,7 +183,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
             <h2 className="display gold-rule mb-8 mt-14 text-2xl">{dict.company.canOrder}</h2>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} favorite={favorites.has(product.id)} />
               ))}
             </div>
           </>

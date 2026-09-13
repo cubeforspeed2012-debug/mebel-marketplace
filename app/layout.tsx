@@ -29,8 +29,8 @@ const manrope = Manrope({
 
 // Тема светлая — иначе браузер с «тёмным режимом» перекрашивает сайт сам
 export const viewport = {
-  colorScheme: 'dark' as const,
-  themeColor: '#0f0f0f',
+  colorScheme: 'light' as const,
+  themeColor: '#ffffff',
 }
 
 export const metadata: Metadata = {
@@ -62,9 +62,9 @@ function Header({
   theme: 'dark' | 'light'
 }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-line-dark bg-ink">
+    <header className="sticky top-0 z-40 border-b border-line bg-ink">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-4">
-        <Link href="/" className="display text-lg text-on-dark">
+        <Link href="/" className="display text-lg text-text">
           Mebel<span className="text-gold">.</span>
         </Link>
 
@@ -77,7 +77,7 @@ function Header({
           {signedIn ? (
             <Link
               href="/catalog"
-              className="press rounded-full bg-white/8 px-4 py-2 text-sm text-on-dark transition-colors hover:bg-white/14 md:hidden"
+              className="press rounded-full bg-sand px-4 py-2 text-sm text-text transition-colors hover:bg-gold-soft md:hidden"
             >
               {dict.nav.catalog}
             </Link>
@@ -85,7 +85,7 @@ function Header({
             <>
               <Link
                 href="/auth"
-                className="hidden rounded-[var(--radius)] px-4 py-2 text-sm text-on-dark-muted transition-colors hover:text-on-dark sm:block"
+                className="hidden rounded-full px-4 py-2 text-sm text-text-muted transition-colors hover:text-text sm:block"
               >
                 {dict.nav.signIn}
               </Link>
@@ -107,11 +107,11 @@ function Header({
 
 function Footer({ dict }: { dict: Dict }) {
   return (
-    <footer className="border-t border-line-dark bg-ink text-on-dark-muted">
+    <footer className="border-t border-line bg-ink-deep text-text-muted">
       <div className="mx-auto max-w-6xl px-4 py-14">
         <div className="grid gap-10 sm:grid-cols-[2fr_1fr_1fr]">
           <div>
-            <div className="display mb-3 text-lg text-on-dark">
+            <div className="display mb-3 text-lg text-text">
               Mebel<span className="text-gold">.</span>
             </div>
             <p className="max-w-xs text-sm leading-relaxed">
@@ -120,30 +120,30 @@ function Footer({ dict }: { dict: Dict }) {
           </div>
 
           <div>
-            <div className="eyebrow mb-3 text-on-dark">{dict.footer.buyers}</div>
+            <div className="eyebrow mb-3 text-text">{dict.footer.buyers}</div>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/catalog" className="transition-colors hover:text-on-dark">
+                <Link href="/catalog" className="transition-colors hover:text-text">
                   {dict.footer.catalog}
                 </Link>
               </li>
               <li>
-                <Link href="/companies" className="transition-colors hover:text-on-dark">
+                <Link href="/companies" className="transition-colors hover:text-text">
                   {dict.footer.allMasters}
                 </Link>
               </li>
               <li>
-                <Link href="/auth?role=buyer" className="transition-colors hover:text-on-dark">
+                <Link href="/auth?role=buyer" className="transition-colors hover:text-text">
                   {dict.footer.account}
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="transition-colors hover:text-on-dark">
+                <Link href="/terms" className="transition-colors hover:text-text">
                   {dict.footer.terms}
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="transition-colors hover:text-on-dark">
+                <Link href="/privacy" className="transition-colors hover:text-text">
                   {dict.footer.privacy}
                 </Link>
               </li>
@@ -151,15 +151,15 @@ function Footer({ dict }: { dict: Dict }) {
           </div>
 
           <div>
-            <div className="eyebrow mb-3 text-on-dark">{dict.footer.masters}</div>
+            <div className="eyebrow mb-3 text-text">{dict.footer.masters}</div>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/dashboard" className="transition-colors hover:text-on-dark">
+                <Link href="/dashboard" className="transition-colors hover:text-text">
                   {dict.footer.postFurniture}
                 </Link>
               </li>
               <li>
-                <Link href="/auth" className="transition-colors hover:text-on-dark">
+                <Link href="/auth" className="transition-colors hover:text-text">
                   {dict.footer.sellerSignIn}
                 </Link>
               </li>
@@ -167,7 +167,7 @@ function Footer({ dict }: { dict: Dict }) {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-line-dark pt-6 text-sm">
+        <div className="mt-12 border-t border-line pt-6 text-sm">
           © {new Date().getFullYear()} Mebel · {dict.footer.city}
         </div>
       </div>
@@ -180,12 +180,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const dict = getDict(locale)
 
   // Тема из куки — страница сразу приходит в нужном цвете, без мигания
-  let theme: 'dark' | 'light' = 'dark'
+  let theme: 'dark' | 'light' = 'light'
   try {
     const store = await cookies()
-    if (store.get('theme')?.value === 'light') theme = 'light'
+    if (store.get('theme')?.value === 'dark') theme = 'dark'
   } catch {
-    theme = 'dark'
+    theme = 'light'
   }
 
   // Администратору в нижнем меню нужна кнопка панели управления,

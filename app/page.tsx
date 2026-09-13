@@ -3,6 +3,7 @@ import { CategoryIcon, FurnitureScene } from '@/components/furniture-icons'
 import { ProductCard } from '@/components/product-card'
 import { FALLBACK_CATEGORIES } from '@/lib/constants'
 import { getDictionary } from '@/lib/locale'
+import { getFavoriteIds } from '@/lib/favorites'
 import { createClient } from '@/lib/supabase/server'
 import type { Category, ProductCard as ProductCardType } from '@/lib/types'
 
@@ -59,6 +60,7 @@ export default async function HomePage() {
   const dict = await getDictionary()
   const signedIn = await isSignedIn()
   const { categories, products } = await getHomeData()
+  const favorites = await getFavoriteIds()
 
   // Названия категорий в базе лежат на двух языках — берём по языку страницы
   const categoryLinks = categories.length
@@ -75,7 +77,7 @@ export default async function HomePage() {
     <>
       {/* Наверху — поиск и категории. Дальше сразу мебель: люди пришли смотреть
           работы мастеров, а не читать про площадку. */}
-      <section className="border-b border-line bg-ink">
+      <section className="border-b border-line bg-paper">
         <div className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
           <form action="/catalog" className="flex gap-2">
             <input
@@ -83,7 +85,7 @@ export default async function HomePage() {
               name="q"
               placeholder={dict.home.searchPlaceholder}
               aria-label={dict.home.searchLabel}
-              className="min-w-0 flex-1 rounded-full bg-paper px-5 py-3.5 text-text outline-none transition-shadow duration-200 placeholder:text-text-muted focus:shadow-[0_0_0_2px_var(--gold)]"
+              className="min-w-0 flex-1 rounded-full bg-cream px-5 py-3.5 text-text outline-none transition-shadow duration-200 placeholder:text-text-muted focus:shadow-[0_0_0_2px_var(--gold)]"
             />
             <button
               type="submit"
@@ -98,7 +100,7 @@ export default async function HomePage() {
               <Link
                 key={category.slug}
                 href={`/catalog?category=${category.slug}`}
-                className="press flex shrink-0 items-center gap-2 rounded-full bg-paper px-4 py-2.5 text-sm text-text-muted transition-colors duration-200 hover:text-gold"
+                className="press flex shrink-0 items-center gap-2 rounded-full bg-cream px-4 py-2.5 text-sm text-text-muted transition-colors duration-200 hover:bg-gold-soft hover:text-gold"
               >
                 <CategoryIcon slug={category.slug} className="size-4.5" />
                 {category.name}
@@ -120,7 +122,11 @@ export default async function HomePage() {
         {products.length > 0 ? (
           <div className="stagger grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                favorite={favorites.has(product.id)}
+              />
             ))}
           </div>
         ) : (
@@ -159,12 +165,12 @@ export default async function HomePage() {
               <p className="mt-3 text-xs text-text-muted">{dict.banner.buyerNote}</p>
             </div>
 
-            <div className="rounded-[28px] bg-ink p-7 sm:p-9">
+            <div className="rounded-[28px] bg-sand p-7 sm:p-9">
               <div className="eyebrow text-gold">{dict.home.masters}</div>
-              <h2 className="display mt-4 text-2xl leading-tight text-on-dark sm:text-3xl">
+              <h2 className="display mt-4 text-2xl leading-tight text-text sm:text-3xl">
                 {dict.banner.sellerTitle}
               </h2>
-              <p className="mt-4 max-w-md leading-relaxed text-on-dark-muted">
+              <p className="mt-4 max-w-md leading-relaxed text-text-muted">
                 {dict.banner.sellerText}
               </p>
               <Link
@@ -173,7 +179,7 @@ export default async function HomePage() {
               >
                 {dict.banner.sellerAction}
               </Link>
-              <p className="mt-3 text-xs text-on-dark-muted">{dict.banner.sellerNote}</p>
+              <p className="mt-3 text-xs text-text-muted">{dict.banner.sellerNote}</p>
             </div>
           </div>
         </section>
@@ -209,13 +215,13 @@ export default async function HomePage() {
       </section>
 
       {/* Две стороны площадки */}
-      <section className={signedIn ? 'hidden' : 'bg-ink'}>
+      <section className={signedIn ? 'hidden' : 'bg-sand'}>
         <div className="mx-auto max-w-6xl px-4 py-16">
           <div className="grid gap-6 sm:grid-cols-2">
-            <div className="rounded-[var(--radius)] border border-line-dark p-8">
+            <div className="rounded-[var(--radius)] bg-paper p-8">
               <div className="eyebrow text-gold">{dict.home.buyers}</div>
-              <h2 className="display mt-3 text-xl text-on-dark sm:text-2xl">{dict.home.buyTitle}</h2>
-              <p className="mt-4 leading-relaxed text-on-dark-muted">
+              <h2 className="display mt-3 text-xl text-text sm:text-2xl">{dict.home.buyTitle}</h2>
+              <p className="mt-4 leading-relaxed text-text-muted">
                 {dict.home.buyText}
               </p>
               <Link
@@ -224,7 +230,7 @@ export default async function HomePage() {
               >
                 {dict.home.buyAction}
               </Link>
-              <p className="mt-4 text-sm text-on-dark-muted">
+              <p className="mt-4 text-sm text-text-muted">
                 {dict.home.buyNoteStart}{' '}
                 <Link href="/catalog" className="text-gold hover:underline">
                   {dict.home.buyNoteLink}
@@ -233,12 +239,12 @@ export default async function HomePage() {
               </p>
             </div>
 
-            <div className="rounded-[var(--radius)] border border-line-dark p-8">
+            <div className="rounded-[var(--radius)] bg-paper p-8">
               <div className="eyebrow text-gold">{dict.home.masters}</div>
-              <h2 className="display mt-3 text-xl text-on-dark sm:text-2xl">
+              <h2 className="display mt-3 text-xl text-text sm:text-2xl">
                 {dict.home.sellTitle}
               </h2>
-              <p className="mt-4 leading-relaxed text-on-dark-muted">
+              <p className="mt-4 leading-relaxed text-text-muted">
                 {dict.home.sellText}
               </p>
               <Link

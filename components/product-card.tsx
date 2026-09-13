@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { FavoriteButton } from '@/components/favorite-button'
 import { IconArmchair } from '@/components/furniture-icons'
 import { useDict } from '@/components/locale-provider'
 import { districtIn, priceIn } from '@/lib/i18n'
@@ -10,7 +11,13 @@ import type { ProductCard as ProductCardType } from '@/lib/types'
  * Карточка товара — как страница мебельного каталога:
  * фото на белом, под ним спецификация: что это, сколько, кто делает.
  */
-export function ProductCard({ product }: { product: ProductCardType }) {
+export function ProductCard({
+  product,
+  favorite = false,
+}: {
+  product: ProductCardType
+  favorite?: boolean
+}) {
   const dict = useDict()
   const image = product.product_images?.[0]?.url
   const company = product.companies
@@ -36,6 +43,11 @@ export function ProductCard({ product }: { product: ProductCardType }) {
             <span className="text-xs">{dict.common.noPhoto}</span>
           </div>
         )}
+
+        {/* Сердечко поверх фото — как во всех каталогах */}
+        <span className="absolute right-2.5 top-2.5 z-10">
+          <FavoriteButton productId={product.id} active={favorite} />
+        </span>
 
         {isBoosted && (
           <span className="absolute left-3 top-3 rounded-[var(--radius)] bg-gold px-2.5 py-1 text-[0.6875rem] font-semibold uppercase tracking-widest text-white">

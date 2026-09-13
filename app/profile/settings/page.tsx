@@ -52,7 +52,7 @@ export default async function SettingsPage({
     .maybeSingle()
 
   const store = await cookies()
-  const theme = store.get('theme')?.value === 'light' ? 'light' : 'dark'
+  const theme = store.get('theme')?.value === 'dark' ? 'dark' : 'light'
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 pb-10">

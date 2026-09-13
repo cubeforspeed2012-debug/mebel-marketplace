@@ -77,8 +77,18 @@ type TabKey =
   | 'portfolio'
   | 'approvals'
   | 'accounts'
+  | 'favorites'
 
 type Tab = Omit<TabItem, 'label'> & { key: TabKey; match: (path: string) => boolean }
+
+function IconHeart(active: boolean) {
+  return (
+    <svg viewBox="0 0 24 24" className="size-[22px]" fill={active ? 'currentColor' : 'none'}
+         strokeWidth={1.8} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M12 20s-7.5-4.7-7.5-9.4A4.1 4.1 0 0 1 12 7.6a4.1 4.1 0 0 1 7.5 3C19.5 15.3 12 20 12 20Z" />
+    </svg>
+  )
+}
 
 function IconChart(active: boolean) {
   return (
@@ -122,6 +132,12 @@ const MASTERS: Tab = {
   icon: IconMasters,
   match: (p) => p.startsWith('/companies') || p.startsWith('/company'),
 }
+const FAVORITES: Tab = {
+  href: '/favorites',
+  key: 'favorites',
+  icon: IconHeart,
+  match: (p) => p.startsWith('/favorites'),
+}
 const PROFILE: Tab = {
   href: '/profile',
   key: 'profile',
@@ -135,8 +151,8 @@ const PROFILE: Tab = {
  * цифры. Администратор разбирает очередь и следит за площадкой.
  */
 const SETS: Record<'guest' | 'buyer' | 'seller' | 'admin', Tab[]> = {
-  guest: [HOME, CATALOG, MASTERS, PROFILE],
-  buyer: [HOME, CATALOG, MASTERS, PROFILE],
+  guest: [HOME, CATALOG, FAVORITES, PROFILE],
+  buyer: [HOME, CATALOG, FAVORITES, PROFILE],
   seller: [
     { href: '/dashboard', key: 'overview', icon: IconChart, match: (p) => p === '/dashboard' || p.startsWith('/dashboard/clients') || p.startsWith('/dashboard/promotion') || p.startsWith('/dashboard/company') },
     { href: '/dashboard/orders', key: 'orders', icon: IconOrders, match: (p) => p.startsWith('/dashboard/orders') },

@@ -66,7 +66,7 @@ export function ThemeSetting({ initial }: { initial: 'dark' | 'light' }) {
     document.documentElement.dataset.theme = theme
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', theme === 'light' ? '#2b2520' : '#0f0f0f')
+      ?.setAttribute('content', theme === 'light' ? '#ffffff' : '#0f0f0f')
   }, [theme])
 
   function choose(next: string) {
