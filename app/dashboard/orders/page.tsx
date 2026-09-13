@@ -67,14 +67,19 @@ export default async function OrdersPage({
         <NewOrderForm />
       </div>
 
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-text-muted">
+        Сюда попадают все, кто хочет у вас заказать: заявки со страницы мастерской и те,
+        кого вы записали сами. Нажмите на заявку — увидите телефон, что нужно человеку, и
+        сможете отметить, на каком вы этапе: созвонились, съездили на замер, делаете,
+        отдали. Так ни один клиент не потеряется.
+      </p>
+
       {/* Фильтр по этапам воронки */}
       <div className="mt-7 flex flex-wrap gap-2">
         <Link
           href="/dashboard/orders"
-          className={`border px-4 py-2 text-sm transition-colors ${
-            !filter
-              ? 'border-gold bg-gold font-semibold text-white'
-              : 'border-line bg-paper text-text-muted hover:border-gold'
+          className={`press rounded-full px-4 py-2 text-sm transition-colors ${
+            !filter ? 'bg-gold font-semibold text-white' : 'bg-paper text-text-muted hover:text-text'
           }`}
         >
           Все
@@ -83,10 +88,10 @@ export default async function OrdersPage({
           <Link
             key={value}
             href={`/dashboard/orders?status=${value}`}
-            className={`border px-4 py-2 text-sm transition-colors ${
+            className={`press rounded-full px-4 py-2 text-sm transition-colors ${
               filter === value
-                ? 'border-gold bg-gold font-semibold text-white'
-                : 'border-line bg-paper text-text-muted hover:border-gold'
+                ? 'bg-gold font-semibold text-white'
+                : 'bg-paper text-text-muted hover:text-text'
             }`}
           >
             {label}
@@ -99,10 +104,11 @@ export default async function OrdersPage({
 
       <div className="mt-7 space-y-4">
         {orders.length === 0 && (
-          <div className="rounded-3xl rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
-            <p className="text-text-muted">
-              Заявок пока нет. Они появятся здесь, как только покупатель оставит её
-              на вашей странице — или добавьте заказ вручную.
+          <div className="rounded-3xl border border-dashed border-line bg-paper p-10 text-center">
+            <p className="mx-auto max-w-md leading-relaxed text-text-muted">
+              Заявок пока нет. Они придут сами, когда покупатель нажмёт «Оставить заявку»
+              на вашей странице. А если клиент позвонил напрямую — запишите его кнопкой
+              «Добавить заказ», чтобы не забыть перезвонить.
             </p>
           </div>
         )}
@@ -111,7 +117,7 @@ export default async function OrdersPage({
           <details key={order.id} className="rounded-3xl bg-paper">
             <summary className="flex cursor-pointer flex-wrap items-center gap-3 p-4">
               <span
-                className={`px-3 py-1 text-xs font-semibold uppercase tracking-widest ${
+                className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
                   STATUS_STYLES[order.status as OrderStatus] ?? ''
                 }`}
               >

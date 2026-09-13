@@ -24,12 +24,12 @@ export const BOARD_STATUSES: OrderStatus[] = [
 
 /** Цвет метки этапа. Заявка кричит золотом, отказ — тихий серый. */
 export const STATUS_STYLES: Record<OrderStatus, string> = {
-  new: 'bg-gold text-ink',
-  contacted: 'bg-ink text-on-dark',
-  measurement: 'bg-cream text-text border border-line',
-  in_progress: 'bg-cream text-text border border-line',
-  done: 'bg-green-700 text-white',
-  cancelled: 'bg-neutral-300 text-neutral-700',
+  new: 'bg-gold text-white',
+  contacted: 'bg-gold-soft text-gold',
+  measurement: 'bg-sand text-text',
+  in_progress: 'bg-sand text-text',
+  done: 'bg-status-done/15 text-status-done',
+  cancelled: 'bg-cream text-text-muted',
 }
 
 export const ORDER_SOURCES = {
