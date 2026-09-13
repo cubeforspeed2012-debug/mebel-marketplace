@@ -7,6 +7,8 @@ export type TabItem = {
   href: string
   label: string
   icon?: (active: boolean) => React.ReactNode
+  /** Цифра на значке: новые заказы, мастерские на проверке */
+  badge?: number
 }
 
 // На сервере useLayoutEffect ругается — подменяем на обычный эффект
@@ -136,7 +138,20 @@ export function LiquidTabs({
                   }`
             }
           >
-            {item.icon?.(active)}
+            {item.icon && (
+              <span className="relative">
+                {item.icon(active)}
+                {item.badge ? (
+                  <span
+                    className={`absolute -right-2 -top-1 min-w-[1.05rem] rounded-full px-1 text-center text-[0.5625rem] font-semibold leading-[1.05rem] ${
+                      active ? 'bg-white text-gold' : 'bg-gold text-white'
+                    }`}
+                  >
+                    {item.badge > 99 ? '99+' : item.badge}
+                  </span>
+                ) : null}
+              </span>
+            )}
             <span className="max-w-full truncate">{item.label}</span>
           </Link>
         )

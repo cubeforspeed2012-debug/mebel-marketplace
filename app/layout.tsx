@@ -194,6 +194,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let isSeller = false
   let signedIn = false
   let role: 'guest' | 'buyer' | 'seller' | 'admin' = 'guest'
+  let newOrders = 0
+  let pending = 0
   try {
     const supabase = await createClient()
     const {
@@ -214,11 +216,32 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       // Кнопка «Мои работы» появляется, когда мастерская уже заведена:
       // раньше вести туда некуда — сначала профиль мастерской
       if (profile?.role === 'seller') {
+        const { data: own } = await supabase
+          .from('companies')
+          .select('id')
+          .eq('owner_user_id', user.id)
+          .limit(1)
+        const companyId = own?.[0]?.id
+        isSeller = Boolean(companyId)
+
+        // Цифра новых заказов — прямо на значке в нижнем меню
+        if (companyId) {
+          const { count } = await supabase
+            .from('orders')
+            .select('id', { count: 'exact', head: true })
+            .eq('company_id', companyId)
+            .eq('status', 'new')
+          newOrders = count ?? 0
+        }
+      }
+
+      // Сколько мастерских ждут решения — видно с любой страницы
+      if (isAdmin) {
         const { count } = await supabase
           .from('companies')
           .select('id', { count: 'exact', head: true })
-          .eq('owner_user_id', user.id)
-        isSeller = (count ?? 0) > 0
+          .eq('status', 'pending')
+        pending = count ?? 0
       }
     }
   } catch {
@@ -226,6 +249,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     isSeller = false
     signedIn = false
     role = 'guest'
+    newOrders = 0
+    pending = 0
   }
 
   return (
@@ -234,7 +259,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       data-theme={theme}
       className={`${inter.variable} ${manrope.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col font-sans">
+      {/* Отступ снизу — под нижнее меню: оно висит поверх и иначе закрыло бы подвал */}
+      <body className="flex min-h-full flex-col font-sans pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
         <LocaleProvider dict={dict}>
           <Suspense fallback={null}>
             <RouteProgress />
@@ -245,10 +271,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <main className="animate-page flex-1">{children}</main>
           <Footer dict={dict} />
 
-          {/* Нижнее меню на телефоне */}
+          {/* Нижнее меню — на каждой странице, и на телефоне, и на компьютере */}
           <Suspense fallback={null}>
             {/* Мастер без мастерской видит меню покупателя: его разделов ещё нет */}
-            <TabBar role={role === 'seller' && !isSeller ? 'buyer' : role} />
+            <TabBar
+              role={role === 'seller' && !isSeller ? 'buyer' : role}
+              newOrders={newOrders}
+              pending={pending}
+            />
           </Suspense>
         </LocaleProvider>
       </body>

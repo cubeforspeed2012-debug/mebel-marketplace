@@ -107,36 +107,3 @@ export function AdminRail({ pending = 0 }: { pending?: number }) {
     </nav>
   )
 }
-
-/** Полоса разделов на телефоне: листается пальцем, ничего не прячется в меню. */
-export function AdminMobileNav({ pending = 0 }: { pending?: number }) {
-  const isActive = useActiveSection()
-
-  return (
-    <nav
-      aria-label="Разделы управления"
-      className="-mx-1 mb-5 flex gap-2 overflow-x-auto pb-1 lg:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-    >
-      {SECTIONS.map((item) => (
-        <Link
-          key={item.label}
-          href={item.href}
-          className={`press flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-sm transition-colors duration-200 ${
-            isActive(item.href)
-              ? 'bg-gold font-semibold text-white'
-              : 'bg-sand text-text-muted'
-          }`}
-        >
-          <Icon>{item.icon}</Icon>
-          {item.label}
-
-          {item.href === '/admin/approvals' && pending > 0 && (
-            <span className="min-w-5 rounded-full bg-gold px-1.5 text-center text-xs font-semibold text-white">
-              {pending}
-            </span>
-          )}
-        </Link>
-      ))}
-    </nav>
-  )
-}

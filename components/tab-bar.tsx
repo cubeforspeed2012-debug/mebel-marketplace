@@ -175,16 +175,30 @@ const SETS: Record<'guest' | 'buyer' | 'seller' | 'admin', Tab[]> = {
 }
 
 /**
- * Нижнее меню на телефоне: стеклянная плашка, перетекающая капсула
- * и приподнятая кнопка главного действия посередине.
+ * Нижнее меню — одно и то же на телефоне и на компьютере: стеклянная плашка,
+ * перетекающая капсула и приподнятая кнопка главного действия посередине.
+ * Оно есть на каждой странице, поэтому выход из любого раздела всегда рядом.
  */
-export function TabBar({ role = 'guest' }: { role?: 'guest' | 'buyer' | 'seller' | 'admin' }) {
+export function TabBar({
+  role = 'guest',
+  newOrders = 0,
+  pending = 0,
+}: {
+  role?: 'guest' | 'buyer' | 'seller' | 'admin'
+  /** Новые заказы мастера */
+  newOrders?: number
+  /** Мастерские, ждущие решения администратора */
+  pending?: number
+}) {
   const dict = useDict()
   const pathname = usePathname()
   useSearchParams() // держим компонент в Suspense-границе вместе с навигацией
 
   const tabs = SETS[role]
   const activeIndex = tabs.findIndex((tab) => tab.match(pathname))
+
+  // Цифры на значках — чтобы не заходить в раздел просто «посмотреть, нет ли нового»
+  const badges: Partial<Record<TabKey, number>> = { orders: newOrders, approvals: pending }
 
   // Приподнятый «+» помещается только когда кнопок четыре: иначе он
   // встанет прямо поверх средней, и по ней нельзя будет попасть
@@ -194,11 +208,15 @@ export function TabBar({ role = 'guest' }: { role?: 'guest' | 'buyer' | 'seller'
   return (
     <nav
       aria-label={dict.nav.home}
-      className="fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
     >
       <div className="glass relative w-full max-w-md rounded-[26px] px-2 py-1.5">
         <LiquidTabs
-          items={tabs.map((tab) => ({ ...tab, label: dict.nav[tab.key] }))}
+          items={tabs.map((tab) => ({
+            ...tab,
+            label: dict.nav[tab.key],
+            badge: badges[tab.key],
+          }))}
           activeIndex={activeIndex}
           tight={tight}
         />

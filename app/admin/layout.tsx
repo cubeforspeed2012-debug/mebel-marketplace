@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import { signOut } from '@/app/auth/actions'
 import { requireAdmin } from '@/lib/session'
-import { AdminMobileNav, AdminRail } from './admin-shell'
+import { AdminRail } from './admin-shell'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { supabase, profile } = await requireAdmin()
@@ -58,8 +58,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               </span>
             </div>
           </div>
-
-          <AdminMobileNav pending={pending} />
 
           {children}
         </div>

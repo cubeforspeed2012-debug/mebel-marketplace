@@ -1,24 +1,13 @@
 import Link from 'next/link'
 import { getSellerContext } from '@/lib/session'
-import { CabinetTabs } from './cabinet-tabs'
 
 /**
  * Кабинет мастера — четыре экрана и ничего лишнего:
- * Аналитика, Заказы, Мои работы, Профиль. На телефоне между ними
- * переключает нижнее меню, на компьютере — та же полоса сверху.
+ * Аналитика, Заказы, Мои работы, Профиль. Между ними переключает
+ * нижнее меню — оно одинаковое и на телефоне, и на компьютере.
  */
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { supabase, company } = await getSellerContext()
-
-  let newOrders = 0
-  if (company) {
-    const { count } = await supabase
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .eq('company_id', company.id)
-      .eq('status', 'new')
-    newOrders = count ?? 0
-  }
+  const { company } = await getSellerContext()
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-5 sm:py-6">
@@ -40,11 +29,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </Link>
           )}
         </div>
-      </div>
-
-      {/* На компьютере нижнего меню нет — те же четыре кнопки сверху */}
-      <div className="mb-6 hidden md:block">
-        <CabinetTabs newOrders={newOrders} />
       </div>
 
       <div className="min-w-0">{children}</div>
