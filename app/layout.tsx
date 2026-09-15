@@ -13,6 +13,7 @@ import { TabBar } from '@/components/tab-bar'
 import type { Dict } from '@/lib/i18n'
 import { getLocale } from '@/lib/locale'
 import { getDict } from '@/lib/i18n'
+import { SITE_URL } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 import './globals.css'
 
@@ -34,6 +35,9 @@ export const viewport = {
 }
 
 export const metadata: Metadata = {
+  // Без этого ссылка, отправленная в Telegram, приходит без картинки:
+  // относительные адреса мессенджеры не понимают.
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Mebel — мебель на заказ и готовая мебель в Ташкенте',
     template: '%s · Mebel',
@@ -50,6 +54,18 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
   },
+  // Как выглядит ссылка, когда мастер кидает её клиенту в Telegram
+  openGraph: {
+    type: 'website',
+    siteName: 'Mebel',
+    locale: 'ru_RU',
+    url: SITE_URL,
+    title: 'Mebel — мебель на заказ и готовая мебель в Ташкенте',
+    description:
+      'Каталог мебельных мастеров и фабрик Ташкента. Кухни, спальни, офисная и детская мебель — готовая и на заказ.',
+    images: [{ url: '/icon-512.png', width: 512, height: 512, alt: 'Mebel' }],
+  },
+  alternates: { canonical: '/' },
 }
 
 function Header({
