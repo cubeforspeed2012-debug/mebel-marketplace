@@ -432,6 +432,24 @@ export const uz: typeof ru = {
       "So'rovlar Telegramga keladi, birortasi yo'qolmaydi",
       "Halol statistika: kim ko'rdi, kim qo'ng'iroq qilmoqchi bo'ldi",
     ],
+    winEyebrow: 'Bularning bari nima uchun',
+    winTitle: "Bu yerda ikkala taraf ham yutadi",
+    winLead:
+      "Usta mijoz topadi, xaridor — o'ziga mos mebel. Biz bitimda qatnashmaymiz va undan foiz olmaymiz: siz to'g'ridan-to'g'ri kelishasiz.",
+    winPoints: [
+      {
+        title: "Ustaga — vitrina",
+        text: "Ishlari va telefoni bilan o'z sahifasi. U qidiruvda ko'rinadi va uni o'nta foto o'rniga mijozga Telegramda yuborish uyat emas.",
+      },
+      {
+        title: 'Xaridorga — tanlov',
+        text: "Shahar ustalari bir joyda. Ishlar, narxlar va tumanni solishtiring — va mebeli yoqqaniga qo'ng'iroq qiling.",
+      },
+      {
+        title: 'Ikkalasiga — halol',
+        text: "Pul mijozdan ustaga bizni chetlab o'tadi. Bizga narxni oshirish yoki kontaktlarni yashirish kerak emas.",
+      },
+    ],
     howTitle: 'Bu qanday ishlaydi',
     steps: [
       { title: 'Toping', text: "Katalogni oching, toifa va tumanni tanlang. Reklamani emas, ishlarni ko'ring." },

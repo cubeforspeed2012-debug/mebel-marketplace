@@ -141,6 +141,35 @@ export default async function AboutPage() {
       </section>
 
       {/* ------------------------------------------------------------------
+          Зачем это всё: главное обещание площадки обеим сторонам
+          ------------------------------------------------------------------ */}
+      <section className="mx-auto max-w-6xl px-4 pb-16">
+        <Reveal>
+          <div className="relative overflow-hidden rounded-[32px] bg-sand px-7 py-12 sm:px-12 sm:py-14">
+            <div className="blob right-[-6%] top-[-30%] h-[20rem] w-[20rem] bg-lime" />
+
+            <div className="relative">
+              <div className="eyebrow text-gold">{t.winEyebrow}</div>
+              <h2 className="display mt-3 max-w-2xl text-3xl leading-tight text-text sm:text-4xl">
+                {t.winTitle}
+              </h2>
+              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-text-muted">{t.winLead}</p>
+
+              <div className="mt-10 grid gap-6 sm:grid-cols-3">
+                {t.winPoints.map((point, index) => (
+                  <div key={point.title} className="border-t-2 border-gold pt-4">
+                    <div className="eyebrow text-text-muted">0{index + 1}</div>
+                    <h3 className="display mt-2 text-lg text-text">{point.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-text-muted">{point.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* ------------------------------------------------------------------
           Как это работает: три пронумерованных шага
           ------------------------------------------------------------------ */}
       <section className="border-y border-line bg-cream">

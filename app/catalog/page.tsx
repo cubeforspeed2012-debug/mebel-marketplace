@@ -228,9 +228,6 @@ export default async function CatalogPage({
         <div className="mt-12">
           {products.length > 0 ? (
             <>
-              <div className="mb-5 text-sm text-text-muted">
-                {dict.catalog.found}: {products.length}
-              </div>
               <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {products.map((product) => (
                   <ProductCard
