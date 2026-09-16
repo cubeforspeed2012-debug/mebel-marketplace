@@ -396,6 +396,7 @@ export const uz: typeof ru = {
 
   reviews: {
     sectionTitle: 'Sharhlar',
+    none: "Sharhlar yo'q",
     empty: "Hozircha sharhlar yo'q. Usta ishi haqida birinchi bo'lib yozing.",
     formTitle: 'Ustani baholang',
     editTitle: 'Sizning sharhingiz',

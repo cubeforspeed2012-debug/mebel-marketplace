@@ -397,6 +397,7 @@ export const ru = {
 
   reviews: {
     sectionTitle: 'Отзывы',
+    none: 'Нет отзывов',
     empty: 'Отзывов пока нет. Станьте первым, кто расскажет о работе мастера.',
     formTitle: 'Оцените мастера',
     editTitle: 'Ваш отзыв',

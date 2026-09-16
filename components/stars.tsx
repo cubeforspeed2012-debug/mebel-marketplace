@@ -5,19 +5,32 @@
 export function Stars({
   value,
   count,
+  emptyLabel = 'Нет отзывов',
   size = 'small',
   className = '',
 }: {
   value: number
-  /** Сколько отзывов. Без отзывов звёзды не показываем — нечего оценивать. */
+  /** Сколько отзывов. Ноль — рисуем пустые звёзды с подписью, чтобы было видно, что оценить можно. */
   count?: number
+  emptyLabel?: string
   size?: 'small' | 'large'
   className?: string
 }) {
-  if (!count) return null
-
   const px = size === 'large' ? 'size-5' : 'size-3.5'
   const text = size === 'large' ? 'text-base' : 'text-xs'
+
+  if (!count) {
+    return (
+      <span className={`inline-flex items-center gap-1.5 ${className}`} aria-label={emptyLabel}>
+        <span className="inline-flex gap-0.5">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <StarShape key={star} className={`${px} text-line`} />
+          ))}
+        </span>
+        <span className={`text-text-muted ${text}`}>{emptyLabel}</span>
+      </span>
+    )
+  }
 
   return (
     <span className={`inline-flex items-center gap-1.5 ${className}`} aria-label={`Рейтинг ${value} из 5`}>

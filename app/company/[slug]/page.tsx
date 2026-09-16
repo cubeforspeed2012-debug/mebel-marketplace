@@ -197,6 +197,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
             <Stars
               value={Number(company.rating_avg)}
               count={company.rating_count}
+              emptyLabel={dict.reviews.none}
               size="large"
               className="mt-3"
             />

@@ -75,7 +75,7 @@ export function ProductCard({
           </div>
           {/* Звёзды мастера — появляются, когда есть хоть один отзыв */}
           {company && (
-            <Stars value={Number(company.rating_avg)} count={company.rating_count} className="mt-1" />
+            <Stars value={Number(company.rating_avg)} count={company.rating_count} emptyLabel={dict.reviews.none} className="mt-1" />
           )}
         </div>
       </div>
