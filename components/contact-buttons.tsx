@@ -1,4 +1,5 @@
-import { formatPhone, instagramHref, telHref, telegramHref } from '@/lib/constants'
+import { instagramHref, telegramHref } from '@/lib/constants'
+import { PhoneReveal } from '@/components/phone-reveal'
 import type { Dict } from '@/lib/i18n'
 
 /* Значки мессенджеров рисуем сами: чужие библиотеки ради двух иконок не тянем */
@@ -38,13 +39,18 @@ function PhoneMark() {
  */
 export function ContactButtons({
   dict,
-  phone,
+  companyId,
+  hasPhone,
+  productId,
   telegram,
   instagram,
   size = 'large',
 }: {
   dict: Dict
-  phone: string | null
+  companyId: number
+  /** Есть ли у мастера телефон. Сам номер сюда не приходит — его выдаёт кнопка. */
+  hasPhone: boolean
+  productId?: number | null
   telegram?: string | null
   instagram?: string | null
   size?: 'large' | 'small'
@@ -57,14 +63,15 @@ export function ContactButtons({
 
   return (
     <div className="flex flex-wrap gap-3">
-      {phone && (
-        <a
-          href={telHref(phone)}
+      {hasPhone && (
+        <PhoneReveal
+          companyId={companyId}
+          productId={productId}
+          labelShow={dict.company.showPhone}
+          labelMissing={dict.company.noPhone}
+          icon={<PhoneMark />}
           className={`press inline-flex items-center gap-2 rounded-full bg-gold font-semibold text-white transition-colors hover:bg-gold-deep ${base}`}
-        >
-          <PhoneMark />
-          {big ? `${dict.company.call} ${formatPhone(phone)}` : dict.company.call}
-        </a>
+        />
       )}
 
       {tg && (

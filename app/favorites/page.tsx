@@ -23,7 +23,7 @@ export default async function FavoritesPage() {
        products (
          id, company_id, category_id, slug, title, description, type, price,
          price_from, currency, status, boosted_until, views_count, created_at,
-         companies (id, name, slug, district, phone_public, work_type),
+         companies (id, name, slug, district, has_phone, work_type),
          product_images (id, product_id, url, sort_order),
          categories (id, name, slug)
        )`,

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { CompanyCard } from '@/components/company-card'
 import { FurnitureScene } from '@/components/furniture-icons'
-import { DISTRICTS, WORK_TYPES } from '@/lib/constants'
+import { DISTRICTS, PUBLIC_COMPANY_FIELDS, WORK_TYPES } from '@/lib/constants'
 import { districtIn } from '@/lib/i18n'
 import { getDictionary } from '@/lib/locale'
 import { createClient } from '@/lib/supabase/server'
@@ -20,7 +20,7 @@ type SearchParams = { work_type?: string; district?: string }
 async function getCompanies(params: SearchParams) {
   try {
     const supabase = await createClient()
-    let query = supabase.from('companies').select('*').eq('status', 'active')
+    let query = supabase.from('companies').select(PUBLIC_COMPANY_FIELDS).eq('status', 'active')
 
     if (params.work_type && params.work_type in WORK_TYPES) {
       // «Готовая и на заказ» подходит под оба запроса.

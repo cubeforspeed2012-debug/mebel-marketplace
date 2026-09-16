@@ -19,6 +19,8 @@ export type Company = {
   address: string | null
   district: string | null
   phone_public: string | null
+  /** Телефон указан. Сам номер гостю не отдаётся. */
+  has_phone: boolean
   email: string | null
   instagram: string | null
   telegram: string | null
@@ -97,7 +99,7 @@ export type Product = {
 export type ProductCard = Product & {
   companies: Pick<
     Company,
-    'id' | 'name' | 'slug' | 'district' | 'phone_public' | 'work_type' | 'telegram' | 'instagram'
+    'id' | 'name' | 'slug' | 'district' | 'has_phone' | 'work_type' | 'telegram' | 'instagram'
   > | null
   product_images: ProductImage[]
   categories: Pick<Category, 'id' | 'name' | 'slug'> | null

@@ -5,7 +5,7 @@ import { ProductCard } from '@/components/product-card'
 import { RequestForm } from '@/components/request-form'
 import { ShareButton } from '@/components/share-button'
 import { WorksGallery, type Work } from '@/components/works-gallery'
-import { WORK_TYPES } from '@/lib/constants'
+import { PUBLIC_COMPANY_FIELDS, WORK_TYPES } from '@/lib/constants'
 import { districtIn } from '@/lib/i18n'
 import { getDictionary } from '@/lib/locale'
 import { getFavoriteIds } from '@/lib/favorites'
@@ -23,7 +23,7 @@ async function getCompany(slug: string) {
     const isNumeric = /^\d+$/.test(slug)
     const { data: company } = await supabase
       .from('companies')
-      .select('*')
+      .select(PUBLIC_COMPANY_FIELDS)
       .eq(isNumeric ? 'id' : 'slug', isNumeric ? Number(slug) : slug)
       .eq('status', 'active')
       .maybeSingle()
@@ -41,7 +41,7 @@ async function getCompany(slug: string) {
       .select(
         `id, company_id, category_id, slug, title, description, type, price,
          price_from, currency, status, boosted_until, views_count, created_at,
-         companies (id, name, slug, district, phone_public, work_type),
+         companies (id, name, slug, district, has_phone, work_type),
          product_images (id, product_id, url, sort_order),
          categories (id, name, slug)`,
       )
@@ -162,7 +162,8 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
             <div className="mt-7">
               <ContactButtons
                 dict={dict}
-                phone={company.phone_public}
+                companyId={company.id}
+                hasPhone={company.has_phone}
                 telegram={company.telegram}
                 instagram={company.instagram}
               />

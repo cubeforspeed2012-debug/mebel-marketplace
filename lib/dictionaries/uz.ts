@@ -131,6 +131,8 @@ export const uz: typeof ru = {
     noWorks: "Usta hali ish qo'shmagan.",
     backToCatalog: '← Katalogga qaytish',
     call: "Qo'ng'iroq qilish",
+    showPhone: "Raqamni ko'rsatish",
+    noPhone: "Raqam ko'rsatilmagan",
   },
 
   product: {

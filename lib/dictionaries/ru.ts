@@ -132,6 +132,8 @@ export const ru = {
     noWorks: 'Мастер пока не добавил работы.',
     backToCatalog: '← Вернуться в каталог',
     call: 'Позвонить',
+    showPhone: 'Показать номер',
+    noPhone: 'Номер не указан',
   },
 
   product: {

@@ -4,6 +4,14 @@
  */
 export const SITE_URL = 'https://top-mebel.uz'
 
+/**
+ * Поля мастерской, которые можно показывать гостю.
+ * Телефона здесь нет специально: его выдаёт кнопка «Показать номер»,
+ * по одному за раз. Иначе базу номеров выкачивают одним запросом.
+ */
+export const PUBLIC_COMPANY_FIELDS =
+  'id, name, slug, description, address, district, work_type, status, logo_url, cover_url, instagram, telegram, phone_verified, has_phone, boosted_until, views_count, created_at' as const
+
 /** Районы Ташкента — для фильтра каталога и профиля продавца. */
 export const DISTRICTS = [
   'Алмазарский',

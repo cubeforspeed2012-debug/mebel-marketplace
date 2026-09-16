@@ -17,21 +17,32 @@ function Tile({
   label,
   value,
   href,
+  hint,
   accent = false,
 }: {
   label: string
   value: number | string
-  href: string
+  href?: string
+  hint?: string
   accent?: boolean
 }) {
-  return (
-    <Link
-      href={href}
-      className={`lift block rounded-3xl p-5 ${accent ? 'bg-gold text-white' : 'bg-paper text-text'}`}
-    >
-      <div className={`text-sm ${accent ? 'text-white/80' : 'text-text-muted'}`}>{label}</div>
+  const skin = `lift block rounded-3xl p-5 ${accent ? 'bg-gold text-white' : 'bg-paper text-text'}`
+  const muted = accent ? 'text-white/80' : 'text-text-muted'
+
+  const body = (
+    <>
+      <div className={`text-sm ${muted}`}>{label}</div>
       <div className="mt-2 text-3xl font-semibold">{value}</div>
+      {hint && <div className={`mt-1 text-xs ${muted}`}>{hint}</div>}
+    </>
+  )
+
+  return href ? (
+    <Link href={href} className={skin}>
+      {body}
     </Link>
+  ) : (
+    <div className={skin}>{body}</div>
   )
 }
 
@@ -61,7 +72,11 @@ export default async function DashboardPage() {
     )
   }
 
-  const [ordersResult, productsResult, clientsResult, recentResult] = await Promise.all([
+  // Неделя назад — «сколько людей хотели позвонить» за свежий период
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+
+  const [ordersResult, productsResult, clientsResult, recentResult, callsResult] =
+    await Promise.all([
     supabase.from('orders').select('id, status').eq('company_id', company.id),
     supabase.from('products').select('id, status').eq('company_id', company.id),
     supabase.from('clients').select('id', { count: 'exact', head: true }).eq('company_id', company.id),
@@ -71,6 +86,11 @@ export default async function DashboardPage() {
       .eq('company_id', company.id)
       .order('created_at', { ascending: false })
       .limit(5),
+    supabase
+      .from('contact_views')
+      .select('visitor', { count: 'exact', head: true })
+      .eq('company_id', company.id)
+      .gte('day', weekAgo),
   ])
 
   const orders = ordersResult.data ?? []
@@ -93,10 +113,12 @@ export default async function DashboardPage() {
       )}
 
       {/* Главные цифры */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
         <Tile label="Новые заявки" value={newOrders} href="/dashboard/orders?status=new" accent={newOrders > 0} />
         <Tile label="В работе" value={inWork} href="/dashboard/orders" />
         <Tile label="Просмотры страницы" value={company.views_count ?? 0} href={`/company/${company.slug ?? company.id}`} />
+        {/* Самая честная цифра: человек не просто посмотрел, а захотел позвонить */}
+        <Tile label="Хотели позвонить" value={callsResult.count ?? 0} hint="за неделю" />
         <Tile label="Клиентов" value={clientsResult.count ?? 0} href="/dashboard/clients" />
       </div>
 

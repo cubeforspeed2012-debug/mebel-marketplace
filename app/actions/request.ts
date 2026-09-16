@@ -29,7 +29,7 @@ export async function sendRequest(
 
   const supabase = await createClient()
 
-  const { error } = await supabase.rpc('submit_request', {
+  const { data, error } = await supabase.rpc('submit_request', {
     p_company_id: companyId,
     p_name: name,
     p_phone: phone,
@@ -43,16 +43,16 @@ export async function sendRequest(
     return { error: known ? error.message : 'Не удалось отправить заявку. Попробуйте позвонить' }
   }
 
-  // Уведомление мастеру — заявка не должна пролежать незамеченной.
-  const { data: company } = await supabase
-    .from('companies')
-    .select('name, telegram_chat_id')
-    .eq('id', companyId)
-    .maybeSingle()
+  /*
+   * Куда слать уведомление, говорит сама функция базы. Раньше мы дочитывали
+   * это из таблицы, но гостю больше не видны служебные поля мастерской —
+   * и правильно: иначе вместе с ними уходил и телефон.
+   */
+  const result = (data ?? {}) as { telegram_chat_id?: string | null }
 
-  if (company?.telegram_chat_id) {
+  if (result.telegram_chat_id) {
     await notifyTelegram(
-      company.telegram_chat_id,
+      result.telegram_chat_id,
       [
         '<b>Новая заявка с Mebel</b>',
         '',
