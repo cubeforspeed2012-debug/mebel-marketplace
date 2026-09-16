@@ -6,8 +6,18 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  // Публичный адрес вида mebel-marketplace.<аккаунт>.workers.dev
+  // Публичный адрес вида mebel-marketplace.<аккаунт>.workers.dev.
+  // Пока оставляем как запасной вход, отключим когда домен обживётся.
   "workers_dev": true,
+
+  // Основной адрес. custom_domain означает, что Cloudflare сам заведёт
+  // DNS-запись и выпустит сертификат — руками в панели ничего не нужно.
+  // Прописывать это можно только после того, как домен появился в аккаунте:
+  // иначе выкладка падает с ошибкой «зона не найдена».
+  "routes": [
+    { "pattern": "top-mebel.uz", "custom_domain": true },
+    { "pattern": "www.top-mebel.uz", "custom_domain": true }
+  ],
 
   // Не стирать при выкладке то, что добавлено в панели вручную.
   // Без этого wrangler считает конфиг единственной правдой и вычищает
