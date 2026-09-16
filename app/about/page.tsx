@@ -1,52 +1,12 @@
 import Link from 'next/link'
-import { CountUp } from '@/components/count-up'
 import { IconArmchair, IconCrib, IconDesk, IconKitchen, IconSofa, IconWardrobe } from '@/components/furniture-icons'
-import { ProductCard } from '@/components/product-card'
 import { Reveal } from '@/components/reveal'
 import { getDictionary } from '@/lib/locale'
-import { getFavoriteIds } from '@/lib/favorites'
-import { createClient } from '@/lib/supabase/server'
-import type { ProductCard as ProductCardType } from '@/lib/types'
-
-export const revalidate = 600
 
 export const metadata = {
   title: 'О площадке',
   description:
     'Mebel — площадка мебельных мастеров Ташкента. Покупателю: живые работы и прямой телефон мастера. Мастеру: бесплатная страница, заявки в Telegram, честная статистика.',
-}
-
-/** Живые цифры для витрины. Если база молчит — показываем нули, страница не падает. */
-async function getFigures() {
-  try {
-    const supabase = await createClient()
-    const [masters, works, districts, featured] = await Promise.all([
-      supabase.from('companies').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-      supabase.from('products').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-      supabase.from('companies').select('district').eq('status', 'active').not('district', 'is', null),
-      supabase
-        .from('products')
-        .select(
-          `id, company_id, category_id, slug, title, description, type, price,
-           price_from, currency, status, boosted_until, views_count, created_at,
-           companies!inner (id, name, slug, district, has_phone, rating_avg, rating_count, work_type),
-           product_images (id, product_id, url, sort_order),
-           categories (id, name, slug)`,
-        )
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(4),
-    ])
-
-    return {
-      masters: masters.count ?? 0,
-      works: works.count ?? 0,
-      districts: new Set((districts.data ?? []).map((row) => row.district)).size,
-      featured: (featured.data ?? []) as unknown as ProductCardType[],
-    }
-  } catch {
-    return { masters: 0, works: 0, districts: 0, featured: [] as ProductCardType[] }
-  }
 }
 
 /* Значки для сетки «почему мастера выбирают» — одной толщины, как весь набор */
@@ -64,7 +24,6 @@ const CATEGORY_ICONS = [IconKitchen, IconWardrobe, IconSofa, IconCrib, IconDesk,
 export default async function AboutPage() {
   const dict = await getDictionary()
   const t = dict.about
-  const [figures, favorites] = await Promise.all([getFigures(), getFavoriteIds()])
 
   // Бегущая строка — категории по кругу. Список удвоен, чтобы шов не был виден.
   const ticker = [...Object.values(dict.categories), ...Object.values(dict.categories)]
@@ -116,25 +75,6 @@ export default async function AboutPage() {
             >
               {t.becomeMaster}
             </Link>
-          </div>
-
-          {/* Живые цифры, разгоняются при появлении */}
-          <div className="mt-16 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {[
-              { value: figures.masters, suffix: '+', label: t.statMasters },
-              { value: figures.works, suffix: '+', label: t.statWorks },
-              { value: figures.districts, suffix: '', label: t.statDistricts },
-              { value: 0, suffix: '%', label: t.statFee },
-            ].map((stat, index) => (
-              <Reveal key={stat.label} delay={index * 80}>
-                <div className="rounded-3xl border border-line bg-paper/70 p-5 backdrop-blur">
-                  <div className="display text-4xl text-text">
-                    <CountUp to={stat.value} suffix={stat.suffix} />
-                  </div>
-                  <div className="mt-1 text-sm text-text-muted">{stat.label}</div>
-                </div>
-              </Reveal>
-            ))}
           </div>
         </div>
 
@@ -223,27 +163,6 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
-
-      {/* ------------------------------------------------------------------
-          Свежие работы — показываем товар лицом
-          ------------------------------------------------------------------ */}
-      {figures.featured.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 py-16">
-          <Reveal>
-            <div className="flex items-end justify-between gap-3">
-              <h2 className="display gold-rule text-3xl text-text">{t.featuredTitle}</h2>
-              <Link href="/catalog" className="arrow-out inline-flex items-center gap-2 font-semibold text-gold">
-                {t.featuredAll} <Arrow />
-              </Link>
-            </div>
-          </Reveal>
-          <div className="stagger mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-            {figures.featured.map((product) => (
-              <ProductCard key={product.id} product={product} favorite={favorites.has(product.id)} />
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* ------------------------------------------------------------------
           Почему мастера: сетка из шести причин со значками

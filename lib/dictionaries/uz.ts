@@ -418,10 +418,6 @@ export const uz: typeof ru = {
     becomeMaster: "Usta bo'lish",
     register: "Ro'yxatdan o'tish",
     signIn: 'Kirish',
-    statMasters: 'usta platformada',
-    statWorks: 'ish katalogda',
-    statDistricts: 'Toshkent tumani',
-    statFee: 'ustadan komissiya',
     forBuyer: 'Xaridorga',
     buyerTitle: 'Sizga kerakdek yasaydigan ustani toping',
     buyerPoints: [
@@ -442,8 +438,6 @@ export const uz: typeof ru = {
       { title: "Bog'laning", text: "«Raqamni ko'rsatish»ni bosing va qo'ng'iroq qiling. Yoki so'rov qoldiring — usta o'zi qo'ng'iroq qiladi." },
       { title: 'Kelishing', text: "O'lchov, muddat, narx — to'g'ridan-to'g'ri usta bilan. Platforma bitimda qatnashmaydi va pul olmaydi." },
     ],
-    featuredTitle: 'Ustalarning yangi ishlari',
-    featuredAll: 'Butun katalog',
     whyTitle: 'Nega ustalar platformani tanlaydi',
     why: [
       { title: 'Bepul', text: "Ustaxona va ishlarni joylashtirish hech narsa turmaydi. Hozir ham, keyin ham." },
