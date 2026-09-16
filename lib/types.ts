@@ -21,6 +21,8 @@ export type Company = {
   phone_public: string | null
   /** Телефон указан. Сам номер гостю не отдаётся. */
   has_phone: boolean
+  rating_avg: number
+  rating_count: number
   email: string | null
   instagram: string | null
   telegram: string | null
@@ -99,8 +101,19 @@ export type Product = {
 export type ProductCard = Product & {
   companies: Pick<
     Company,
-    'id' | 'name' | 'slug' | 'district' | 'has_phone' | 'work_type' | 'telegram' | 'instagram'
+    'id' | 'name' | 'slug' | 'district' | 'has_phone' | 'work_type' | 'telegram' | 'instagram' | 'rating_avg' | 'rating_count'
   > | null
   product_images: ProductImage[]
   categories: Pick<Category, 'id' | 'name' | 'slug'> | null
+}
+
+/** Отзыв о мастере, как он показывается на странице мастерской. */
+export type Review = {
+  id: number
+  company_id: number
+  user_id: string
+  rating: number
+  text: string | null
+  author_name: string | null
+  created_at: string
 }

@@ -24,7 +24,7 @@ async function getProduct(id: string) {
       .select(
         `id, company_id, category_id, slug, title, description, type, price,
          price_from, currency, status, boosted_until, views_count, created_at,
-         companies!inner (id, name, slug, district, has_phone, work_type, telegram, instagram),
+         companies!inner (id, name, slug, district, has_phone, rating_avg, rating_count, work_type, telegram, instagram),
          product_images (id, product_id, url, sort_order),
          categories (id, name, slug)`,
       )
@@ -57,7 +57,7 @@ async function getMaster(companyId: number, excludeProductId: number) {
         .select(
           `id, company_id, category_id, slug, title, description, type, price,
            price_from, currency, status, boosted_until, views_count, created_at,
-           companies (id, name, slug, district, has_phone, work_type),
+           companies (id, name, slug, district, has_phone, rating_avg, rating_count, work_type),
            product_images (id, product_id, url, sort_order),
            categories (id, name, slug)`,
         )

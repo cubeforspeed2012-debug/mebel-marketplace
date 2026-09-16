@@ -5,7 +5,7 @@ import { LiquidTabs, type TabItem } from '@/components/liquid-tabs'
 import { useDict } from '@/components/locale-provider'
 
 const NAV: (Omit<TabItem, 'label'> & {
-  key: 'catalog' | 'custom' | 'masters'
+  key: 'catalog' | 'custom' | 'masters' | 'about'
   match: (path: string, custom: boolean) => boolean
 })[] = [
   {
@@ -22,6 +22,11 @@ const NAV: (Omit<TabItem, 'label'> & {
     href: '/companies',
     key: 'masters',
     match: (p) => p.startsWith('/companies') || p.startsWith('/company'),
+  },
+  {
+    href: '/about',
+    key: 'about',
+    match: (p) => p.startsWith('/about'),
   },
 ]
 

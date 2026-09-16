@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { FavoriteButton } from '@/components/favorite-button'
 import { IconArmchair } from '@/components/furniture-icons'
+import { Stars } from '@/components/stars'
 import { useDict } from '@/components/locale-provider'
 import { districtIn, priceIn } from '@/lib/i18n'
 import type { ProductCard as ProductCardType } from '@/lib/types'
@@ -68,8 +69,14 @@ export function ProductCard({
         </div>
 
         <div className="mt-auto pt-3 text-sm text-text-muted">
-          {company?.name}
-          {company?.district && <span> · {districtIn(dict, company.district)}</span>}
+          <div className="truncate">
+            {company?.name}
+            {company?.district && <span> · {districtIn(dict, company.district)}</span>}
+          </div>
+          {/* Звёзды мастера — появляются, когда есть хоть один отзыв */}
+          {company && (
+            <Stars value={Number(company.rating_avg)} count={company.rating_count} className="mt-1" />
+          )}
         </div>
       </div>
     </Link>

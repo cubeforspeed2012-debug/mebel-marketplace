@@ -149,6 +149,11 @@ function Footer({ dict }: { dict: Dict }) {
                 </Link>
               </li>
               <li>
+                <Link href="/about" className="transition-colors hover:text-text">
+                  {dict.nav.about}
+                </Link>
+              </li>
+              <li>
                 <Link href="/auth?role=buyer" className="transition-colors hover:text-text">
                   {dict.footer.account}
                 </Link>

@@ -12,6 +12,9 @@ import { getFavoriteIds } from '@/lib/favorites'
 import { createClient } from '@/lib/supabase/server'
 import type { Company, ProductCard as ProductCardType } from '@/lib/types'
 import { bumpViews } from '@/lib/views'
+import { ReviewForm } from '@/components/review-form'
+import { Stars } from '@/components/stars'
+import type { Review } from '@/lib/types'
 
 export const revalidate = 300
 
@@ -41,7 +44,7 @@ async function getCompany(slug: string) {
       .select(
         `id, company_id, category_id, slug, title, description, type, price,
          price_from, currency, status, boosted_until, views_count, created_at,
-         companies (id, name, slug, district, has_phone, work_type),
+         companies (id, name, slug, district, has_phone, rating_avg, rating_count, work_type),
          product_images (id, product_id, url, sort_order),
          categories (id, name, slug)`,
       )
@@ -72,6 +75,50 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       `${company.name}: ${
         company.work_type ? WORK_TYPES[company.work_type].toLowerCase() : 'мебель'
       } в Ташкенте${company.district ? `, ${company.district} район` : ''}. Фото работ и прямой телефон.`,
+  }
+}
+
+/**
+ * Отзывы о мастере и что показывать зрителю: форму, свой отзыв на правку
+ * или подсказку «войдите». Владельцу форму не даём — свою мастерскую
+ * оценивать нельзя, и база это тоже запрещает.
+ */
+async function getReviews(companyId: number) {
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    const [{ data: reviews }, own, owner] = await Promise.all([
+      supabase
+        .from('reviews')
+        .select('id, company_id, user_id, rating, text, author_name, created_at')
+        .eq('company_id', companyId)
+        .eq('status', 'visible')
+        .order('created_at', { ascending: false })
+        .limit(30),
+      user
+        ? supabase
+            .from('reviews')
+            .select('rating, text')
+            .eq('company_id', companyId)
+            .eq('user_id', user.id)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
+      user
+        ? supabase.from('companies').select('id').eq('id', companyId).eq('owner_user_id', user.id).maybeSingle()
+        : Promise.resolve({ data: null }),
+    ])
+
+    return {
+      reviews: (reviews ?? []) as Review[],
+      own: own.data as { rating: number; text: string | null } | null,
+      signedIn: Boolean(user),
+      isOwner: Boolean(owner.data),
+    }
+  } catch {
+    return { reviews: [] as Review[], own: null, signedIn: false, isOwner: false }
   }
 }
 
@@ -112,6 +159,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
 
   // Считаем просмотр — мастер видит его у себя, площадка в статистике
   await bumpViews('company', company.id)
+  const { reviews, own, signedIn, isOwner } = await getReviews(company.id)
 
   return (
     <>
@@ -145,6 +193,13 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
                 </span>
               )}
             </div>
+
+            <Stars
+              value={Number(company.rating_avg)}
+              count={company.rating_count}
+              size="large"
+              className="mt-3"
+            />
 
             {company.description && (
               <p className="mt-5 max-w-2xl leading-relaxed text-text-muted">
@@ -208,6 +263,64 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
             </div>
           </>
         )}
+
+        {/* Отзывы — то, на что покупатель смотрит перед звонком */}
+        <section className="mt-14">
+          <h2 className="display gold-rule mb-8 text-2xl">
+            {dict.reviews.sectionTitle}{' '}
+            {company.rating_count > 0 && (
+              <span className="text-text-muted">({company.rating_count})</span>
+            )}
+          </h2>
+
+          <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+            <div>
+              {reviews.length === 0 ? (
+                <p className="rounded-3xl border border-dashed border-line bg-paper p-8 text-center text-text-muted">
+                  {dict.reviews.empty}
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {reviews.map((review) => (
+                    <li key={review.id} className="rounded-3xl bg-paper p-5">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="font-semibold text-text">{review.author_name ?? 'Покупатель'}</span>
+                        <span className="text-xs text-text-muted">
+                          {new Date(review.created_at).toLocaleDateString('ru-RU', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                      <Stars value={review.rating} count={1} className="mt-2 [&>span:last-child]:hidden" />
+                      {review.text && (
+                        <p className="mt-3 leading-relaxed text-text-muted">{review.text}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div>
+              {isOwner ? (
+                <p className="rounded-3xl bg-sand p-5 text-sm leading-relaxed text-text-muted">
+                  {dict.reviews.ownCompany}
+                </p>
+              ) : signedIn ? (
+                <ReviewForm companyId={company.id} initial={own} />
+              ) : (
+                <Link
+                  href={`/auth?role=buyer&next=/company/${company.slug ?? company.id}`}
+                  className="press block rounded-3xl bg-gold p-5 text-center font-semibold text-white transition-colors hover:bg-gold-deep"
+                >
+                  {dict.reviews.signInToReview}
+                </Link>
+              )}
+            </div>
+          </div>
+        </section>
 
         <div className="mt-12">
           <Link href="/catalog" className="font-semibold text-gold-deep hover:underline">

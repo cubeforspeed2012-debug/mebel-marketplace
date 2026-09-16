@@ -10,7 +10,7 @@ export const SITE_URL = 'https://top-mebel.uz'
  * по одному за раз. Иначе базу номеров выкачивают одним запросом.
  */
 export const PUBLIC_COMPANY_FIELDS =
-  'id, name, slug, description, address, district, work_type, status, logo_url, cover_url, instagram, telegram, phone_verified, has_phone, boosted_until, views_count, created_at' as const
+  'id, name, slug, description, address, district, work_type, status, logo_url, cover_url, instagram, telegram, phone_verified, has_phone, rating_avg, rating_count, boosted_until, views_count, created_at' as const
 
 /** Районы Ташкента — для фильтра каталога и профиля продавца. */
 export const DISTRICTS = [

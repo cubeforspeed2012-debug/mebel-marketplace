@@ -291,3 +291,81 @@ summary {
     padding-bottom: 5.5rem;
   }
 }
+
+/* ---------------------------------------------------------------
+   Лендинг «О площадке». Яркий акцент поверх тёплой палитры —
+   лаймовый маркер, как на бумаге, чтобы страница не была однотонной.
+   --------------------------------------------------------------- */
+:root,
+[data-theme="light"] {
+  --lime: #c9f35c;
+  --lime-deep: #a8d93a;
+  --lime-ink: #1d2a06;
+}
+[data-theme="dark"] {
+  --lime: #9fd23f;
+  --lime-deep: #7fb52b;
+  --lime-ink: #0f1603;
+}
+@theme inline {
+  --color-lime: var(--lime);
+  --color-lime-deep: var(--lime-deep);
+  --color-lime-ink: var(--lime-ink);
+}
+
+/* Слово, подчёркнутое маркером */
+.marker {
+  background-image: linear-gradient(transparent 58%, var(--lime) 58%, var(--lime) 92%, transparent 92%);
+  padding: 0 0.15em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* Размытые цветные пятна на фоне — глубина без картинок */
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+[data-theme="dark"] .blob { opacity: 0.28; }
+
+/* Блок всплывает, когда доезжает до экрана */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s var(--ease-ios),
+    transform 0.7s var(--ease-ios);
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* Бегущая строка категорий */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+.marquee:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .marquee { animation: none; }
+}
+
+/* Стрелка в углу карточки уезжает по диагонали при наведении */
+.arrow-out svg {
+  transition: transform 0.3s var(--ease-ios);
+}
+.arrow-out:hover svg {
+  transform: translate(3px, -3px);
+}

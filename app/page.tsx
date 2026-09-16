@@ -24,7 +24,7 @@ async function getHomeData() {
         .select(
           `id, company_id, category_id, slug, title, description, type, price,
            price_from, currency, status, boosted_until, views_count, created_at,
-           companies!inner (id, name, slug, district, has_phone, work_type),
+           companies!inner (id, name, slug, district, has_phone, rating_avg, rating_count, work_type),
            product_images (id, product_id, url, sort_order),
            categories (id, name, slug)`,
         )
@@ -181,6 +181,11 @@ export default async function HomePage() {
               </Link>
               <p className="mt-3 text-xs text-text-muted">{dict.banner.sellerNote}</p>
             </div>
+          </div>
+          <div className="mt-5 text-center">
+            <Link href="/about" className="font-semibold text-gold hover:underline">
+              {dict.about.howTitle} →
+            </Link>
           </div>
         </section>
       )}
