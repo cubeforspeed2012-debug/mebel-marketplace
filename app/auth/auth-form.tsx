@@ -153,7 +153,13 @@ export function AuthForm({
       )}
 
       <div className="mt-8 [&_button]:rounded-2xl [&_button]:border-line [&_button]:bg-paper [&_button]:text-text [&_span]:bg-line">
-        <OAuthButtons next={next} />
+        {/*
+          Внутри Telegram вход через Google не показываем. Во-первых, он уводит
+          на домен Supabase, и Telegram пугает человека табличкой «Переход
+          в приложение». Во-вторых, Google сам не пускает свой вход в окна
+          внутри приложений. Почта с паролем работает не выходя с нашего домена.
+        */}
+        {!next.startsWith('/tg') && <OAuthButtons next={next} />}
       </div>
     </div>
   )
