@@ -35,7 +35,12 @@
   // кладём — только через Settings → Variables and Secrets как Secret.
   "vars": {
     "NEXT_PUBLIC_SUPABASE_URL": "https://haxmubqjipkwgmeagezm.supabase.co",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_N9aZTyHKQY3D32SsDNibeg_7gB8ESB7"
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_N9aZTyHKQY3D32SsDNibeg_7gB8ESB7",
+
+    // Имя бота — не секрет: его и так видно в Telegram каждому.
+    // Сам токен сюда класть нельзя, файл лежит в GitHub. Токен и
+    // TELEGRAM_WEBHOOK_SECRET добавляются в панели как Secret.
+    "TELEGRAM_BOT_USERNAME": "mebel717_bot"
   },
 
   "assets": {
