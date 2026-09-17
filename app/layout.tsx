@@ -4,6 +4,7 @@ import { Inter, Manrope } from 'next/font/google'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { HeaderNav } from '@/components/header-nav'
+import { HideOnTg } from '@/components/hide-on-tg'
 import { InstallApp } from '@/components/install-app'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { LocaleProvider } from '@/components/locale-provider'
@@ -286,11 +287,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Suspense fallback={null}>
             <RouteProgress />
           </Suspense>
-          <Header dict={dict} signedIn={signedIn} theme={theme} />
-          {/* Предложение поставить на домашний экран — там, где его видно сразу */}
-          <InstallApp />
+          <HideOnTg>
+            <Header dict={dict} signedIn={signedIn} theme={theme} />
+            {/* Предложение поставить на домашний экран — там, где его видно сразу */}
+            <InstallApp />
+          </HideOnTg>
+
           <main className="animate-page flex-1">{children}</main>
-          <Footer dict={dict} />
+
+          <HideOnTg>
+            <Footer dict={dict} />
+          </HideOnTg>
 
           {/* Нижнее меню — на каждой странице, и на телефоне, и на компьютере */}
           <Suspense fallback={null}>

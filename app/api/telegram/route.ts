@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { notifyTelegram } from '@/lib/telegram'
+import { SITE_URL } from '@/lib/constants'
+import { notifyTelegram, sendPhotoTelegram } from '@/lib/telegram'
 
 /**
  * Сюда стучится Telegram, когда мастер нажимает «Подключить» и попадает
@@ -33,10 +34,22 @@ export async function POST(request: NextRequest) {
 
   const code = /^\/start\s+(\S+)$/.exec(text)?.[1]
 
+  // Кнопка, открывающая укороченный кабинет прямо внутри Telegram
+  const openApp = { text: 'Открыть кабинет', url: `${SITE_URL}/tg` }
+
   if (!code) {
-    await notifyTelegram(
+    await sendPhotoTelegram(
       String(chatId),
-      'Чтобы получать заявки сюда, откройте кабинет мастера на Mebel и нажмите «Подключить Telegram».',
+      `${SITE_URL}/logo-tg.png`,
+      [
+        '<b>Mebel — мебель Ташкента</b>',
+        '',
+        'Здесь мастер видит свои заявки и цифры, не выходя из Telegram:',
+        'кто оставил заявку, кто смотрел страницу, кто хотел позвонить.',
+        '',
+        'Нажмите кнопку ниже — откроется кабинет.',
+      ].join('\n'),
+      openApp,
     )
     return NextResponse.json({ ok: true })
   }
@@ -53,6 +66,7 @@ export async function POST(request: NextRequest) {
       company
         ? `<b>Готово.</b> Заявки мастерской «${company}» будут приходить сюда.`
         : 'Ссылка устарела. Откройте кабинет мастера и нажмите «Подключить Telegram» ещё раз — она действует 15 минут.',
+      company ? openApp : undefined,
     )
   } catch {
     // Telegram повторит доставку сам — молчим, чтобы не сыпать ошибками.

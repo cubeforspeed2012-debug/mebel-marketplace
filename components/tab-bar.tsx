@@ -194,9 +194,10 @@ export function TabBar({
   const pathname = usePathname()
   useSearchParams() // держим компонент в Suspense-границе вместе с навигацией
 
-  // На ознакомительной странице нижнего меню нет: человек ещё не внутри
-  // приложения, и меню только спорит с кнопками «Войти» и «Стать мастером».
-  if (pathname.startsWith('/about')) return null
+  // На ознакомительной странице человек ещё не внутри приложения, и меню
+  // спорит с кнопками «Войти» и «Стать мастером». Внутри Telegram у окна
+  // своя навигация, наша вторая только мешает.
+  if (pathname.startsWith('/about') || pathname.startsWith('/tg')) return null
 
   const tabs = SETS[role]
   const activeIndex = tabs.findIndex((tab) => tab.match(pathname))
