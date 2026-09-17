@@ -43,9 +43,12 @@ function Field({
 export function AuthForm({
   next,
   role = 'seller',
+  compact = false,
 }: {
   next: string
   role?: 'seller' | 'buyer'
+  /** Внутри Telegram: без тени и без ссылок, уводящих из мини-приложения. */
+  compact?: boolean
 }) {
   const dict = useDict()
   const [mode, setMode] = useState<'in' | 'up'>(role === 'buyer' ? 'up' : 'in')
@@ -57,7 +60,13 @@ export function AuthForm({
   const pending = isLogin ? signingIn : signingUp
 
   return (
-    <div className="rounded-[28px] border border-line bg-paper p-7 shadow-[0_18px_50px_rgba(0,0,0,0.45)] sm:p-9">
+    <div
+      className={
+        compact
+          ? 'rounded-[28px] border border-line bg-paper p-6'
+          : 'rounded-[28px] border border-line bg-paper p-7 shadow-[0_18px_50px_rgba(0,0,0,0.45)] sm:p-9'
+      }
+    >
       {/* Переключатель: утопленная дорожка, приподнятая активная половина */}
       <div className="mb-8 flex rounded-2xl bg-cream p-1.5">
         {(
@@ -101,14 +110,17 @@ export function AuthForm({
             {pending ? dict.auth.signingIn : dict.auth.doSignIn}
           </button>
 
-          <div className="flex items-center justify-between text-sm">
-            <Link href="/auth/code" className="text-gold hover:underline">
-              {dict.auth.codeLogin}
-            </Link>
-            <Link href="/auth/reset" className="text-text-muted hover:text-text">
-              {dict.auth.forgot}
-            </Link>
-          </div>
+          {/* Эти ссылки уводят на страницы большого сайта — внутри Telegram прячем */}
+          {!compact && (
+            <div className="flex items-center justify-between text-sm">
+              <Link href="/auth/code" className="text-gold hover:underline">
+                {dict.auth.codeLogin}
+              </Link>
+              <Link href="/auth/reset" className="text-text-muted hover:text-text">
+                {dict.auth.forgot}
+              </Link>
+            </div>
+          )}
         </form>
       ) : (
         <form action={signUpAction} className="space-y-5">

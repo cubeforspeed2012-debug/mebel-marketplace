@@ -1,6 +1,11 @@
-import Link from 'next/link'
+import { AuthForm } from '@/app/auth/auth-form'
 
-/** Приветствие для гостя и подсказка тому, кто ещё не завёл мастерскую. */
+/**
+ * Вход и регистрация прямо внутри Telegram. Раньше кнопка уводила на
+ * страницу большого сайта — вместе с шапкой, баннером «установите на
+ * телефон» и меню каталога. Внутри мини-приложения всё это лишнее:
+ * человек пришёл за своими заявками, а не гулять по сайту.
+ */
 export function TgWelcome({ state }: { state: 'guest' | 'no-company' }) {
   if (state === 'no-company') {
     return (
@@ -10,38 +15,31 @@ export function TgWelcome({ state }: { state: 'guest' | 'no-company' }) {
           Осталось завести мастерскую: название, телефон, чем занимаетесь.
           Пара минут — и клиенты смогут вас найти.
         </p>
-        <Link
+        <a
           href="/profile/company"
           className="press mt-6 block rounded-full bg-gold px-6 py-3.5 font-semibold text-white"
         >
           Заполнить профиль
-        </Link>
+        </a>
       </div>
     )
   }
 
   return (
-    <div className="px-4 py-10 text-center">
-      <div className="display text-2xl text-text">
-        Добро пожаловать в Mebel<span className="text-gold">.</span>
+    <div className="px-4 py-7">
+      <div className="text-center">
+        <div className="display text-2xl text-text">
+          Mebel<span className="text-gold">.</span>
+        </div>
+        <div className="eyebrow mt-2">Кабинет мастера</div>
+        <p className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-text-muted">
+          Заявки, клиенты и цифры — не выходя из Telegram
+        </p>
       </div>
-      <p className="mx-auto mt-3 max-w-xs leading-relaxed text-text-muted">
-        Здесь мастер видит свои заявки и цифры, не выходя из Telegram.
-        Войдите или заведите кабинет — это бесплатно.
-      </p>
 
-      <Link
-        href="/auth?next=/tg"
-        className="press mt-7 block rounded-full bg-gold px-6 py-3.5 font-semibold text-white"
-      >
-        Войти
-      </Link>
-      <Link
-        href="/auth?mode=signup&next=/tg"
-        className="press mt-3 block rounded-full border border-line bg-paper px-6 py-3.5 font-semibold text-text"
-      >
-        Зарегистрироваться
-      </Link>
+      <div className="mt-6">
+        <AuthForm next="/tg" compact />
+      </div>
     </div>
   )
 }
