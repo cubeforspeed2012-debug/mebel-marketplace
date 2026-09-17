@@ -194,6 +194,10 @@ export function TabBar({
   const pathname = usePathname()
   useSearchParams() // держим компонент в Suspense-границе вместе с навигацией
 
+  // На ознакомительной странице нижнего меню нет: человек ещё не внутри
+  // приложения, и меню только спорит с кнопками «Войти» и «Стать мастером».
+  if (pathname.startsWith('/about')) return null
+
   const tabs = SETS[role]
   const activeIndex = tabs.findIndex((tab) => tab.match(pathname))
 
