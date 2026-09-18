@@ -1,4 +1,5 @@
 import { AuthForm } from '@/app/auth/auth-form'
+import { TgOpenOutside } from '@/components/tg-open-outside'
 
 /**
  * Вход и регистрация прямо внутри Telegram. Раньше кнопка уводила на
@@ -15,12 +16,17 @@ export function TgWelcome({ state }: { state: 'guest' | 'no-company' }) {
           Осталось завести мастерскую: название, телефон, чем занимаетесь.
           Пара минут — и клиенты смогут вас найти.
         </p>
-        <a
-          href="/profile/company"
+        {/*
+          Завести мастерскую можно только на большом сайте: там загрузка
+          фото и карта. Внутри окошка Telegram эта страница не помещается,
+          поэтому открываем её браузером поверх.
+        */}
+        <TgOpenOutside
+          path="/profile/company"
           className="press mt-6 block rounded-full bg-gold px-6 py-3.5 font-semibold text-white"
         >
           Заполнить профиль
-        </a>
+        </TgOpenOutside>
       </div>
     )
   }

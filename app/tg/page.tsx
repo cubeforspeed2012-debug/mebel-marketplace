@@ -1,8 +1,8 @@
-import Link from 'next/link'
 import { TgWelcome } from '@/components/tg-welcome'
 import { formatPhone, telHref } from '@/lib/constants'
 import { ORDER_STATUSES, type OrderStatus } from '@/lib/orders'
 import { getTgContext } from '@/lib/tg'
+import { TgOpenOutside } from '@/components/tg-open-outside'
 
 export const metadata = { title: 'Аналитика' }
 
@@ -90,12 +90,18 @@ export default async function TgAnalytics() {
         </ul>
       )}
 
-      <Link
-        href="/dashboard"
+      {/*
+        Полный кабинет — это большой сайт, и внутри окошка Telegram он
+        не помещается: человек проваливался в витрину и терял свои цифры.
+        Отдаём переход самому Telegram — он откроет сайт браузером поверх,
+        а мини-приложение останется на месте.
+      */}
+      <TgOpenOutside
+        path="/dashboard"
         className="press mt-5 block rounded-full border border-line bg-paper px-6 py-3 text-center text-sm font-semibold text-text"
       >
-        Открыть полный кабинет
-      </Link>
+        Полный кабинет — откроется в браузере
+      </TgOpenOutside>
     </div>
   )
 }
