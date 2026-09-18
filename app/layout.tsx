@@ -15,7 +15,7 @@ import type { Dict } from '@/lib/i18n'
 import { getLocale } from '@/lib/locale'
 import { getDict } from '@/lib/i18n'
 import { SITE_URL } from '@/lib/constants'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, currentUser } from '@/lib/supabase/server'
 import './globals.css'
 
 const inter = Inter({
@@ -220,9 +220,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let pending = 0
   try {
     const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const user = await currentUser()
 
     signedIn = Boolean(user)
 

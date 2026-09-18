@@ -5,6 +5,7 @@ import { RoleSwitcher } from '@/components/role-switcher'
 import { formatPhone, telHref } from '@/lib/constants'
 import { ORDER_STATUSES, STATUS_STYLES, type OrderStatus } from '@/lib/orders'
 import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/session'
 
 export const metadata = { title: 'Мои заявки' }
 
@@ -20,10 +21,7 @@ type Row = {
 export default async function AccountPage() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/auth?role=buyer&next=/account')
+  const user = await requireUser('/auth?role=buyer&next=/account')
 
   const { data: profile } = await supabase
     .from('profiles')

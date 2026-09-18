@@ -1,16 +1,30 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getCurrentUser } from '@/lib/supabase/server'
 import type { Company } from '@/lib/types'
+
+/**
+ * Пускает дальше только вошедшего.
+ *
+ * Отдельно разбираем случай, когда Supabase не ответил: вход при этом
+ * в порядке, и уводить человека на регистрацию — худшее, что можно сделать.
+ * Он решит, что аккаунт пропал вместе со всеми работами. Лучше честно
+ * сказать «сервер занят, обновите страницу» и оставить его вошедшим.
+ */
+export async function requireUser(signInPath: string) {
+  const { user, authUnavailable } = await getCurrentUser()
+  if (user) return user
+
+  if (authUnavailable) {
+    throw new Error('Сервер входа не ответил. Обновите страницу через минуту — вы не вышли из аккаунта.')
+  }
+
+  redirect(signInPath)
+}
 
 /** Пользователь кабинета вместе с его мастерской (если уже создана). */
 export async function getSellerContext() {
   const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) redirect('/auth')
+  const user = await requireUser('/auth')
 
   const { data: company } = await supabase
     .from('companies')
@@ -38,11 +52,7 @@ export async function getSellerContext() {
 /** Кабинет площадки: пускаем только администратора. */
 export async function requireAdmin() {
   const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/auth?next=/admin')
+  const user = await requireUser('/auth?next=/admin')
 
   const { data: profile } = await supabase
     .from('profiles')

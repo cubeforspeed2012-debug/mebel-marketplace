@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, currentUser } from '@/lib/supabase/server'
 
 /**
  * Какие товары человек уже отметил сердечком. Одним запросом на страницу,
@@ -7,9 +7,7 @@ import { createClient } from '@/lib/supabase/server'
 export async function getFavoriteIds(): Promise<Set<number>> {
   try {
     const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const user = await currentUser()
     if (!user) return new Set()
 
     const { data } = await supabase.from('favorites').select('product_id').eq('user_id', user.id)

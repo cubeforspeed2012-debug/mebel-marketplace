@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { ScreenHeader } from '@/components/settings-list'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, currentUser } from '@/lib/supabase/server'
 import { ProfileForm } from '../profile-form'
 
 export const metadata = { title: 'Личные данные' }
@@ -8,9 +8,7 @@ export const metadata = { title: 'Личные данные' }
 export default async function ProfileEditPage() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await currentUser()
   if (!user) redirect('/auth?next=/profile/edit')
 
   const { data: profile } = await supabase

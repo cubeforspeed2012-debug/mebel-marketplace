@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getDictionary } from '@/lib/locale'
-import { createClient } from '@/lib/supabase/server'
+import { currentUser } from '@/lib/supabase/server'
 import { AuthForm } from './auth-form'
 
 export const metadata = {
@@ -20,10 +20,7 @@ export default async function AuthPage({
   // Уже вошёл — сразу в кабинет. Если база недоступна, показываем форму.
   let signedIn = false
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const user = await currentUser()
     signedIn = Boolean(user)
   } catch {
     signedIn = false

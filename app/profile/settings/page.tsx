@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { ScreenHeader } from '@/components/settings-list'
 import { IconGlobe, IconLock, IconMoon, IconTrash } from '@/components/ui-icons'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, currentUser } from '@/lib/supabase/server'
 import { deleteOwnAccount } from './actions'
 import { DeleteAccount, LanguageSetting, ThemeSetting } from './settings-controls'
 
@@ -40,9 +40,7 @@ export default async function SettingsPage({
   const { error } = await searchParams
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await currentUser()
   if (!user) redirect('/auth?next=/profile/settings')
 
   const { data: profile } = await supabase

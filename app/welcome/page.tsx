@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getDictionary } from '@/lib/locale'
 import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/session'
 import { WelcomeForm } from './welcome-form'
 
 export const metadata = { title: 'Знакомимся' }
@@ -14,10 +15,7 @@ export default async function WelcomePage({
   const dict = await getDictionary()
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/auth')
+  const user = await requireUser('/auth')
 
   const { data: profile } = await supabase
     .from('profiles')

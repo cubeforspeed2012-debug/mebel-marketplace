@@ -4,7 +4,7 @@ import { ProductCard } from '@/components/product-card'
 import { FALLBACK_CATEGORIES } from '@/lib/constants'
 import { getDictionary } from '@/lib/locale'
 import { getFavoriteIds } from '@/lib/favorites'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, currentUser } from '@/lib/supabase/server'
 import type { Category, ProductCard as ProductCardType } from '@/lib/types'
 
 export const revalidate = 300
@@ -46,10 +46,7 @@ async function getHomeData() {
 /** Вошёл человек или нет — от этого зависит, звать ли его регистрироваться. */
 async function isSignedIn() {
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const user = await currentUser()
     return Boolean(user)
   } catch {
     return false

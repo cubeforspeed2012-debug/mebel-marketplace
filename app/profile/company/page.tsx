@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { CompanyForm } from '@/app/dashboard/company/company-form'
 import { ScreenHeader } from '@/components/settings-list'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, currentUser } from '@/lib/supabase/server'
 import type { Company } from '@/lib/types'
 
 export const metadata = { title: 'Моя мастерская' }
@@ -11,9 +11,7 @@ export const metadata = { title: 'Моя мастерская' }
 export default async function ProfileCompanyPage() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await currentUser()
   if (!user) redirect('/auth?next=/profile/company')
 
   const { data } = await supabase

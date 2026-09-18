@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 import { FurnitureScene } from '@/components/furniture-icons'
 import { ProductCard } from '@/components/product-card'
 import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/session'
 import type { ProductCard as ProductCardType } from '@/lib/types'
 
 export const metadata = { title: 'Любимое' }
@@ -11,10 +11,7 @@ export const metadata = { title: 'Любимое' }
 export default async function FavoritesPage() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/auth?role=buyer&next=/favorites')
+  const user = await requireUser('/auth?role=buyer&next=/favorites')
 
   const { data } = await supabase
     .from('favorites')

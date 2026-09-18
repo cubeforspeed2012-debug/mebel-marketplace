@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, currentUser } from '@/lib/supabase/server'
 
 /**
  * Кто открыл мини-приложение. Оба экрана показывают одно и то же
@@ -6,9 +6,7 @@ import { createClient } from '@/lib/supabase/server'
  */
 export async function getTgContext() {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await currentUser()
 
   if (!user) return { state: 'guest' as const, supabase }
 

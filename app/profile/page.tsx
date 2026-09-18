@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation'
 import { signOut } from '@/app/auth/actions'
 import { SettingsGroup, SettingsRow } from '@/components/settings-list'
 import {
@@ -17,6 +16,7 @@ import {
 } from '@/components/ui-icons'
 import { formatPhone } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/session'
 
 export const metadata = { title: 'Профиль' }
 
@@ -28,10 +28,7 @@ export const metadata = { title: 'Профиль' }
 export default async function ProfilePage() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/auth?next=/profile')
+  const user = await requireUser('/auth?next=/profile')
 
   const { data: profile } = await supabase
     .from('profiles')

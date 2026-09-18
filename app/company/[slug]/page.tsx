@@ -9,7 +9,7 @@ import { PUBLIC_COMPANY_FIELDS, WORK_TYPES } from '@/lib/constants'
 import { districtIn } from '@/lib/i18n'
 import { getDictionary } from '@/lib/locale'
 import { getFavoriteIds } from '@/lib/favorites'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, currentUser } from '@/lib/supabase/server'
 import type { Company, ProductCard as ProductCardType } from '@/lib/types'
 import { bumpViews } from '@/lib/views'
 import { ReviewForm } from '@/components/review-form'
@@ -86,9 +86,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 async function getReviews(companyId: number) {
   try {
     const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const user = await currentUser()
 
     const [{ data: reviews }, own, owner] = await Promise.all([
       supabase
