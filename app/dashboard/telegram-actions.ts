@@ -32,3 +32,17 @@ export async function disconnectTelegram(): Promise<TelegramState> {
   revalidatePath('/dashboard')
   return { message: 'Telegram отключён' }
 }
+
+/**
+ * Ссылка на бота для подтверждения номера.
+ *
+ * Отдельного кода здесь нет: чат уже привязан к мастерской, по нему бот
+ * и узнаёт, чей номер пришёл. А сам номер подделать нельзя — его присылает
+ * Telegram, а не человек.
+ */
+export async function phoneVerifyLink(): Promise<TelegramState> {
+  const bot = process.env.TELEGRAM_BOT_USERNAME
+  if (!bot) return { error: 'Бот пока не настроен' }
+
+  return { link: `https://t.me/${bot.replace(/^@/, '')}?start=phone` }
+}

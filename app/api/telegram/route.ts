@@ -1,15 +1,36 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { SITE_URL } from '@/lib/constants'
-import { notifyTelegram, sendPhotoTelegram } from '@/lib/telegram'
+import {
+  askPhoneTelegram,
+  escapeHtml,
+  notifyTelegram,
+  replyAndHideKeyboard,
+  sendPhotoTelegram,
+} from '@/lib/telegram'
+
+/** Что бот умеет: привязать мастерскую и подтвердить номер. Больше ничего. */
+const OPEN_APP = { text: 'Открыть кабинет', url: `${SITE_URL}/tg` }
 
 /**
- * Сюда стучится Telegram, когда мастер нажимает «Подключить» и попадает
- * в бота по ссылке вида t.me/бот?start=код.
+ * Текст, который человек видит перед тем, как поделиться номером.
  *
- * Только это и умеем: поймать /start с кодом, привязать чат к мастерской
- * и ответить человеку. Никаких других команд бот не обрабатывает.
+ * Прямо называем то, чего мы никогда не спросим: именно по этим четырём
+ * вещам люди отличают мошенника, и честно сказать о них — единственный
+ * способ выглядеть не как мошенник.
  */
+const PHONE_ASK = [
+  '<b>Подтверждение номера</b>',
+  '',
+  'Нажмите кнопку ниже — Telegram сам пришлёт нам номер, на который',
+  'зарегистрирован ваш аккаунт. Мы сверим его с номером в мастерской',
+  'и поставим в каталоге отметку «номер проверен».',
+  '',
+  'Клиенты доверяют таким мастерским больше.',
+  '',
+  '<i>Мы никогда не просим пароль, код из СМС, номер карты и деньги.</i>',
+].join('\n')
+
 export async function POST(request: NextRequest) {
   // Секрет задаётся при регистрации адреса у Telegram. Без него кто угодно
   // мог бы слать сюда выдуманные сообщения.
@@ -19,7 +40,12 @@ export async function POST(request: NextRequest) {
   }
 
   let update: {
-    message?: { text?: string; chat?: { id?: number | string } }
+    message?: {
+      text?: string
+      from?: { id?: number }
+      chat?: { id?: number | string }
+      contact?: { phone_number?: string; user_id?: number }
+    }
   }
 
   try {
@@ -28,18 +54,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true })
   }
 
-  const chatId = update.message?.chat?.id
-  const text = (update.message?.text ?? '').trim()
+  const message = update.message
+  const chatId = message?.chat?.id
   if (!chatId) return NextResponse.json({ ok: true })
 
-  const code = /^\/start\s+(\S+)$/.exec(text)?.[1]
+  const chat = String(chatId)
 
-  // Кнопка, открывающая укороченный кабинет прямо внутри Telegram
-  const openApp = { text: 'Открыть кабинет', url: `${SITE_URL}/tg` }
+  // ── Человек поделился номером ──────────────────────────────────────
+  const contact = message?.contact
+  if (contact) {
+    await handleContact(chat, contact, message?.from?.id)
+    return NextResponse.json({ ok: true })
+  }
 
-  if (!code) {
+  const text = (message?.text ?? '').trim()
+  const startArg = /^\/start(?:\s+(\S+))?$/.exec(text)?.[1]
+
+  // ── Пришёл по кнопке «Подтвердить номер» из кабинета ───────────────
+  if (startArg === 'phone') {
+    await askPhoneTelegram(chat, PHONE_ASK)
+    return NextResponse.json({ ok: true })
+  }
+
+  // ── Просто открыл бота ─────────────────────────────────────────────
+  if (!startArg) {
     await sendPhotoTelegram(
-      String(chatId),
+      chat,
       `${SITE_URL}/logo-tg.png`,
       [
         '<b>Mebel — мебель Ташкента</b>',
@@ -49,28 +89,111 @@ export async function POST(request: NextRequest) {
         '',
         'Нажмите кнопку ниже — откроется кабинет.',
       ].join('\n'),
-      openApp,
+      OPEN_APP,
     )
     return NextResponse.json({ ok: true })
   }
 
+  // ── Пришёл по одноразовой ссылке привязки ──────────────────────────
   try {
     const supabase = await createClient()
     const { data: company } = await supabase.rpc('link_telegram', {
-      p_code: code,
-      p_chat_id: String(chatId),
+      p_code: startArg,
+      p_chat_id: chat,
     })
 
     await notifyTelegram(
-      String(chatId),
+      chat,
       company
-        ? `<b>Готово.</b> Заявки мастерской «${company}» будут приходить сюда.`
+        ? `<b>Готово.</b> Заявки мастерской «${escapeHtml(String(company))}» будут приходить сюда.`
         : 'Ссылка устарела. Откройте кабинет мастера и нажмите «Подключить Telegram» ещё раз — она действует 15 минут.',
-      company ? openApp : undefined,
+      company ? OPEN_APP : undefined,
     )
   } catch {
     // Telegram повторит доставку сам — молчим, чтобы не сыпать ошибками.
   }
 
   return NextResponse.json({ ok: true })
+}
+
+/**
+ * Разбираем присланный номер.
+ *
+ * Главная проверка — что номер его собственный. Telegram позволяет
+ * переслать боту контакт из записной книжки, и без этой проверки мастер
+ * «подтвердил» бы номер брата или конкурента. У своего контакта user_id
+ * совпадает с автором сообщения, у чужого — нет или его вовсе нет.
+ */
+async function handleContact(
+  chat: string,
+  contact: { phone_number?: string; user_id?: number },
+  fromId?: number,
+) {
+  if (!contact.user_id || !fromId || contact.user_id !== fromId) {
+    await replyAndHideKeyboard(
+      chat,
+      'Это чужой контакт. Подтвердить можно только свой номер — нажмите кнопку «Поделиться номером», а не выбирайте контакт из списка.',
+    )
+    return
+  }
+
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase.rpc('verify_phone_by_telegram', {
+      p_chat_id: chat,
+      p_phone: contact.phone_number ?? '',
+    })
+
+    const result = (data ?? {}) as {
+      status?: string
+      company?: string
+      stored_tail?: string
+      shared_tail?: string
+    }
+    const company = escapeHtml(String(result.company ?? ''))
+
+    if (result.status === 'ok') {
+      await replyAndHideKeyboard(
+        chat,
+        `<b>Номер подтверждён.</b> В каталоге у мастерской «${company}» появилась отметка «номер проверен».`,
+        OPEN_APP,
+      )
+      return
+    }
+
+    if (result.status === 'mismatch') {
+      await replyAndHideKeyboard(
+        chat,
+        [
+          '<b>Номера не совпали.</b>',
+          '',
+          `В мастерской «${company}» указан номер, оканчивающийся на ${escapeHtml(String(result.stored_tail ?? '••••'))},`,
+          `а ваш Telegram — на ${escapeHtml(String(result.shared_tail ?? '••••'))}.`,
+          '',
+          'Подтвердить можно только свой номер. Исправьте номер в профиле мастерской и попробуйте ещё раз.',
+        ].join('\n'),
+      )
+      return
+    }
+
+    if (result.status === 'no_phone') {
+      await replyAndHideKeyboard(
+        chat,
+        'Сначала укажите номер в профиле мастерской — потом его можно будет подтвердить.',
+      )
+      return
+    }
+
+    if (result.status === 'not_linked') {
+      await replyAndHideKeyboard(
+        chat,
+        'Этот чат ещё не привязан к мастерской. Откройте кабинет мастера и нажмите «Подключить Telegram».',
+      )
+      return
+    }
+
+    await replyAndHideKeyboard(chat, 'Не получилось прочитать номер. Попробуйте ещё раз.')
+  } catch {
+    // Telegram повторит доставку сам.
+  }
 }

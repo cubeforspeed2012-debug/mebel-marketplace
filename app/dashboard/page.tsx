@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { formatPhone, telHref } from '@/lib/constants'
 import { ORDER_STATUSES, type OrderStatus } from '@/lib/orders'
 import { getSellerContext } from '@/lib/session'
+import { PhoneCard } from '@/app/dashboard/phone-card'
 import { TelegramCard } from '@/app/dashboard/telegram-card'
 
 export const metadata = { title: 'Аналитика' }
@@ -125,6 +126,13 @@ export default async function DashboardPage() {
 
       {/* Заявки в Telegram — чтобы клиент не ждал, пока мастер зайдёт в кабинет */}
       <TelegramCard connected={Boolean(company.telegram_chat_id)} />
+
+      {/* Проверенный номер — то, по чему клиент отличает живого мастера от объявления-пустышки */}
+      <PhoneCard
+        verified={Boolean(company.phone_verified)}
+        hasPhone={Boolean(company.phone_public)}
+        telegramConnected={Boolean(company.telegram_chat_id)}
+      />
 
       {/* Последние заявки — то, ради чего мастер открыл приложение */}
       <section className="rounded-3xl bg-paper p-5 sm:p-6">
