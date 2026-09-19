@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { CompanyForm } from '@/app/dashboard/company/company-form'
+import { PhoneCard } from '@/app/dashboard/phone-card'
 import { ScreenHeader } from '@/components/settings-list'
 import { createClient, currentUser } from '@/lib/supabase/server'
 import type { Company } from '@/lib/types'
@@ -21,6 +22,19 @@ export default async function ProfileCompanyPage() {
     .maybeSingle()
 
   const company = (data as Company | null) ?? null
+
+  // Телефон человек уже вписал при регистрации — не заставляем вводить
+  // его второй раз. Заодно это тот самый номер, который он подтвердит:
+  // проверка начинается прямо с регистрации, а не когда-нибудь потом.
+  let phoneFromProfile: string | null = null
+  if (!company) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('phone')
+      .eq('id', user.id)
+      .maybeSingle()
+    phoneFromProfile = profile?.phone ?? null
+  }
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
@@ -55,7 +69,23 @@ export default async function ProfileCompanyPage() {
         </Link>
       )}
 
-      <CompanyForm company={company} />
+      {/*
+        Сразу после того, как мастерская заведена, — шаг с номером.
+        Здесь он к месту: человек только что вписал телефон, и тут же
+        видит, что его стоит подтвердить. Если отложить это до кабинета,
+        до подтверждения не дойдёт почти никто.
+      */}
+      {company && (
+        <div className="mb-5">
+          <PhoneCard
+            verified={Boolean(company.phone_verified)}
+            hasPhone={Boolean(company.phone_public)}
+            telegramConnected={Boolean(company.telegram_chat_id)}
+          />
+        </div>
+      )}
+
+      <CompanyForm company={company} suggestedPhone={phoneFromProfile} />
     </div>
   )
 }

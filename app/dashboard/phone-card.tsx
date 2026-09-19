@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { phoneVerifyLink } from '@/app/dashboard/telegram-actions'
+import { connectTelegram, phoneVerifyLink } from '@/app/dashboard/telegram-actions'
 
 function ShieldMark({ done }: { done: boolean }) {
   return (
@@ -71,10 +71,6 @@ export function PhoneCard({
         <p className="mt-4 rounded-2xl bg-cream px-4 py-3 text-sm text-text-muted">
           Сначала укажите телефон в профиле мастерской — потом его можно будет подтвердить.
         </p>
-      ) : !telegramConnected ? (
-        <p className="mt-4 rounded-2xl bg-cream px-4 py-3 text-sm text-text-muted">
-          Сначала подключите Telegram кнопкой выше — номер подтверждается через нашего бота.
-        </p>
       ) : link ? (
         <>
           <a
@@ -86,8 +82,10 @@ export function PhoneCard({
             Открыть бота
           </a>
           <div className="mt-3 rounded-2xl bg-cream px-4 py-3 text-sm leading-relaxed text-text-muted">
-            Откроется наш бот <b className="text-text">Mebel</b>. Внизу появится кнопка Telegram
-            «Поделиться номером» — нажмите её, больше ничего делать не нужно.
+            Откроется наш бот <b className="text-text">Mebel</b>.
+            {telegramConnected
+              ? ' Внизу появится кнопка Telegram «Поделиться номером» — нажмите её, больше ничего делать не нужно.'
+              : ' Нажмите «Start», а потом кнопку Telegram «Поделиться номером» — больше ничего делать не нужно.'}
             <br />
             <br />
             Номер увидим только мы, в каталоге он не появится: там будет лишь отметка, что он проверен.
@@ -103,7 +101,9 @@ export function PhoneCard({
           onClick={() =>
             startTransition(async () => {
               setError(null)
-              const result = await phoneVerifyLink()
+              // Telegram ещё не подключён — выдаём ссылку привязки:
+              // бот сам попросит номер сразу после «Start», одним разговором.
+              const result = telegramConnected ? await phoneVerifyLink() : await connectTelegram()
               if (result.link) setLink(result.link)
               else setError(result.error ?? 'Не получилось')
             })

@@ -109,6 +109,14 @@ export async function POST(request: NextRequest) {
         : 'Ссылка устарела. Откройте кабинет мастера и нажмите «Подключить Telegram» ещё раз — она действует 15 минут.',
       company ? OPEN_APP : undefined,
     )
+
+    // Мастер только что подключился и он здесь, в разговоре. Просить его
+    // отдельно вернуться и нажать ещё одну кнопку — значит потерять почти
+    // всех: до второго шага не доходят. Спрашиваем номер сразу, пока он тут.
+    if (company) {
+      const { data: needsPhone } = await supabase.rpc('tg_needs_phone', { p_chat_id: chat })
+      if (needsPhone) await askPhoneTelegram(chat, PHONE_ASK)
+    }
   } catch {
     // Telegram повторит доставку сам — молчим, чтобы не сыпать ошибками.
   }

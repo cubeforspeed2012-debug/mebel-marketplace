@@ -9,7 +9,14 @@ import { saveCompany, type FormState } from './actions'
 
 const EMPTY: FormState = {}
 
-export function CompanyForm({ company }: { company: Company | null }) {
+export function CompanyForm({
+  company,
+  /** Телефон из регистрации — подставляем в новую мастерскую, чтобы не вводить дважды */
+  suggestedPhone = null,
+}: {
+  company: Company | null
+  suggestedPhone?: string | null
+}) {
   const [state, action, pending] = useActionState(saveCompany, EMPTY)
   const [logo, setLogo] = useState<string | null>(company?.logo_url ?? null)
   const [name, setName] = useState(company?.name ?? '')
@@ -44,7 +51,7 @@ export function CompanyForm({ company }: { company: Company | null }) {
           name="phone_public"
           required
           type="tel"
-          defaultValue={company?.phone_public ?? ''}
+          defaultValue={company?.phone_public ?? suggestedPhone ?? ''}
           placeholder="+998 90 123-45-67"
           className="w-full rounded-2xl bg-cream px-4 py-2.5 outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
         />
