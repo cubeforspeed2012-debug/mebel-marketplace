@@ -10,7 +10,7 @@ const FAQ = [
   },
   {
     q: 'Почему мою работу не видно?',
-    a: 'Работы видны, только когда мастерская открыта в каталоге. Ещё проверьте, что у работы есть фото и статус «активна».',
+    a: 'Каждая новая работа проходит проверку — в кабинете у неё статус «На проверке», обычно это занимает день. После одобрения она появится в каталоге. Если поменять название, цену, описание или фото, работа снова уйдёт на проверку.',
   },
   {
     q: 'Кто берёт деньги за заказ?',
@@ -47,12 +47,12 @@ export default function HelpPage() {
         <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
           Напишите администратору площадки — разберёмся.
         </p>
-        <a
-          href="mailto:admin@mebel.uz"
+        <Link
+          href="/support"
           className="press mt-4 block rounded-2xl bg-gold py-3.5 text-center text-sm font-semibold text-white transition-colors hover:bg-gold-deep"
         >
-          Написать администратору
-        </a>
+          Написать в поддержку
+        </Link>
       </section>
 
       <div className="mt-5 flex flex-wrap justify-center gap-4 text-sm text-text-muted">

@@ -160,6 +160,11 @@ function Footer({ dict }: { dict: Dict }) {
                 </Link>
               </li>
               <li>
+                <Link href="/support" className="transition-colors hover:text-text">
+                  Поддержка
+                </Link>
+              </li>
+              <li>
                 <Link href="/terms" className="transition-colors hover:text-text">
                   {dict.footer.terms}
                 </Link>

@@ -133,3 +133,18 @@ export async function setProductStatus(formData: FormData) {
   revalidatePath('/catalog')
   revalidatePath('/dashboard/products')
 }
+
+/** Обращение разобрано: отметить закрытым и записать, что ответили. */
+export async function closeSupportTicket(formData: FormData) {
+  const { supabase } = await requireAdmin()
+  const id = Number(formData.get('id'))
+  const note = String(formData.get('note') ?? '').trim() || null
+  if (!id) return
+
+  await supabase
+    .from('support_tickets')
+    .update({ status: 'done', admin_note: note, updated_at: new Date().toISOString() })
+    .eq('id', id)
+
+  revalidatePath('/admin/support')
+}

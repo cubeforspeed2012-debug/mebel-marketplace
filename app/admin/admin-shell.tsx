@@ -36,6 +36,15 @@ const SECTIONS = [
     ),
   },
   {
+    href: '/admin/support',
+    label: 'Поддержка',
+    icon: (
+      <svg viewBox="0 0 24 24" className="size-5" fill="none" strokeWidth={1.8} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V16H6.5A2.5 2.5 0 0 1 4 13.5v-7Z" />
+      </svg>
+    ),
+  },
+  {
     href: '/profile',
     label: 'Мой профиль',
     icon: (

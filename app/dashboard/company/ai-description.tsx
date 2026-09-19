@@ -38,7 +38,7 @@ function Field({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-2xl bg-cream px-4 py-2.5 text-sm text-text outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
+        className="w-full rounded-2xl border border-line bg-paper px-4 py-2.5 text-sm text-text outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
       />
       {hint && <span className="mt-1 block text-xs text-text-muted">{hint}</span>}
     </label>
@@ -221,16 +221,24 @@ export function AiDescription({
           </div>
         </div>
 
-        <label className="block sm:col-span-2">
-          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
-            Что ещё важно знать
+        {/*
+          Место для подробностей выделяем заметнее остальных полей: это
+          единственное, где мастер пишет своими словами, и именно это
+          делает текст непохожим на соседей по каталогу.
+        */}
+        <label className="block rounded-2xl border-2 border-dashed border-gold/60 bg-paper p-4 sm:col-span-2">
+          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-gold">
+            Подробности своими словами
+          </span>
+          <span className="mb-2 block text-xs text-text-muted">
+            Всё, что не влезло выше: чем гордитесь, с кем работаете, что умеете особенного
           </span>
           <textarea
-            rows={2}
+            rows={3}
             value={extra}
             onChange={(event) => setExtra(event.target.value)}
             placeholder="Делаем сложные угловые кухни, работаем с дизайнерами, есть свой сборщик"
-            className="w-full rounded-2xl bg-paper px-4 py-2.5 text-sm text-text outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
+            className="w-full rounded-2xl border border-line bg-cream px-4 py-2.5 text-sm text-text outline-none transition-shadow focus:shadow-[0_0_0_2px_var(--gold)]"
           />
         </label>
 

@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
@@ -53,6 +54,16 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
 
       if (profile?.role === 'admin') destination = '/admin'
       else if (profile?.role === 'buyer') destination = '/account'
+      else {
+        // Мастер, который так и не завёл мастерскую, — сразу в форму:
+        // кабинет без мастерской пустой и только сбивает с толку.
+        const { data: own } = await supabase
+          .from('companies')
+          .select('id')
+          .eq('owner_user_id', data.user.id)
+          .limit(1)
+        if (!own?.length) destination = '/profile/company'
+      }
     }
   } catch (e) {
     failure = readableError(e instanceof Error ? e.message : 'network')
@@ -108,13 +119,34 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
   }
 
   revalidatePath('/', 'layout')
-  // Мастера ведём заполнять мастерскую, покупателя — сразу в каталог.
-  redirect(role === 'buyer' ? '/catalog' : '/profile')
+  // Мастера ведём сразу в форму мастерской — без неё в каталоге его нет,
+  // а страница профиля между регистрацией и формой только теряет людей.
+  // Покупателя — в каталог.
+  redirect(role === 'buyer' ? '/catalog' : '/profile/company')
 }
 
 export async function signOut() {
   const supabase = await createClient()
-  await supabase.auth.signOut()
+
+  // Supabase стирает куки входа только если его сервер ответил «ок».
+  // Не ответил (занят, оборвалась сеть) — куки остаются, и человек,
+  // нажавший «Выйти», при следующем же клике оказывается снова внутри.
+  // Ровно это и происходило. Поэтому куки вычищаем сами, независимо
+  // от того, что ответил Supabase: выход — это решение человека,
+  // а не сервера.
+  try {
+    await supabase.auth.signOut()
+  } catch {
+    // ниже всё равно вычистим
+  }
+
+  const store = await cookies()
+  for (const cookie of store.getAll()) {
+    if (cookie.name.startsWith('sb-')) {
+      store.set(cookie.name, '', { path: '/', maxAge: 0 })
+    }
+  }
+
   revalidatePath('/', 'layout')
   redirect('/')
 }
