@@ -14,9 +14,17 @@ type Lead = {
   clients: { full_name: string | null; phone: string | null } | null
 }
 
-export default async function TgAnalytics() {
+export default async function TgAnalytics({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>
+}) {
   const context = await getTgContext()
-  if (context.state !== 'master') return <TgWelcome state={context.state} />
+  if (context.state !== 'master') {
+    // Вошёл через Google почтой, которой у нас нет, — скажем об этом прямо
+    const { error } = await searchParams
+    return <TgWelcome state={context.state} error={error} />
+  }
 
   const { supabase, company } = context
 

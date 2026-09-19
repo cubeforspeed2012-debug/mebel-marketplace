@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { connectTelegram, disconnectTelegram } from '@/app/dashboard/telegram-actions'
+import { connectTelegram, disconnectTelegram, openBotLink } from '@/app/dashboard/telegram-actions'
 
 function TelegramMark() {
   return (
@@ -22,24 +22,59 @@ export function TelegramCard({ connected }: { connected: boolean }) {
 
   if (connected) {
     return (
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-paper p-5">
-        <div className="flex items-center gap-3">
-          <span className="flex size-10 items-center justify-center rounded-2xl bg-[#e8f4fc] text-[#2aabee]">
-            <TelegramMark />
-          </span>
-          <div>
-            <div className="font-semibold text-text">Заявки приходят в Telegram</div>
-            <div className="text-sm text-text-muted">Новая заявка — сразу сообщение в чат</div>
+      <div className="rounded-3xl bg-paper p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="flex size-10 items-center justify-center rounded-2xl bg-[#e8f4fc] text-[#2aabee]">
+              <TelegramMark />
+            </span>
+            <div>
+              <div className="font-semibold text-text">Заявки приходят в Telegram</div>
+              <div className="text-sm text-text-muted">Новая заявка — сразу сообщение в чат</div>
+            </div>
           </div>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => startTransition(async () => { await disconnectTelegram() })}
+            className="press rounded-full border border-line px-5 py-2 text-sm text-text-muted transition-colors hover:border-status-error hover:text-status-error disabled:opacity-60"
+          >
+            Отключить
+          </button>
         </div>
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() => startTransition(async () => { await disconnectTelegram() })}
-          className="press rounded-full border border-line px-5 py-2 text-sm text-text-muted transition-colors hover:border-status-error hover:text-status-error disabled:opacity-60"
-        >
-          Отключить
-        </button>
+
+        {/*
+          Короткий кабинет прямо в Telegram: заявки и цифры под рукой,
+          когда мастер в цеху и открывать сайт неудобно. Вход там нужен
+          один раз — дальше окно Telegram помнит его само.
+        */}
+        {link ? (
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="press mt-4 block rounded-full bg-[#2aabee] px-6 py-3 text-center font-semibold text-white transition-opacity hover:opacity-90"
+          >
+            Открыть в Telegram
+          </a>
+        ) : (
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() =>
+              startTransition(async () => {
+                const result = await openBotLink()
+                if (result.link) setLink(result.link)
+                else setError(result.error ?? 'Не получилось')
+              })
+            }
+            className="press mt-4 w-full rounded-full border border-line px-6 py-3 text-sm font-semibold text-text transition-colors hover:border-[#2aabee] hover:text-[#2aabee] disabled:opacity-60"
+          >
+            Открыть мини-приложение в Telegram
+          </button>
+        )}
+
+        {error && <p className="mt-2 text-sm text-status-error">{error}</p>}
       </div>
     )
   }

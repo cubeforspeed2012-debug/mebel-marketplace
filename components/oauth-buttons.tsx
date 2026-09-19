@@ -32,7 +32,14 @@ function GoogleMark() {
  * Вход через Google. Провайдер включается в панели Supabase —
  * если он не настроен, показываем понятную подсказку, а не ошибку.
  */
-export function OAuthButtons({ next = '/dashboard' }: { next?: string }) {
+export function OAuthButtons({
+  next = '/dashboard',
+  /** В мини-приложении Google стоит первым, и разделитель «или» над ним лишний */
+  solo = false,
+}: {
+  next?: string
+  solo?: boolean
+}) {
   const dict = useDict()
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -67,17 +74,21 @@ export function OAuthButtons({ next = '/dashboard' }: { next?: string }) {
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-3 text-xs uppercase tracking-widest text-text-muted">
-        <span className="h-px flex-1 bg-line" />
-        {dict.auth.or}
-        <span className="h-px flex-1 bg-line" />
-      </div>
+      {!solo && (
+        <div className="mb-4 flex items-center gap-3 text-xs uppercase tracking-widest text-text-muted">
+          <span className="h-px flex-1 bg-line" />
+          {dict.auth.or}
+          <span className="h-px flex-1 bg-line" />
+        </div>
+      )}
 
       <button
         type="button"
         onClick={signInWithGoogle}
         disabled={busy}
-        className="flex w-full items-center justify-center gap-3 border border-line px-5 py-2.5 font-medium transition-colors hover:border-gold disabled:opacity-60"
+        className={`flex w-full items-center justify-center gap-3 border border-line px-5 font-medium transition-colors hover:border-gold disabled:opacity-60 ${
+          solo ? 'rounded-2xl py-3.5' : 'py-2.5'
+        }`}
       >
         <GoogleMark />
         {busy ? dict.auth.googleOpening : dict.auth.google}

@@ -46,3 +46,16 @@ export async function phoneVerifyLink(): Promise<TelegramState> {
 
   return { link: `https://t.me/${bot.replace(/^@/, '')}?start=phone` }
 }
+
+/**
+ * Ссылка на бота — оттуда открывается мини-приложение.
+ *
+ * Вход мастер проходит один раз: окно Telegram держит куки, и дальше
+ * приложение открывается сразу на его цифрах, без пароля.
+ */
+export async function openBotLink(): Promise<TelegramState> {
+  const bot = process.env.TELEGRAM_BOT_USERNAME
+  if (!bot) return { error: 'Бот пока не настроен' }
+
+  return { link: `https://t.me/${bot.replace(/^@/, '')}` }
+}

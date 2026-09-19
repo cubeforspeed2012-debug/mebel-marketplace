@@ -1,32 +1,39 @@
-import { AuthForm } from '@/app/auth/auth-form'
 import { TgOpenOutside } from '@/components/tg-open-outside'
+import { TgSignIn } from '@/components/tg-signin'
 
 /**
- * Вход и регистрация прямо внутри Telegram. Раньше кнопка уводила на
- * страницу большого сайта — вместе с шапкой, баннером «установите на
- * телефон» и меню каталога. Внутри мини-приложения всё это лишнее:
- * человек пришёл за своими заявками, а не гулять по сайту.
+ * Первый экран мини-приложения.
+ *
+ * Мини-приложение — это витрина цифр для мастера, у которого уже есть
+ * мастерская. Поэтому здесь только вход. Всё, что требует большого экрана
+ * (регистрация, заполнение мастерской, загрузка работ), уводим браузером
+ * наружу, а не подменяем окошко Telegram целым сайтом.
  */
-export function TgWelcome({ state }: { state: 'guest' | 'no-company' }) {
+export function TgWelcome({
+  state,
+  error,
+}: {
+  state: 'guest' | 'no-company'
+  /** Вошёл через Google почтой, которой у нас нет */
+  error?: string
+}) {
   if (state === 'no-company') {
     return (
       <div className="px-4 py-10 text-center">
         <div className="display text-xl text-text">Почти всё</div>
         <p className="mx-auto mt-3 max-w-xs leading-relaxed text-text-muted">
           Осталось завести мастерскую: название, телефон, чем занимаетесь.
-          Пара минут — и клиенты смогут вас найти.
+          Это делается на сайте — там есть загрузка фото и выбор района.
         </p>
-        {/*
-          Завести мастерскую можно только на большом сайте: там загрузка
-          фото и карта. Внутри окошка Telegram эта страница не помещается,
-          поэтому открываем её браузером поверх.
-        */}
         <TgOpenOutside
           path="/profile/company"
           className="press mt-6 block rounded-full bg-gold px-6 py-3.5 font-semibold text-white"
         >
-          Заполнить профиль
+          Заполнить на сайте
         </TgOpenOutside>
+        <p className="mt-3 text-xs text-text-muted">
+          Откроется браузером. Закончите — возвращайтесь сюда за цифрами
+        </p>
       </div>
     )
   }
@@ -43,8 +50,17 @@ export function TgWelcome({ state }: { state: 'guest' | 'no-company' }) {
         </p>
       </div>
 
+      {error === 'no-account' && (
+        <div className="mt-6 rounded-2xl border border-[#b91c1c]/40 bg-[#b91c1c]/10 px-4 py-4 text-sm leading-relaxed text-status-error">
+          <b>Такого аккаунта нет.</b>
+          <br />
+          Мастера с этой почтой мы не нашли. Проверьте, тем ли аккаунтом Google
+          вы вошли, или зарегистрируйтесь на сайте.
+        </div>
+      )}
+
       <div className="mt-6">
-        <AuthForm next="/tg" compact />
+        <TgSignIn />
       </div>
     </div>
   )
