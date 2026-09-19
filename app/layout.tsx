@@ -255,13 +255,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         }
       }
 
-      // Сколько мастерских ждут решения — видно с любой страницы
+      // Сколько всего ждёт решения — видно с любой страницы.
+      // Работы считаем вместе с мастерскими: их добавляют постоянно,
+      // и очередь из непроверенных работ важнее разобрать вовремя.
       if (isAdmin) {
-        const { count } = await supabase
-          .from('companies')
-          .select('id', { count: 'exact', head: true })
-          .eq('status', 'pending')
-        pending = count ?? 0
+        const [companiesPending, productsPending] = await Promise.all([
+          supabase
+            .from('companies')
+            .select('id', { count: 'exact', head: true })
+            .eq('status', 'pending'),
+          supabase
+            .from('products')
+            .select('id', { count: 'exact', head: true })
+            .eq('status', 'pending'),
+        ])
+        pending = (companiesPending.count ?? 0) + (productsPending.count ?? 0)
       }
     }
   } catch {

@@ -91,7 +91,9 @@ export type Product = {
   price: number | null
   price_from: boolean
   currency: string
-  status: 'draft' | 'active' | 'hidden'
+  status: 'draft' | 'pending' | 'active' | 'hidden'
+  /** Работу уже смотрел администратор — одобренную мастер прячет и показывает сам */
+  moderated?: boolean
   boosted_until: string | null
   views_count: number
   created_at: string

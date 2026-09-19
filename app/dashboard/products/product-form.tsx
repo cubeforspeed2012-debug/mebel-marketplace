@@ -119,13 +119,23 @@ export function ProductForm({
           </span>
           <select
             name="status"
-            defaultValue={product?.status ?? 'active'}
+            defaultValue={product?.status === 'pending' ? 'active' : (product?.status ?? 'active')}
             className="w-full rounded-3xl bg-paper px-4 py-2.5 outline-none transition-colors focus:border-gold"
           >
             <option value="active">Показывать</option>
             <option value="hidden">Спрятать</option>
             <option value="draft">Черновик</option>
           </select>
+          {/*
+            Честно предупреждаем, что «Показывать» не значит «сразу в каталоге».
+            Без этой строки мастер сохранит работу, не найдёт её в каталоге
+            и решит, что сайт сломался.
+          */}
+          <span className="mt-1.5 block text-xs leading-relaxed text-text-muted">
+            {product?.moderated
+              ? 'Если поменять название, цену, описание или фото — работа снова уйдёт на проверку.'
+              : 'Новая работа появится в каталоге после проверки. Обычно это занимает день.'}
+          </span>
         </label>
       </div>
 

@@ -109,14 +109,28 @@ export default async function ProductsPage({
                 </div>
               </div>
 
+              {/*
+                Три разных состояния, и путать их нельзя: «на проверке» —
+                это не «скрыто». Мастер должен понимать, что работа не
+                потерялась, а ждёт администратора, иначе он будет
+                пересоздавать её снова и снова.
+              */}
               <span
                 className={`px-3 py-1 text-xs font-semibold uppercase tracking-widest ${
                   product.status === 'active'
                     ? 'bg-gold text-white'
-                    : 'border border-line text-text-muted'
+                    : product.status === 'pending'
+                      ? 'bg-status-process/20 text-status-process'
+                      : 'border border-line text-text-muted'
                 }`}
               >
-                {product.status === 'active' ? 'В каталоге' : 'Скрыто'}
+                {product.status === 'active'
+                  ? 'В каталоге'
+                  : product.status === 'pending'
+                    ? 'На проверке'
+                    : product.status === 'draft'
+                      ? 'Черновик'
+                      : 'Скрыто'}
               </span>
 
               <div className="flex gap-2">
@@ -127,20 +141,25 @@ export default async function ProductsPage({
                   Изменить
                 </Link>
 
-                <form action={toggleProductStatus}>
-                  <input type="hidden" name="id" value={product.id} />
-                  <input
-                    type="hidden"
-                    name="next_status"
-                    value={product.status === 'active' ? 'hidden' : 'active'}
-                  />
-                  <button
-                    type="submit"
-                    className="border border-line px-4 py-2 text-sm transition-colors hover:bg-sand"
-                  >
-                    {product.status === 'active' ? 'Спрятать' : 'Показать'}
-                  </button>
-                </form>
+                {/* Пока работу не проверили, кнопка «Показать» ничего не даст —
+                    нажатие вернуло бы её в то же «на проверке» и выглядело
+                    бы как поломка. Поэтому у таких работ её нет. */}
+                {product.status !== 'pending' && (
+                  <form action={toggleProductStatus}>
+                    <input type="hidden" name="id" value={product.id} />
+                    <input
+                      type="hidden"
+                      name="next_status"
+                      value={product.status === 'active' ? 'hidden' : 'active'}
+                    />
+                    <button
+                      type="submit"
+                      className="border border-line px-4 py-2 text-sm transition-colors hover:bg-sand"
+                    >
+                      {product.status === 'active' ? 'Спрятать' : 'Показать'}
+                    </button>
+                  </form>
+                )}
 
                 <form action={deleteProduct}>
                   <input type="hidden" name="id" value={product.id} />

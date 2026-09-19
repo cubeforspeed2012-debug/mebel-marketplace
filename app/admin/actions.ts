@@ -100,3 +100,36 @@ export async function deleteUser(formData: FormData) {
 
   redirect(error ? `/admin/users?error=${encodeURIComponent(error.message)}` : '/admin/users?ok=delete')
 }
+
+/**
+ * Решение по работе: пустить в каталог или отклонить.
+ *
+ * Одобрение помечаем отдельным полем moderated, а не только статусом:
+ * по нему сторож в базе отличает «эту работу уже смотрели» от «новая».
+ * Одобренную мастер волен сам прятать и показывать, а вот поменял
+ * содержимое или фото — она вернётся сюда же на повторную проверку.
+ */
+export async function setProductStatus(formData: FormData) {
+  const { supabase } = await requireAdmin()
+
+  const id = Number(formData.get('id'))
+  const status = String(formData.get('status') ?? '')
+
+  if (!id || !['active', 'hidden', 'pending'].includes(status)) return
+
+  await supabase
+    .from('products')
+    .update({
+      status,
+      // Отклонённую работу мастер поправит и пришлёт снова — тогда
+      // она опять будет непроверенной, поэтому метку ставим только
+      // вместе с допуском в каталог.
+      moderated: status === 'active',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+
+  revalidatePath('/admin/approvals')
+  revalidatePath('/catalog')
+  revalidatePath('/dashboard/products')
+}
