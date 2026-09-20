@@ -1,6 +1,38 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { SITE_URL } from '@/lib/constants'
 import { AUTH_COOKIE_OPTIONS } from './cookies'
+
+
+/**
+ * Приводит адрес к единственному правильному.
+ *
+ * Сайт отвечает по нескольким именам сразу: рабочее top-mebel.uz,
+ * служебное имя воркера на workers.dev и www. Браузер хранит вход
+ * отдельно для каждого имени, и человек, вошедший на одном, на другом
+ * оказывается гостем. Со стороны это выглядит дико: вышел — а сайт
+ * пускает, вошёл — а через минуту выкинуло. На деле это просто два
+ * разных хранилища.
+ *
+ * Отдельно это лечит вход через Google: если он возвращает человека
+ * на служебный адрес, мы перенаправим ещё до разбора кода входа —
+ * одноразовый код уедет вместе с адресом, и сессия ляжет куда надо.
+ *
+ * Локальную разработку не трогаем.
+ */
+function toCanonicalHost(request: NextRequest): URL | null {
+  const host = request.headers.get('host') ?? ''
+  if (!host || host.startsWith('localhost') || host.startsWith('127.0.0.1')) return null
+
+  const target = new URL(SITE_URL).host
+  if (host === target) return null
+
+  const url = request.nextUrl.clone()
+  url.host = target
+  url.protocol = 'https:'
+  url.port = ''
+  return url
+}
 
 /** Страницы, куда пускаем только после входа. */
 const PROTECTED = ['/dashboard', '/admin', '/account']
@@ -10,6 +42,10 @@ const PROTECTED = ['/dashboard', '/admin', '/account']
  * Без этого вход «слетал» бы через час.
  */
 export async function updateSession(request: NextRequest) {
+  // Один сайт — один адрес. Иначе вход живёт в двух местах сразу.
+  const canonical = toCanonicalHost(request)
+  if (canonical) return NextResponse.redirect(canonical, 308)
+
   let response = NextResponse.next({ request })
 
   // Браузер заранее подтягивает соседние разделы, чтобы переход был
