@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { decide, type ProductForReview } from '@/lib/moderation'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
@@ -138,10 +139,59 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
     }
   }
 
+  /*
+   * Автопроверка. Черновик не трогаем: мастер ещё сам не закончил.
+   * Ошибка проверки работу не теряет — она просто останется ждать
+   * человека, а это и есть безопасное поведение по умолчанию.
+   */
+  if (productId && fields.status !== 'draft') {
+    try {
+      await moderateProduct(supabase, productId, {
+        title: fields.title,
+        description: fields.description,
+        price: fields.price,
+        type: fields.type,
+        photos: images.length,
+      })
+    } catch {
+      // Остаётся «на проверке» — разберёт человек
+    }
+  }
+
   revalidatePath('/dashboard/products')
   revalidatePath('/catalog')
   revalidatePath(`/company/${company.slug ?? company.id}`)
   redirect('/dashboard/products?saved=1')
+}
+
+/**
+ * Прогоняет работу через автопроверку и записывает решение.
+ *
+ * Секрет нужен, чтобы решение нельзя было подделать: он живёт только
+ * в секретах Cloudflare и в браузер не попадает. Секрета нет — ничего
+ * не одобряем, работа ждёт человека. Это важнее удобства: молча пускать
+ * в каталог непроверенное нельзя.
+ */
+async function moderateProduct(
+  supabase: Awaited<ReturnType<typeof getOwnCompany>>['supabase'],
+  productId: number,
+  product: ProductForReview,
+) {
+  const secret = process.env.AI_MODERATION_SECRET
+  if (!secret) return
+
+  const { data: approvedBefore } = await supabase.rpc('company_approved_count', {
+    p_product_id: productId,
+  })
+
+  const decision = await decide(product, Number(approvedBefore ?? 0))
+
+  await supabase.rpc('apply_ai_moderation', {
+    p_secret: secret,
+    p_product_id: productId,
+    p_verdict: decision.verdict,
+    p_reason: decision.reason,
+  })
 }
 
 export async function deleteProduct(formData: FormData) {

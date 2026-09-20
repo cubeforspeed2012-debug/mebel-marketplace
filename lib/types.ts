@@ -94,6 +94,11 @@ export type Product = {
   status: 'draft' | 'pending' | 'active' | 'hidden'
   /** Работу уже смотрел администратор — одобренную мастер прячет и показывает сам */
   moderated?: boolean
+  /** Решение автопроверки: approve, review или reject */
+  moderation_verdict?: string | null
+  /** Почему так решили — это же объяснение видит мастер */
+  moderation_reason?: string | null
+  moderated_by?: string | null
   boosted_until: string | null
   views_count: number
   created_at: string

@@ -107,6 +107,23 @@ export default async function ProductsPage({
                   {product.type && PRODUCT_TYPES[product.type]} ·{' '}
                   {formatPrice(product.price, product.price_from)}
                 </div>
+
+                {/*
+                  Почему работа не в каталоге — словами, прямо здесь.
+                  Отказ без объяснения мастер воспринимает как поломку
+                  и заводит работу заново, ничего не исправив.
+                */}
+                {product.moderation_reason && product.status !== 'active' && (
+                  <p
+                    className={`mt-2 rounded-xl px-3 py-2 text-xs leading-relaxed ${
+                      product.moderation_verdict === 'reject'
+                        ? 'bg-status-error/10 text-status-error'
+                        : 'bg-status-process/15 text-status-process'
+                    }`}
+                  >
+                    {product.moderation_reason}
+                  </p>
+                )}
               </div>
 
               {/*
@@ -130,7 +147,9 @@ export default async function ProductsPage({
                     ? 'На проверке'
                     : product.status === 'draft'
                       ? 'Черновик'
-                      : 'Скрыто'}
+                      : product.moderation_verdict === 'reject'
+                        ? 'Не пропущено'
+                        : 'Скрыто'}
               </span>
 
               <div className="flex gap-2">

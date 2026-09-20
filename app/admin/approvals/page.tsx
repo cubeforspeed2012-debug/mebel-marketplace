@@ -26,7 +26,7 @@ export default async function ApprovalsPage() {
   const { data: productRows } = await supabase
     .from('products')
     .select(
-      'id, title, description, price, price_from, currency, type, status, created_at, companies (id, name, slug), product_images (url, sort_order)',
+      'id, title, description, price, price_from, currency, type, status, created_at, moderation_verdict, moderation_reason, companies (id, name, slug), product_images (url, sort_order)',
     )
     .eq('status', 'pending')
     .order('created_at', { ascending: true })
@@ -40,6 +40,8 @@ export default async function ApprovalsPage() {
     price_from: boolean
     currency: string
     created_at: string
+    moderation_verdict: string | null
+    moderation_reason: string | null
     companies: { id: number; name: string; slug: string | null } | null
     product_images: { url: string; sort_order: number | null }[] | null
   }
@@ -191,7 +193,8 @@ export default async function ApprovalsPage() {
       <section>
         <h2 className="text-xl font-semibold text-text">Работы на проверке</h2>
         <p className="mt-2 text-sm text-text-muted">
-          Здесь и новые работы, и те, у которых мастер поменял описание,
+          Сюда попадает только то, в чём автопроверка не уверена: остальное
+          она пропускает сама. Плюс работы, у которых мастер поменял описание,
           цену или фотографии после одобрения.
         </p>
 
@@ -235,6 +238,13 @@ export default async function ApprovalsPage() {
                       {product.description && (
                         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-text-muted">
                           {product.description.slice(0, 400)}
+                        </p>
+                      )}
+
+                      {/* Что сказала автопроверка — чтобы не перечитывать всё заново */}
+                      {product.moderation_reason && (
+                        <p className="mt-3 rounded-xl bg-sand px-3 py-2 text-sm leading-relaxed text-text-muted">
+                          <b className="text-text">Автопроверка:</b> {product.moderation_reason}
                         </p>
                       )}
                     </div>
