@@ -9,6 +9,48 @@ import { saveProduct, type FormState } from './actions'
 
 const EMPTY: FormState = {}
 
+
+/** Что нужно, чтобы работа прошла проверку с первого раза. */
+function Rules({ editing }: { editing: boolean }) {
+  return (
+    <div className="rounded-3xl border border-line bg-cream p-5">
+      <div className="font-semibold text-text">
+        {editing ? 'После изменений работа снова пройдёт проверку' : 'Работа пройдёт проверку'}
+      </div>
+      <p className="mt-1.5 text-sm leading-relaxed text-text-muted">
+        Сначала её смотрит автоматическая проверка — обычно это занимает несколько секунд.
+        Спорное уходит администратору, это до одного дня.
+      </p>
+
+      <div className="mt-4 text-xs font-semibold uppercase tracking-widest text-text-muted">
+        Пройдёт сразу
+      </div>
+      <ul className="mt-2 space-y-1.5 text-sm text-text">
+        <li>· Свои фотографии готовой работы — хотя бы одна, лучше несколько</li>
+        <li>· Понятное название: «Кухня под ваш размер», «Шкаф-купе в нишу»</li>
+        <li>· Настоящая цена. Пишите полностью: 4 500 000, а не 4500</li>
+        <li>· Описание своими словами. Коротко — тоже нормально</li>
+      </ul>
+
+      <div className="mt-4 text-xs font-semibold uppercase tracking-widest text-status-error">
+        Не пройдёт
+      </div>
+      <ul className="mt-2 space-y-1.5 text-sm text-text">
+        <li>· Без фотографий</li>
+        <li>· Телефон, Telegram, Instagram или ссылка в тексте — клиенты и так видят ваш номер кнопкой «Показать номер»</li>
+        <li>· НАЗВАНИЕ ЗАГЛАВНЫМИ и «Дёшево!!!»</li>
+        <li>· Чужие фотографии из интернета</li>
+        <li>· Не мебель</li>
+      </ul>
+
+      <p className="mt-4 border-t border-line pt-3 text-xs leading-relaxed text-text-muted">
+        Первые две работы новой мастерской смотрит человек, даже если замечаний нет.
+        Дальше ваши работы проходят проверку сами и появляются в каталоге почти сразу.
+      </p>
+    </div>
+  )
+}
+
 export function ProductForm({
   product,
   images: initialImages,
@@ -27,6 +69,15 @@ export function ProductForm({
     <form action={action} className="space-y-6 rounded-3xl bg-paper p-6">
       {product && <input type="hidden" name="id" value={product.id} />}
       <input type="hidden" name="images" value={JSON.stringify(images)} />
+
+      {/*
+        Правила до отправки, а не после отказа.
+        Мастер, узнавший про них из отклонённой работы, считает, что
+        площадка к нему придирается. Тот же человек, прочитавший их
+        заранее, просто делает как надо — и работа проходит с первого раза.
+        Поэтому список открыт сразу и написан как подсказка, а не как угроза.
+      */}
+      <Rules editing={Boolean(product)} />
 
       <PhotoPicker saved={images} onChangeSaved={setImages} />
 
