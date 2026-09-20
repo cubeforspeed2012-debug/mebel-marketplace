@@ -265,7 +265,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ slug: 
 
         {/* Отзывы — то, на что покупатель смотрит перед звонком */}
         <section className="mt-14">
-          <h2 className="display gold-rule mb-8 text-2xl">
+          <h2 id="otzyvy" className="display gold-rule mb-8 scroll-mt-20 text-2xl">
             {dict.reviews.sectionTitle}{' '}
             {company.rating_count > 0 && (
               <span className="text-text-muted">({company.rating_count})</span>

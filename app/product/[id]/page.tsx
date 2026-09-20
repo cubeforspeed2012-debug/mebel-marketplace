@@ -4,6 +4,7 @@ import { RequestForm } from '@/components/request-form'
 import { ContactButtons } from '@/components/contact-buttons'
 import { FavoriteButton } from '@/components/favorite-button'
 import { ProductCard } from '@/components/product-card'
+import { Stars } from '@/components/stars'
 import { formatPrice } from '@/lib/constants'
 import { districtIn, priceIn } from '@/lib/i18n'
 import { getDictionary } from '@/lib/locale'
@@ -46,7 +47,7 @@ async function getMaster(companyId: number, excludeProductId: number) {
   try {
     const supabase = await createClient()
 
-    const [companyResult, othersResult, countResult] = await Promise.all([
+    const [companyResult, othersResult, countResult, reviewsResult] = await Promise.all([
       supabase
         .from('companies')
         .select('id, name, slug, district, work_type, description, logo_url, created_at')
@@ -71,16 +72,34 @@ async function getMaster(companyId: number, excludeProductId: number) {
         .select('id', { count: 'exact', head: true })
         .eq('company_id', companyId)
         .eq('status', 'active'),
+      // Отзывы о мастере — их читают перед тем, как решиться позвонить,
+      // поэтому показываем прямо здесь, а не только на странице мастерской
+      supabase
+        .from('reviews')
+        .select('id, rating, text, author_name, created_at')
+        .eq('company_id', companyId)
+        .eq('status', 'visible')
+        .order('created_at', { ascending: false })
+        .limit(5),
     ])
 
     return {
       master: companyResult.data,
       others: (othersResult.data ?? []) as unknown as ProductCardType[],
       worksCount: countResult.count ?? 0,
+      reviews: (reviewsResult.data ?? []) as Review[],
     }
   } catch {
-    return { master: null, others: [] as ProductCardType[], worksCount: 0 }
+    return { master: null, others: [] as ProductCardType[], worksCount: 0, reviews: [] as Review[] }
   }
+}
+
+type Review = {
+  id: number
+  rating: number
+  text: string | null
+  author_name: string | null
+  created_at: string
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -108,9 +127,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const images = [...(product.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order)
   const company = product.companies
   const favorites = await getFavoriteIds()
-  const { master, others, worksCount } = company
+  const { master, others, worksCount, reviews } = company
     ? await getMaster(company.id, product.id)
-    : { master: null, others: [], worksCount: 0 }
+    : { master: null, others: [], worksCount: 0, reviews: [] as Review[] }
 
   // Считаем просмотр товара — попадёт в статистику мастера и площадки
   await bumpViews('product', product.id)
@@ -171,6 +190,26 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             />
           </div>
 
+          {/*
+            Оценка сразу под названием — так её ищут глазами на любой
+            площадке. И это ссылка: человек, увидевший «12 отзывов»,
+            хочет их прочитать, а не искать по странице.
+          */}
+          {company && (
+            <a href="#otzyvy" className="mt-2 inline-flex items-center gap-2 hover:opacity-80">
+              <Stars
+                value={Number(company.rating_avg)}
+                count={company.rating_count}
+                emptyLabel={dict.reviews.none}
+              />
+              {company.rating_count > 0 && (
+                <span className="text-sm text-text-muted underline">
+                  {dict.reviews.sectionTitle.toLowerCase()}
+                </span>
+              )}
+            </a>
+          )}
+
           <div className="mt-5 border-y border-line py-5">
             <div className="display text-3xl text-gold-deep">
               {priceIn(dict, product.price, product.price_from)}
@@ -223,6 +262,14 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                       {worksCount} {dict.product.worksCount}
                     </span>
                   )}
+                  <span className="mt-1 block">
+                    <Stars
+                      value={Number(company.rating_avg)}
+                      count={company.rating_count}
+                      size="small"
+                      emptyLabel={dict.reviews.none}
+                    />
+                  </span>
                 </span>
               </Link>
 
@@ -282,6 +329,82 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             {others.map((item) => (
               <ProductCard key={item.id} product={item} favorite={favorites.has(item.id)} />
             ))}
+          </div>
+        </section>
+      )}
+
+      {/*
+        Отзывы о мастере — на странице работы, а не только у мастерской.
+        Решение «звонить или нет» человек принимает здесь, глядя на эту
+        кухню, и уходить за отзывами на другую страницу он не станет.
+      */}
+      {company && (
+        <section id="otzyvy" className="mt-14 scroll-mt-20">
+          <h2 className="display gold-rule mb-6 text-2xl text-text">
+            {dict.reviews.sectionTitle}{' '}
+            {company.rating_count > 0 && (
+              <span className="text-text-muted">({company.rating_count})</span>
+            )}
+          </h2>
+
+          <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+            <div>
+              {reviews.length === 0 ? (
+                <p className="rounded-3xl border border-dashed border-line bg-paper p-8 text-center text-text-muted">
+                  {dict.reviews.empty}
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {reviews.map((review) => (
+                    <li key={review.id} className="rounded-3xl bg-paper p-5">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="font-semibold text-text">
+                          {review.author_name ?? 'Покупатель'}
+                        </span>
+                        <span className="text-xs text-text-muted">
+                          {new Date(review.created_at).toLocaleDateString('ru-RU', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                      <Stars
+                        value={review.rating}
+                        count={1}
+                        className="mt-2 [&>span:last-child]:hidden"
+                      />
+                      {review.text && (
+                        <p className="mt-3 leading-relaxed text-text-muted">{review.text}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Оценку ставят мастерской целиком, поэтому и форма живёт у неё */}
+            <div className="rounded-3xl bg-paper p-5">
+              <div className="flex items-baseline gap-3">
+                <span className="display text-4xl text-text">
+                  {company.rating_count > 0 ? Number(company.rating_avg).toFixed(1) : '—'}
+                </span>
+                <Stars
+                  value={Number(company.rating_avg)}
+                  count={company.rating_count}
+                  emptyLabel={dict.reviews.none}
+                />
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-text-muted">
+                Оценка складывается из отзывов обо всех работах мастерской.
+              </p>
+              <Link
+                href={`/company/${company.slug ?? company.id}#otzyvy`}
+                className="press mt-4 block rounded-full bg-sand px-5 py-3 text-center text-sm font-semibold text-text transition-colors hover:bg-gold hover:text-white"
+              >
+                {reviews.length === 0 ? 'Оставить отзыв' : 'Все отзывы и оценка'}
+              </Link>
+            </div>
           </div>
         </section>
       )}
