@@ -54,6 +54,15 @@ export function OAuthButtons({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+          /*
+           * Просим Google каждый раз показывать список аккаунтов.
+           * Без этого он молча берёт тот, которым человек уже вошёл
+           * в браузере, — а внутри Telegram это часто вообще не тот
+           * аккаунт, под которым заведена мастерская. Человек жмёт
+           * кнопку, его никто ни о чём не спрашивает, и он получает
+           * отказ, не поняв, что произошло.
+           */
+          queryParams: { prompt: 'select_account' },
         },
       })
 

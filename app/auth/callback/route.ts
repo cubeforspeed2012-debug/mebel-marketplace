@@ -21,18 +21,22 @@ export async function GET(request: NextRequest) {
 
       if (!error) {
         if (data.user && fromMiniApp) {
-          // Мини-приложение — витрина цифр для мастера. Если человек вошёл
-          // не тем аккаунтом Google (а промахнуться легко: на телефоне их
-          // часто несколько), мастерской за этой почтой нет. Пускать его
-          // в пустой кабинет нельзя — он решит, что мастерская пропала.
-          // Честнее сразу сказать, что такого аккаунта у нас нет.
-          const { data: company } = await supabase
-            .from('companies')
-            .select('id')
-            .eq('owner_user_id', data.user.id)
-            .maybeSingle()
+          /*
+           * Внутри Telegram регистрации нет, поэтому чужой аккаунт Google
+           * заворачиваем. Но «чужой» — это именно новый аккаунт, который
+           * Google только что завёл у нас этим входом. Раньше мы проверяли
+           * наличие мастерской, и мастер, который зарегистрировался, но ещё
+           * не заполнил её, получал «такого аккаунта нет» — хотя аккаунт
+           * у него есть. Теперь такого человека пускаем: он увидит экран
+           * «почти всё, заполните на сайте».
+           *
+           * Отличаем по возрасту записи: если аккаунт появился секунды
+           * назад — значит его создал этот самый вход.
+           */
+          const createdAt = Date.parse(data.user.created_at ?? '')
+          const justCreated = Number.isFinite(createdAt) && Date.now() - createdAt < 60_000
 
-          if (!company) {
+          if (justCreated) {
             await supabase.auth.signOut()
             return NextResponse.redirect(`${origin}/tg?error=no-account`)
           }

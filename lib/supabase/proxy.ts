@@ -24,6 +24,15 @@ function toCanonicalHost(request: NextRequest): URL | null {
   const host = request.headers.get('host') ?? ''
   if (!host || host.startsWith('localhost') || host.startsWith('127.0.0.1')) return null
 
+  /*
+   * Машины по перенаправлению не ходят. Telegram стучится к нам по адресу,
+   * который мы ему когда-то назвали, и на ответ «переехало» он просто
+   * разводит руками: сообщение считается недоставленным, бот молчит.
+   * Люди приходят на страницы — их и переводим, а служебные входы
+   * оставляем работать по любому адресу.
+   */
+  if (request.nextUrl.pathname.startsWith('/api/')) return null
+
   const target = new URL(SITE_URL).host
   if (host === target) return null
 

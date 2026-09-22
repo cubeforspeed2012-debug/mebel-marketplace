@@ -91,6 +91,21 @@ export async function POST(request: NextRequest) {
       ].join('\n'),
       OPEN_APP,
     )
+
+    /*
+     * И сразу просим номер, если он ещё не подтверждён. Так это устроено
+     * везде, где номер проверяют через Telegram: человек открыл бота —
+     * бот сам попросил, кнопка уже на экране. Искать её в кабинете
+     * мастер не пойдёт, а значит и не подтвердит никогда.
+     */
+    try {
+      const supabase = await createClient()
+      const { data: needsPhone } = await supabase.rpc('tg_needs_phone', { p_chat_id: chat })
+      if (needsPhone) await askPhoneTelegram(chat, PHONE_ASK)
+    } catch {
+      // Не смогли спросить сейчас — спросим при следующем заходе
+    }
+
     return NextResponse.json({ ok: true })
   }
 
