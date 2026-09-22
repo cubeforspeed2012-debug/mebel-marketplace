@@ -190,6 +190,7 @@ export const ru = {
     phoneHintBuyer: 'По нему мастер свяжется с вами по заявке',
     doSignIn: 'Войти',
     signingIn: 'Входим…',
+    oauthTerms: 'Продолжая, вы принимаете',
     terms: 'Я прочитал и принимаю',
     termsLink: 'условия использования',
     termsAnd: 'и',

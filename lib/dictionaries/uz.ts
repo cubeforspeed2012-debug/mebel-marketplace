@@ -189,6 +189,7 @@ export const uz: typeof ru = {
     phoneHintBuyer: "Shu raqam orqali usta siz bilan bog'lanadi",
     doSignIn: 'Kirish',
     signingIn: 'Kirilmoqda…',
+    oauthTerms: 'Davom etsangiz, siz qabul qilasiz',
     terms: 'Men oqidim va qabul qilaman',
     termsLink: 'foydalanish shartlari',
     termsAnd: 'va',

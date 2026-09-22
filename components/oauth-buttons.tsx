@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 import { useDict } from '@/components/locale-provider'
 import { createClient } from '@/lib/supabase/client'
@@ -102,6 +103,24 @@ export function OAuthButtons({
         <GoogleMark />
         {busy ? dict.auth.googleOpening : dict.auth.google}
       </button>
+
+      {/*
+        Через Google аккаунт создаётся одним нажатием — формы регистрации
+        с галочкой человек не видит. Поэтому условия называем прямо здесь,
+        у кнопки. Само согласие он подтвердит галочкой на следующем шаге,
+        когда будет вписывать имя и телефон, но узнать о нём должен
+        до того, как нажмёт, а не после.
+      */}
+      <p className="mt-3 text-center text-xs leading-relaxed text-text-muted">
+        {dict.auth.oauthTerms}{' '}
+        <Link href="/terms" target="_blank" className="underline hover:text-text">
+          {dict.auth.termsLink}
+        </Link>{' '}
+        {dict.auth.termsAnd}{' '}
+        <Link href="/privacy" target="_blank" className="underline hover:text-text">
+          {dict.auth.privacyLink}
+        </Link>
+      </p>
 
       {error && <p className="mt-3 text-sm text-status-error">{error}</p>}
     </div>
