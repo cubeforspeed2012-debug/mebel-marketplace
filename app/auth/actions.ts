@@ -84,6 +84,15 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
   // Кто регистрируется: мастер (ведёт мастерскую) или покупатель (ищет мебель).
   const role = formData.get('role') === 'buyer' ? 'buyer' : 'seller'
 
+  /*
+   * Галочку в браузере отключить несложно, поэтому проверяем и здесь.
+   * Регистрация без согласия не проходит совсем: сказать потом «вы же
+   * согласились», не имея этому подтверждения, — хуже, чем не спросить.
+   */
+  if (formData.get('terms') !== 'on') {
+    return { error: 'Чтобы зарегистрироваться, примите условия использования' }
+  }
+
   if (!fullName) return { error: 'Укажите имя' }
   if (!phone) {
     return {
@@ -103,7 +112,9 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName, phone, role } },
+      // terms_accepted уходит в базу: там триггер поставит время согласия
+      // своими часами — браузеру в таком вопросе верить нельзя
+      options: { data: { full_name: fullName, phone, role, terms_accepted: true } },
     })
     if (error) failure = readableError(error.message)
     hasSession = Boolean(data?.session)

@@ -139,6 +139,40 @@ export function AuthForm({
           <Field label={dict.auth.email} name="email" type="email" placeholder="" />
           <Field label={dict.auth.password} name="password" type="password" placeholder="" />
 
+          {/*
+            Согласие — отдельной галочкой, которую человек ставит сам.
+            Мелкая строчка «регистрируясь, вы соглашаетесь» юридически
+            слабее: по ней не видно, что человек вообще её заметил.
+            Ссылки открываются в новой вкладке, чтобы заполненная форма
+            не потерялась, пока он читает условия.
+          */}
+          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-cream p-4">
+            <input
+              type="checkbox"
+              name="terms"
+              required
+              className="mt-0.5 size-5 shrink-0 accent-[var(--gold)]"
+            />
+            <span className="text-sm leading-relaxed text-text-muted">
+              {dict.auth.terms}{' '}
+              <Link
+                href="/terms"
+                target="_blank"
+                className="font-semibold text-gold underline hover:text-gold-deep"
+              >
+                {dict.auth.termsLink}
+              </Link>{' '}
+              {dict.auth.termsAnd}{' '}
+              <Link
+                href="/privacy"
+                target="_blank"
+                className="font-semibold text-gold underline hover:text-gold-deep"
+              >
+                {dict.auth.privacyLink}
+              </Link>
+            </span>
+          </label>
+
           {state.error && (
             <p className="rounded-xl border border-[#b91c1c]/40 bg-[#b91c1c]/15 px-4 py-3 text-sm text-status-error">
               {state.error}

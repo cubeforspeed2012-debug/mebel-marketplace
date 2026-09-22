@@ -20,6 +20,11 @@ export async function completeProfile(
   const phoneRaw = String(formData.get('phone') ?? '').trim()
   const role = formData.get('role') === 'seller' ? 'seller' : 'buyer'
 
+  // Ту же проверку держим и на сервере: галочку в браузере обойти несложно
+  if (formData.get('terms') !== 'on') {
+    return { error: 'Чтобы продолжить, примите условия использования' }
+  }
+
   if (fullName.length < 2) return { error: 'Напишите, как вас зовут' }
   if (fullName.length > 60) return { error: 'Имя слишком длинное — до 60 символов' }
 
@@ -47,7 +52,15 @@ export async function completeProfile(
 
     const { error } = await supabase
       .from('profiles')
-      .update({ full_name: fullName, phone, role: nextRole, onboarded: true })
+      // Время согласия ставим здесь же. Повторное знакомство его
+      // не перезапишет: первое согласие и есть то, что имеет значение.
+      .update({
+        full_name: fullName,
+        phone,
+        role: nextRole,
+        onboarded: true,
+        terms_accepted_at: new Date().toISOString(),
+      })
       .eq('id', user.id)
 
     if (error) failure = 'Не удалось сохранить. Попробуйте ещё раз'
