@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useActionState } from 'react'
 import { requestReset, setNewPassword, type ResetState } from './actions'
+import { PasswordInput } from '@/components/password-input'
 
 const EMPTY: ResetState = {}
 
@@ -82,12 +83,8 @@ export function NewPasswordForm() {
         <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
           Новый пароль
         </span>
-        <input
-          name="password"
-          type="password"
-          required
+        <PasswordInput
           autoComplete="new-password"
-          placeholder="минимум 6 символов"
           className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
         />
       </label>
@@ -96,10 +93,8 @@ export function NewPasswordForm() {
         <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
           Ещё раз
         </span>
-        <input
+        <PasswordInput
           name="repeat"
-          type="password"
-          required
           autoComplete="new-password"
           className="w-full rounded-[var(--radius)] border border-line px-4 py-2.5 outline-none transition-colors focus:border-gold"
         />

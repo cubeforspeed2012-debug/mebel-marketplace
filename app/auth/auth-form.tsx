@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useActionState, useState } from 'react'
 import { useDict } from '@/components/locale-provider'
 import { OAuthButtons } from '@/components/oauth-buttons'
+import { PasswordInput } from '@/components/password-input'
 import { signIn, signUp, type AuthState } from './actions'
 
 const EMPTY: AuthState = {}
@@ -15,26 +16,36 @@ function Field({
   type = 'text',
   placeholder,
   hint,
+  autoComplete,
 }: {
   label: string
   name: string
   type?: string
   placeholder?: string
   hint?: string
+  autoComplete?: string
 }) {
   return (
     <label className="block">
       <span className="mb-2 block text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-text-muted">
         {label}
       </span>
-      <input
-        name={name}
-        type={type}
-        required
-        placeholder={placeholder}
-        autoComplete={type === 'password' ? 'current-password' : name === 'email' ? 'email' : 'on'}
-        className="w-full rounded-2xl border border-line bg-cream px-5 py-3.5 text-text outline-none transition-shadow duration-200 placeholder:text-text-muted focus:shadow-[0_0_0_2px_var(--gold)]"
-      />
+      {type === 'password' ? (
+        <PasswordInput
+          name={name}
+          autoComplete={autoComplete ?? 'current-password'}
+          className="w-full rounded-2xl border border-line bg-cream px-5 py-3.5 text-text outline-none transition-shadow duration-200 placeholder:text-text-muted focus:shadow-[0_0_0_2px_var(--gold)]"
+        />
+      ) : (
+        <input
+          name={name}
+          type={type}
+          required
+          placeholder={placeholder}
+          autoComplete={autoComplete ?? (name === 'email' ? 'email' : 'on')}
+          className="w-full rounded-2xl border border-line bg-cream px-5 py-3.5 text-text outline-none transition-shadow duration-200 placeholder:text-text-muted focus:shadow-[0_0_0_2px_var(--gold)]"
+        />
+      )}
       {hint && <span className="mt-1.5 block text-xs text-text-muted">{hint}</span>}
     </label>
   )
@@ -137,7 +148,13 @@ export function AuthForm({
             }
           />
           <Field label={dict.auth.email} name="email" type="email" placeholder="" />
-          <Field label={dict.auth.password} name="password" type="password" placeholder="" />
+          <Field
+            label={dict.auth.password}
+            name="password"
+            type="password"
+            placeholder=""
+            autoComplete="new-password"
+          />
 
           {/*
             Согласие — отдельной галочкой, которую человек ставит сам.

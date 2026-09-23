@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import { signIn, type AuthState } from '@/app/auth/actions'
 import { OAuthButtons } from '@/components/oauth-buttons'
+import { PasswordInput } from '@/components/password-input'
 import { TgOpenOutside } from '@/components/tg-open-outside'
 
 const EMPTY: AuthState = {}
@@ -49,13 +50,7 @@ export function TgSignIn() {
           <span className="mb-2 block text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-text-muted">
             Пароль
           </span>
-          <input
-            name="password"
-            type="password"
-            required
-            autoComplete="current-password"
-            className="w-full rounded-2xl border border-line bg-cream px-5 py-3.5 text-text outline-none transition-shadow duration-200 focus:shadow-[0_0_0_2px_var(--gold)]"
-          />
+          <PasswordInput className="w-full rounded-2xl border border-line bg-cream px-5 py-3.5 text-text outline-none transition-shadow duration-200 focus:shadow-[0_0_0_2px_var(--gold)]" />
         </label>
 
         {state.error && (
