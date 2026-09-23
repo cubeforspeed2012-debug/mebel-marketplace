@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { CompanyForm } from '@/app/dashboard/company/company-form'
 import { PhoneCard } from '@/app/dashboard/phone-card'
+import { gatewayEnabled } from '@/lib/telegram-gateway'
 import { ScreenHeader } from '@/components/settings-list'
 import { createClient, currentUser } from '@/lib/supabase/server'
 import type { Company } from '@/lib/types'
@@ -81,6 +82,7 @@ export default async function ProfileCompanyPage() {
             verified={Boolean(company.phone_verified)}
             hasPhone={Boolean(company.phone_public)}
             telegramConnected={Boolean(company.telegram_chat_id)}
+            gateway={gatewayEnabled()}
           />
         </div>
       )}

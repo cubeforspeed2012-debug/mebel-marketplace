@@ -3,6 +3,7 @@ import { formatPhone, telHref } from '@/lib/constants'
 import { ORDER_STATUSES, type OrderStatus } from '@/lib/orders'
 import { getSellerContext } from '@/lib/session'
 import { PhoneCard } from '@/app/dashboard/phone-card'
+import { gatewayEnabled } from '@/lib/telegram-gateway'
 import { TelegramCard } from '@/app/dashboard/telegram-card'
 
 export const metadata = { title: 'Аналитика' }
@@ -132,6 +133,7 @@ export default async function DashboardPage() {
         verified={Boolean(company.phone_verified)}
         hasPhone={Boolean(company.phone_public)}
         telegramConnected={Boolean(company.telegram_chat_id)}
+        gateway={gatewayEnabled()}
       />
 
       {/* Последние заявки — то, ради чего мастер открыл приложение */}
