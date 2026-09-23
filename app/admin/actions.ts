@@ -2,6 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { SITE_URL } from '@/lib/constants'
+import { escapeHtml, notifyTelegram } from '@/lib/telegram'
 import { requireAdmin } from '@/lib/session'
 
 /** Одобрить, заблокировать или вернуть мастерскую на проверку. */
@@ -14,15 +16,60 @@ export async function setCompanyStatus(formData: FormData) {
 
   if (!id || !['pending', 'active', 'blocked'].includes(status)) return
 
+  const { data: before } = await supabase
+    .from('companies')
+    .select('name, slug, status, telegram_chat_id')
+    .eq('id', id)
+    .maybeSingle()
+
   await supabase
     .from('companies')
     .update({ status, moderation_note: note, updated_at: new Date().toISOString() })
     .eq('id', id)
 
+  /*
+   * Мастер ждёт решения и проверять сайт каждый час не будет. Пишем ему
+   * сами, в тот же чат, куда приходят заявки, и сразу даём кнопку
+   * в кабинет — там его цифры и оттуда добавляют работы.
+   *
+   * Только при смене состояния: повторное нажатие «Одобрить» не должно
+   * слать человеку то же сообщение второй раз.
+   */
+  if (before?.telegram_chat_id && before.status !== status) {
+    const cabinet = { text: 'Открыть кабинет', url: `${SITE_URL}/tg` }
+    const name = escapeHtml(before.name ?? 'Ваша мастерская')
+
+    if (status === 'active') {
+      await notifyTelegram(
+        before.telegram_chat_id,
+        [
+          `<b>Мастерская «${name}» одобрена.</b>`,
+          '',
+          'Вы в каталоге — клиенты уже могут вас найти.',
+          'Дальше добавьте работы с фотографиями: без них карточку почти не открывают.',
+        ].join('\n'),
+        cabinet,
+      )
+    } else if (status === 'blocked') {
+      await notifyTelegram(
+        before.telegram_chat_id,
+        [
+          `<b>Мастерская «${name}» пока скрыта из каталога.</b>`,
+          note ? `\nПричина: ${escapeHtml(note)}` : '',
+          '\nИсправьте и мы посмотрим ещё раз.',
+        ].join('\n'),
+        cabinet,
+      )
+    }
+  }
+
   revalidatePath('/admin')
   revalidatePath(`/admin/company/${id}`)
   revalidatePath('/catalog')
   revalidatePath('/companies')
+  // Кабинет мастера: чтобы он увидел новое состояние сразу, без обновления
+  revalidatePath('/dashboard')
+  if (before?.slug) revalidatePath(`/company/${before.slug}`)
 }
 
 /** Подтвердить оплату продвижения — пока вручную, до подключения Payme и Click. */

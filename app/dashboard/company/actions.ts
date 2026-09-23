@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { normalizePhone } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
 
@@ -124,8 +125,13 @@ export async function saveCompany(_prev: FormState, formData: FormData): Promise
     .neq('role', 'admin')
 
   revalidatePath('/dashboard')
-  return {
-    message:
-      'Мастерская создана и отправлена на проверку. Как только её одобрят, она появится в каталоге.',
-  }
+  revalidatePath('/profile')
+
+  /*
+   * Уводим в кабинет, а не оставляем на форме. Человек только что всё
+   * заполнил и видит ту же форму со строчкой «сохранено» — ему кажется,
+   * что ничего не произошло. В кабинете он сразу видит свою мастерскую,
+   * надпись «на проверке» и что делать дальше: добавить работы.
+   */
+  redirect('/dashboard')
 }
