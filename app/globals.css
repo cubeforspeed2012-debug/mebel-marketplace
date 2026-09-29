@@ -14,22 +14,23 @@
   color-scheme: light;
 
   /*
-   * Белая тема. Раньше фон был песочным (#f7f4ef), и на телефоне сайт
-   * выглядел тускло, будто выцвел. Теперь фон — чистый белый, а слои
-   * различаются не оттенком, а тонкой линией и лёгкой тенью (см. ниже).
+   * Светлая тема как в приложениях iOS: фон страницы — светло-серый,
+   * карточки и кнопки — белые с заметной рамкой. Раньше фон тоже был
+   * белым, и на телефоне карточки, списки и кнопки сливались в одно
+   * белое полотно. Серый фон отделяет их без тусклости песочного.
    */
   --ink: #ffffff;          /* шапка */
-  --ink-deep: #f6f6f6;     /* подложка подвала */
-  --cream: #ffffff;        /* фон страницы */
+  --ink-deep: #ececef;     /* подложка подвала */
+  --cream: #f2f2f5;        /* фон страницы */
   --paper: #ffffff;        /* карточки */
-  --sand: #f4f4f4;         /* второй слой внутри карточек: чипы, поля */
+  --sand: #ebebef;         /* второй слой: чипы, кнопки-пилюли на белом */
 
   --gold: #b4671f;         /* тёплое дерево, чуть ярче — на белом читается лучше */
   --gold-deep: #8f4f16;    /* темнее: наведение */
   --gold-soft: #fbf2e8;    /* мягкая заливка акцента */
 
-  --line: #e6e6e6;
-  --line-dark: #dcdcdc;
+  --line: #dadade;         /* рамки — заметные, чтобы белое не сливалось */
+  --line-dark: #c9c9cf;
 
   --text: #171717;
   --text-muted: #6f6f6f;
@@ -100,16 +101,16 @@ body {
 }
 
 /*
- * Белое на белом: карточка и фон теперь одного цвета, поэтому границу
- * карточке рисует тонкое кольцо и едва заметная тень. Поля ввода и
- * кнопки-чипы уже имеют свою рамку — им кольцо не нужно.
+ * Белые карточки на сером фоне: тонкое кольцо рамки и мягкая тень,
+ * чтобы край был виден и на ярком экране телефона. Поля ввода и кнопки
+ * со своей рамкой не трогаем.
  */
-:root:not([data-theme="dark"]) :is(.bg-paper, .bg-cream):not(input, select, textarea, button, a, header, footer, nav, .flat) {
-  box-shadow: 0 0 0 1px var(--line), 0 2px 10px rgba(0, 0, 0, 0.035);
+:root:not([data-theme="dark"]) .bg-paper:not(input, select, textarea, header, footer, nav, .flat) {
+  box-shadow: 0 0 0 1px var(--line), 0 2px 8px rgba(20, 20, 40, 0.05);
 }
-/* Кнопки и ссылки без своей рамки (плитки кабинета, чипы категорий) — кольцо тоньше, без тени */
-:root:not([data-theme="dark"]) :is(a, button):is(.bg-paper, .bg-cream):not(.border, [class*="border-"]) {
-  box-shadow: 0 0 0 1px var(--line);
+/* Кнопки и ссылки белого цвета без своей рамки — только кольцо */
+:root:not([data-theme="dark"]) :is(a, button).bg-paper:not(.border, [class*="border-"]) {
+  box-shadow: 0 0 0 1px var(--line-dark);
 }
 
 /*
@@ -135,7 +136,7 @@ summary {
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="range"]),
 textarea,
 select {
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-dark);
 }
 
 /* Заголовки — плотные и уверенные. Без верхнего регистра:
@@ -169,13 +170,15 @@ select {
    Стеклянная панель — нижнее меню на телефоне и всплывающие блоки.
    --------------------------------------------------------------- */
 .glass {
-  background: color-mix(in srgb, var(--paper) 72%, transparent);
+  /* Плотнее, чем раньше: под нижним меню едут карточки, и полупрозрачное
+     меню сливалось с ними */
+  background: color-mix(in srgb, var(--paper) 90%, transparent);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border: 1px solid var(--line-dark);
   box-shadow:
-    0 1px 2px rgb(59 51 43 / 0.06),
-    0 8px 24px rgb(59 51 43 / 0.14);
+    0 1px 2px rgb(20 20 40 / 0.08),
+    0 10px 30px rgb(20 20 40 / 0.18);
 }
 [data-theme="dark"] .glass {
   box-shadow:
