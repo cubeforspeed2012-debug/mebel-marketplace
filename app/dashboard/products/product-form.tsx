@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useActionState, useState } from 'react'
 import { PhotoPicker } from '@/components/photo-picker'
+import { AttributesFields } from './attributes-fields'
 import { PRODUCT_TYPES } from '@/lib/constants'
 import type { Category, Product, ProductImage } from '@/lib/types'
 import { saveProduct, type FormState } from './actions'
@@ -30,6 +31,7 @@ function Rules({ editing }: { editing: boolean }) {
         <li>· Понятное название: «Кухня под ваш размер», «Шкаф-купе в нишу»</li>
         <li>· Настоящая цена. Пишите полностью: 4 500 000, а не 4500</li>
         <li>· Описание своими словами. Коротко — тоже нормально</li>
+        <li>· Заполненные характеристики: материал, стиль, цвет, размеры — по ним клиенты ищут</li>
       </ul>
 
       <div className="mt-4 text-xs font-semibold uppercase tracking-widest text-status-error">
@@ -189,6 +191,8 @@ export function ProductForm({
           </span>
         </label>
       </div>
+
+      <AttributesFields value={product?.attributes} />
 
       <label className="block">
         <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">

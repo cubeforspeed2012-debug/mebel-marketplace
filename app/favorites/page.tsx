@@ -22,7 +22,7 @@ export default async function FavoritesPage() {
          price_from, currency, status, boosted_until, views_count, created_at,
          companies (id, name, slug, district, has_phone, rating_avg, rating_count, work_type),
          product_images (id, product_id, url, sort_order),
-         categories (id, name, slug)
+         categories (id, name, slug), attributes
        )`,
     )
     .eq('user_id', user.id)

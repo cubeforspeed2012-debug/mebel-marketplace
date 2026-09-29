@@ -26,7 +26,7 @@ async function getHomeData() {
            price_from, currency, status, boosted_until, views_count, created_at,
            companies!inner (id, name, slug, district, has_phone, rating_avg, rating_count, work_type),
            product_images (id, product_id, url, sort_order),
-           categories (id, name, slug)`,
+           categories (id, name, slug), attributes`,
         )
         .eq('status', 'active')
         .order('boosted_until', { ascending: false, nullsFirst: false })

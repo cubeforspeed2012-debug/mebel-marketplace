@@ -5,6 +5,7 @@ import { ContactButtons } from '@/components/contact-buttons'
 import { FavoriteButton } from '@/components/favorite-button'
 import { ProductCard } from '@/components/product-card'
 import { Stars } from '@/components/stars'
+import { CHOICE_GROUPS, label as attrLabel, sizeLine, type ChoiceKey } from '@/lib/attributes'
 import { formatPrice } from '@/lib/constants'
 import { districtIn, priceIn } from '@/lib/i18n'
 import { getDictionary } from '@/lib/locale'
@@ -27,7 +28,7 @@ async function getProduct(id: string) {
          price_from, currency, status, boosted_until, views_count, created_at,
          companies!inner (id, name, slug, district, has_phone, rating_avg, rating_count, work_type, telegram, instagram),
          product_images (id, product_id, url, sort_order),
-         categories (id, name, slug)`,
+         categories (id, name, slug), attributes`,
       )
       .eq('id', Number(id))
       .eq('status', 'active')
@@ -127,6 +128,19 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const images = [...(product.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order)
   const company = product.companies
   const favorites = await getFavoriteIds()
+
+  const lang = dict.code === 'uz' ? 'uz' : 'ru'
+  const a = product.attributes ?? {}
+  const specs: Array<{ name: string; value: string; href?: string }> = []
+  for (const key of Object.keys(CHOICE_GROUPS) as ChoiceKey[]) {
+    const value = attrLabel(key, a[key], lang)
+    if (value) specs.push({ name: CHOICE_GROUPS[key][lang], value, href: `/catalog?${key}=${a[key]}` })
+  }
+  const size = sizeLine(a)
+  if (size) specs.push({ name: lang === 'uz' ? 'O‘lchamlari' : 'Размеры', value: size })
+  if (a.made_days) specs.push({ name: lang === 'uz' ? 'Tayyorlash muddati' : 'Срок изготовления', value: lang === 'uz' ? `${a.made_days} kun` : `${a.made_days} дн.` })
+  const extras = [a.delivery && (lang === 'uz' ? 'Yetkazib berish' : 'Доставка'), a.installation && (lang === 'uz' ? 'O‘rnatish' : 'Установка')].filter(Boolean)
+  if (extras.length) specs.push({ name: lang === 'uz' ? 'Qo‘shimcha' : 'Дополнительно', value: extras.join(' · ') })
   const { master, others, worksCount, reviews } = company
     ? await getMaster(company.id, product.id)
     : { master: null, others: [], worksCount: 0, reviews: [] as Review[] }
@@ -220,6 +234,24 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               </p>
             )}
           </div>
+
+          {/*
+            Характеристики — то, о чём клиент спросил бы по телефону:
+            материал, стиль, размеры, срок. Каждая — ссылка в каталог
+            на такие же работы, как в любом маркетплейсе.
+          */}
+          {specs.length > 0 && (
+            <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 rounded-[var(--radius)] border border-line bg-paper p-5 text-sm">
+              {specs.map((row) => (
+                <div key={row.name} className="contents">
+                  <dt className="text-text-muted">{row.name}</dt>
+                  <dd className="font-semibold text-text">
+                    {row.href ? <Link href={row.href} className="hover:text-gold-deep">{row.value}</Link> : row.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
 
           {product.description && (
             <p className="mt-6 whitespace-pre-line leading-relaxed">{product.description}</p>

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { CategoryIcon, FurnitureScene } from '@/components/furniture-icons'
 import { ProductCard } from '@/components/product-card'
+import { CHOICE_GROUPS, SORTS, searchWords, type ChoiceKey, type SortKey } from '@/lib/attributes'
 import { DISTRICTS, FALLBACK_CATEGORIES, PRODUCT_TYPES } from '@/lib/constants'
 import { districtIn } from '@/lib/i18n'
 import { getDictionary } from '@/lib/locale'
@@ -15,6 +16,20 @@ type SearchParams = {
   category?: string
   type?: string
   district?: string
+  room?: string
+  material?: string
+  style?: string
+  color?: string
+  price_min?: string
+  price_max?: string
+  sort?: string
+}
+
+const CHOICE_KEYS = Object.keys(CHOICE_GROUPS) as ChoiceKey[]
+
+const toNumber = (raw?: string) => {
+  const n = Number(String(raw ?? '').replace(/\D/g, ''))
+  return Number.isFinite(n) && n > 0 ? n : null
 }
 
 export async function generateMetadata({
@@ -50,11 +65,14 @@ async function getCatalog(params: SearchParams) {
          price_from, currency, status, boosted_until, views_count, created_at,
          companies!inner (id, name, slug, district, has_phone, rating_avg, rating_count, work_type),
          product_images (id, product_id, url, sort_order),
-         categories (id, name, slug)`,
+         categories (id, name, slug), attributes`,
       )
       .eq('status', 'active')
 
-    if (params.q) query = query.ilike('title', `%${params.q}%`)
+    // Поиск по строке search_text: название, описание, категория и все
+    // характеристики на двух языках. Каждое слово запроса должно найтись —
+    // «кухня лофт» даст кухни в стиле лофт, а не всё, где есть «кухня».
+    for (const word of searchWords(params.q)) query = query.ilike('search_text', `%${word}%`)
     if (params.type && params.type in PRODUCT_TYPES) query = query.eq('type', params.type)
 
     if (params.category) {
@@ -64,11 +82,29 @@ async function getCatalog(params: SearchParams) {
 
     if (params.district) query = query.eq('companies.district', params.district)
 
+    // Характеристики лежат в jsonb — фильтруем по ключу внутри него
+    for (const key of CHOICE_KEYS) {
+      const value = params[key]
+      if (value && CHOICE_GROUPS[key].options.some((o) => o.key === value)) {
+        query = query.eq(`attributes->>${key}`, value)
+      }
+    }
+
+    const min = toNumber(params.price_min)
+    const max = toNumber(params.price_max)
+    if (min) query = query.gte('price', min)
+    if (max) query = query.lte('price', max)
+
     // Оплаченный буст поднимает товар наверх — так работает продвижение.
-    const { data: products } = await query
-      .order('boosted_until', { ascending: false, nullsFirst: false })
-      .order('created_at', { ascending: false })
-      .limit(60)
+    // Дальше — как попросил человек; по умолчанию новые сверху.
+    query = query.order('boosted_until', { ascending: false, nullsFirst: false })
+    switch (params.sort as SortKey | undefined) {
+      case 'cheap': query = query.order('price', { ascending: true, nullsFirst: false }); break
+      case 'expensive': query = query.order('price', { ascending: false, nullsFirst: false }); break
+      case 'popular': query = query.order('views_count', { ascending: false }); break
+      default: query = query.order('created_at', { ascending: false })
+    }
+    const { data: products } = await query.limit(60)
 
     return {
       categories: (categories ?? []) as Category[],
@@ -122,6 +158,7 @@ export default async function CatalogPage({
 }) {
   const params = await searchParams
   const dict = await getDictionary()
+  const lang = dict.code === 'uz' ? 'uz' : 'ru'
   const { categories, products } = await getCatalog(params)
   const favorites = await getFavoriteIds()
 
@@ -153,6 +190,7 @@ export default async function CatalogPage({
             {params.category && <input type="hidden" name="category" value={params.category} />}
             {params.type && <input type="hidden" name="type" value={params.type} />}
             {params.district && <input type="hidden" name="district" value={params.district} />}
+            {CHOICE_KEYS.map((k) => params[k] && <input key={k} type="hidden" name={k} value={params[k]} />)}
             <button
               type="submit"
               className="press rounded-[var(--radius)] bg-gold px-6 py-2.5 font-semibold text-white transition-colors hover:bg-gold-deep"
@@ -222,6 +260,61 @@ export default async function CatalogPage({
               ))}
             </div>
           </details>
+
+          {/* Характеристики: комната, материал, стиль, цвет. Свёрнуты, чтобы
+              не пугать длиной, но открытый фильтр показывает выбранное. */}
+          {CHOICE_KEYS.map((key) => {
+            const group = CHOICE_GROUPS[key]
+            const picked = group.options.find((o) => o.key === params[key])
+            return (
+              <details key={key} open={Boolean(picked)}>
+                <summary className="cursor-pointer text-xs font-semibold uppercase tracking-widest text-text-muted hover:text-text">
+                  {group[lang]}{' '}
+                  {picked && <span className="text-gold-deep">· {picked[lang]}</span>}
+                </summary>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {group.options.map((option) => (
+                    <FilterChip
+                      key={option.key}
+                      href={filterHref(params, key, option.key)}
+                      active={params[key] === option.key}
+                    >
+                      {option[lang]}
+                    </FilterChip>
+                  ))}
+                </div>
+              </details>
+            )
+          })}
+
+          {/* Цена и сортировка — одной строкой, отправляется кнопкой */}
+          <form action="/catalog" className="flex flex-wrap items-end gap-2">
+            {Object.entries(params)
+              .filter(([k, v]) => v && !['price_min', 'price_max', 'sort'].includes(k))
+              .map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
+                {lang === 'uz' ? 'Narx, so‘m' : 'Цена, сум'}
+              </span>
+              <span className="flex gap-2">
+                <input name="price_min" inputMode="numeric" defaultValue={params.price_min ?? ''} placeholder={lang === 'uz' ? 'dan' : 'от'} className="w-28 rounded-[var(--radius)] border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-gold" />
+                <input name="price_max" inputMode="numeric" defaultValue={params.price_max ?? ''} placeholder={lang === 'uz' ? 'gacha' : 'до'} className="w-32 rounded-[var(--radius)] border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-gold" />
+              </span>
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-text-muted">
+                {lang === 'uz' ? 'Saralash' : 'Сортировка'}
+              </span>
+              <select name="sort" defaultValue={params.sort ?? 'new'} className="rounded-[var(--radius)] border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-gold">
+                {(Object.keys(SORTS) as SortKey[]).map((k) => (
+                  <option key={k} value={k}>{SORTS[k][lang]}</option>
+                ))}
+              </select>
+            </label>
+            <button type="submit" className="press rounded-[var(--radius)] border border-line bg-paper px-4 py-2 text-sm font-semibold text-text transition-colors hover:border-gold hover:text-gold">
+              {lang === 'uz' ? 'Qo‘llash' : 'Применить'}
+            </button>
+          </form>
         </div>
 
         {/* Результаты */}

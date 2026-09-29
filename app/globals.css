@@ -13,23 +13,28 @@
 [data-theme="light"] {
   color-scheme: light;
 
-  --ink: #ffffff;          /* шапка и подвал — светлые, без чёрного */
-  --ink-deep: #f1ebe2;     /* подложка подвала */
-  --cream: #f7f4ef;        /* фон страницы */
+  /*
+   * Белая тема. Раньше фон был песочным (#f7f4ef), и на телефоне сайт
+   * выглядел тускло, будто выцвел. Теперь фон — чистый белый, а слои
+   * различаются не оттенком, а тонкой линией и лёгкой тенью (см. ниже).
+   */
+  --ink: #ffffff;          /* шапка */
+  --ink-deep: #f6f6f6;     /* подложка подвала */
+  --cream: #ffffff;        /* фон страницы */
   --paper: #ffffff;        /* карточки */
-  --sand: #f1ece4;         /* второй слой внутри карточек */
+  --sand: #f4f4f4;         /* второй слой внутри карточек: чипы, поля */
 
-  --gold: #9c5a22;         /* тёплое дерево: кнопки, активные вкладки */
-  --gold-deep: #7f4718;    /* темнее: наведение */
-  --gold-soft: #f6ece2;    /* мягкая заливка акцента */
+  --gold: #b4671f;         /* тёплое дерево, чуть ярче — на белом читается лучше */
+  --gold-deep: #8f4f16;    /* темнее: наведение */
+  --gold-soft: #fbf2e8;    /* мягкая заливка акцента */
 
-  --line: #e7e0d6;
-  --line-dark: #e7e0d6;
+  --line: #e6e6e6;
+  --line-dark: #dcdcdc;
 
-  --text: #241f1a;
-  --text-muted: #7b7268;
-  --text-on-dark: #241f1a;      /* «на тёмном» теперь читается на светлом */
-  --text-on-dark-muted: #7b7268;
+  --text: #171717;
+  --text-muted: #6f6f6f;
+  --text-on-dark: #171717;
+  --text-on-dark-muted: #6f6f6f;
 
   --status-done: #15803d;
   --status-process: #b45309;
@@ -92,6 +97,19 @@
 body {
   background: var(--cream);
   color: var(--text);
+}
+
+/*
+ * Белое на белом: карточка и фон теперь одного цвета, поэтому границу
+ * карточке рисует тонкое кольцо и едва заметная тень. Поля ввода и
+ * кнопки-чипы уже имеют свою рамку — им кольцо не нужно.
+ */
+:root:not([data-theme="dark"]) :is(.bg-paper, .bg-cream):not(input, select, textarea, button, a, header, footer, nav, .flat) {
+  box-shadow: 0 0 0 1px var(--line), 0 2px 10px rgba(0, 0, 0, 0.035);
+}
+/* Кнопки и ссылки без своей рамки (плитки кабинета, чипы категорий) — кольцо тоньше, без тени */
+:root:not([data-theme="dark"]) :is(a, button):is(.bg-paper, .bg-cream):not(.border, [class*="border-"]) {
+  box-shadow: 0 0 0 1px var(--line);
 }
 
 /*

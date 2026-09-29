@@ -1,3 +1,4 @@
+import type { ProductAttributes } from './attributes'
 import type { ProductType, WorkType } from './constants'
 import type { OrderSource, OrderStatus } from './orders'
 
@@ -92,6 +93,8 @@ export type Product = {
   price_from: boolean
   currency: string
   status: 'draft' | 'pending' | 'active' | 'hidden'
+  /** Материал, стиль, цвет, комната, размеры — по ним ищут и фильтруют */
+  attributes?: ProductAttributes | null
   /** Работу уже смотрел администратор — одобренную мастер прячет и показывает сам */
   moderated?: boolean
   /** Решение автопроверки: approve, review или reject */

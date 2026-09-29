@@ -5,6 +5,7 @@ import { FavoriteButton } from '@/components/favorite-button'
 import { IconArmchair } from '@/components/furniture-icons'
 import { Stars } from '@/components/stars'
 import { useDict } from '@/components/locale-provider'
+import { label as attrLabel, sizeLine } from '@/lib/attributes'
 import { districtIn, priceIn } from '@/lib/i18n'
 import type { ProductCard as ProductCardType } from '@/lib/types'
 
@@ -23,6 +24,13 @@ export function ProductCard({
   const image = product.product_images?.[0]?.url
   const company = product.companies
   const isBoosted = product.boosted_until && new Date(product.boosted_until) > new Date()
+  // Материал · стиль · размер — то, по чему сравнивают, не открывая карточку
+  const lang = dict.code === 'uz' ? 'uz' : 'ru'
+  const specs = [
+    attrLabel('material', product.attributes?.material, lang),
+    attrLabel('style', product.attributes?.style, lang),
+    sizeLine(product.attributes),
+  ].filter(Boolean)
 
   return (
     <Link
@@ -67,6 +75,10 @@ export function ProductCard({
         <div className="display mt-2 text-lg text-gold">
           {priceIn(dict, product.price, product.price_from)}
         </div>
+
+        {specs.length > 0 && (
+          <div className="mt-1.5 truncate text-xs text-text-muted">{specs.join(' · ')}</div>
+        )}
 
         <div className="mt-auto pt-3 text-sm text-text-muted">
           <div className="truncate">
