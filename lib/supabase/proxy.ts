@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { SITE_URL } from '@/lib/constants'
+import { tooManyRequests } from '@/lib/rate-limit'
 import { AUTH_COOKIE_OPTIONS } from './cookies'
 
 
@@ -54,6 +55,10 @@ export async function updateSession(request: NextRequest) {
   // Один сайт — один адрес. Иначе вход живёт в двух местах сразу.
   const canonical = toCanonicalHost(request)
   if (canonical) return NextResponse.redirect(canonical, 308)
+
+  // Слишком частые запросы с одного адреса отбиваем до похода в базу.
+  const blocked = await tooManyRequests(request)
+  if (blocked) return blocked
 
   let response = NextResponse.next({ request })
 
