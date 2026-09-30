@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { CategoryIcon, FurnitureScene } from '@/components/furniture-icons'
 import { ProductCard } from '@/components/product-card'
-import { CHOICE_GROUPS, SORTS, searchWords, type ChoiceKey, type SortKey } from '@/lib/attributes'
+import { CHOICE_GROUPS, SORTS, relevance, searchWords, type ChoiceKey, type SortKey } from '@/lib/attributes'
 import { DISTRICTS, FALLBACK_CATEGORIES, PRODUCT_TYPES } from '@/lib/constants'
 import { districtIn } from '@/lib/i18n'
 import { getDictionary } from '@/lib/locale'
@@ -58,57 +58,100 @@ async function getCatalog(params: SearchParams) {
       .eq('vertical', 'furniture')
       .order('sort_order')
 
-    let query = supabase
-      .from('products')
-      .select(
-        `id, company_id, category_id, slug, title, description, type, price,
-         price_from, currency, status, boosted_until, views_count, created_at,
-         companies!inner (id, name, slug, district, has_phone, rating_avg, rating_count, work_type),
-         product_images (id, product_id, url, sort_order),
-         categories (id, name, slug), attributes`,
-      )
-      .eq('status', 'active')
+    const words = searchWords(params.q)
 
-    // Поиск по строке search_text: название, описание, категория и все
-    // характеристики на двух языках. Каждое слово запроса должно найтись —
-    // «кухня лофт» даст кухни в стиле лофт, а не всё, где есть «кухня».
-    for (const word of searchWords(params.q)) query = query.ilike('search_text', `%${word}%`)
-    if (params.type && params.type in PRODUCT_TYPES) query = query.eq('type', params.type)
+    /*
+     * Каталог: сначала фильтры — категория, тип, район, характеристики,
+     * цена. Они работают как полки: сужают витрину до нужного.
+     */
+    const build = () => {
+      let query = supabase
+        .from('products')
+        .select(
+          `id, company_id, category_id, slug, title, description, type, price,
+           price_from, currency, status, boosted_until, views_count, created_at,
+           companies!inner (id, name, slug, district, has_phone, rating_avg, rating_count, work_type),
+           product_images (id, product_id, url, sort_order),
+           categories (id, name, slug), attributes, search_text`,
+        )
+        .eq('status', 'active')
 
-    if (params.category) {
-      const matched = (categories ?? []).find((c) => c.slug === params.category)
-      if (matched) query = query.eq('category_id', matched.id)
-    }
+      if (params.type && params.type in PRODUCT_TYPES) query = query.eq('type', params.type)
 
-    if (params.district) query = query.eq('companies.district', params.district)
-
-    // Характеристики лежат в jsonb — фильтруем по ключу внутри него
-    for (const key of CHOICE_KEYS) {
-      const value = params[key]
-      if (value && CHOICE_GROUPS[key].options.some((o) => o.key === value)) {
-        query = query.eq(`attributes->>${key}`, value)
+      if (params.category) {
+        const matched = (categories ?? []).find((c) => c.slug === params.category)
+        if (matched) query = query.eq('category_id', matched.id)
       }
+
+      if (params.district) query = query.eq('companies.district', params.district)
+
+      // Характеристики лежат в jsonb — фильтруем по ключу внутри него
+      for (const key of CHOICE_KEYS) {
+        const value = params[key]
+        if (value && CHOICE_GROUPS[key].options.some((o) => o.key === value)) {
+          query = query.eq(`attributes->>${key}`, value)
+        }
+      }
+
+      const min = toNumber(params.price_min)
+      const max = toNumber(params.price_max)
+      if (min) query = query.gte('price', min)
+      if (max) query = query.lte('price', max)
+
+      // Оплаченный буст поднимает товар наверх — так работает продвижение.
+      query = query.order('boosted_until', { ascending: false, nullsFirst: false })
+      switch (params.sort as SortKey | undefined) {
+        case 'cheap': query = query.order('price', { ascending: true, nullsFirst: false }); break
+        case 'expensive': query = query.order('price', { ascending: false, nullsFirst: false }); break
+        case 'popular': query = query.order('views_count', { ascending: false }); break
+        default: query = query.order('created_at', { ascending: false })
+      }
+      return query
     }
 
-    const min = toNumber(params.price_min)
-    const max = toNumber(params.price_max)
-    if (min) query = query.gte('price', min)
-    if (max) query = query.lte('price', max)
+    type Row = ProductCardType & { search_text?: string | null }
+    let products: Row[] = []
 
-    // Оплаченный буст поднимает товар наверх — так работает продвижение.
-    // Дальше — как попросил человек; по умолчанию новые сверху.
-    query = query.order('boosted_until', { ascending: false, nullsFirst: false })
-    switch (params.sort as SortKey | undefined) {
-      case 'cheap': query = query.order('price', { ascending: true, nullsFirst: false }); break
-      case 'expensive': query = query.order('price', { ascending: false, nullsFirst: false }); break
-      case 'popular': query = query.order('views_count', { ascending: false }); break
-      default: query = query.order('created_at', { ascending: false })
+    if (!words.length) {
+      const { data } = await build().limit(60)
+      products = (data ?? []) as unknown as Row[]
+    } else {
+      /*
+       * Поиск — по индексу search_text, который собирает база: название,
+       * описание, категория, тип, мастерская, характеристики. Сначала
+       * ищем работы, где нашлись все слова. Если таких нет — где нашлось
+       * хоть одно: пустой экран на запрос «кухня лофт» хуже, чем просто
+       * кухни, пусть и не лофт.
+       */
+      let strict = build()
+      for (const w of words) strict = strict.ilike('search_text', `%${w}%`)
+      const { data: exact } = await strict.limit(200)
+      let rows = (exact ?? []) as unknown as Row[]
+
+      if (!rows.length) {
+        const any = words.map((w) => `search_text.ilike.*${w}*`).join(',')
+        const { data: loose } = await build().or(any).limit(200)
+        rows = (loose ?? []) as unknown as Row[]
+      }
+
+      // Ранжирование: совпадение в названии выше, чем в описании.
+      // Если человек сам выбрал сортировку по цене — уважаем её.
+      if (!params.sort || params.sort === 'new') {
+        rows = rows
+          .map((row, index) => ({
+            row,
+            index,
+            score: relevance(words, { title: row.title, category: row.categories?.name, searchText: row.search_text }),
+          }))
+          .sort((a, b) => b.score - a.score || a.index - b.index)
+          .map((x) => x.row)
+      }
+      products = rows.slice(0, 60)
     }
-    const { data: products } = await query.limit(60)
 
     return {
       categories: (categories ?? []) as Category[],
-      products: (products ?? []) as unknown as ProductCardType[],
+      products: products as ProductCardType[],
     }
   } catch {
     return { categories: [] as Category[], products: [] as ProductCardType[] }

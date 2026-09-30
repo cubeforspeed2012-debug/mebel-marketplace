@@ -118,37 +118,85 @@ export function sizeLine(a: ProductAttributes | null | undefined) {
 }
 
 /**
- * Текст для поиска: название, описание и все подписи характеристик на
- * обоих языках. Клиент ищет «мдф лофт» или «MDF» — найдётся и так и так.
- * Пишется в products.search_text при каждом сохранении.
+ * Подписи характеристик для поискового индекса — на обоих языках.
+ * Остальное (название, описание, категорию, тип, мастерскую) база
+ * добавляет сама триггером, см. миграцию 0030. Клиент ищет «мдф лофт»
+ * или «MDF» — найдётся и так и так.
  */
-export function buildSearchText(input: {
-  title: string
-  description: string | null
-  category: string | null
-  attributes: ProductAttributes
-}) {
-  const words: string[] = [input.title, input.description ?? '', input.category ?? '']
+export function buildAttrText(attributes: ProductAttributes) {
+  const words: string[] = []
   for (const key of Object.keys(CHOICE_GROUPS) as ChoiceKey[]) {
-    const value = input.attributes[key]
+    const value = attributes[key]
     const option = value ? CHOICE_GROUPS[key].options.find((o) => o.key === value) : null
     if (option) words.push(option.ru, option.uz)
   }
-  if (input.attributes.delivery) words.push('доставка', 'yetkazib berish')
-  if (input.attributes.installation) words.push('установка сборка', "o'rnatish")
-  const size = sizeLine(input.attributes)
-  if (size) words.push(size)
-  return words.join(' ').replace(/\s+/g, ' ').trim().toLowerCase()
+  if (attributes.delivery) words.push('доставка', 'yetkazib berish')
+  if (attributes.installation) words.push('установка сборка', "o'rnatish")
+  return words.join(' ').toLowerCase()
 }
 
-/** Слова запроса — каждое должно найтись. Короткий мусор и лишние знаки отбрасываем. */
+/*
+ * Слова, по которым не ищут: предлоги и союзы, а ещё «мебель» — на
+ * площадке мебели это слово есть у всего подряд и ничего не отсекает.
+ */
+const STOP_WORDS = new Set([
+  'на', 'в', 'во', 'из', 'для', 'и', 'с', 'со', 'по', 'под', 'до', 'от', 'к', 'ко', 'у', 'о', 'об', 'а', 'или', 'не',
+  'мебель', 'мебели', 'мебелью', 'mebel', 'mebellar', 'uchun', 'va', 'bilan',
+  'купить', 'заказать', 'ташкент', 'ташкенте', 'toshkent',
+])
+
+/*
+ * Основа слова: срезаем окончание, чтобы «кухни», «кухню» и «кухня»
+ * находили одно и то же. Грубо, но для коротких запросов работает:
+ * «шкафы» → «шкаф», «спальни» → «спаль», «заказ» → «зака».
+ */
+function stem(word: string) {
+  if (/^\d+$/.test(word)) return word
+  if (word.length >= 7) return word.slice(0, -2)
+  if (word.length >= 5) return word.slice(0, -1)
+  return word
+}
+
+/** Слова запроса: без знаков, предлогов и окончаний. */
 export function searchWords(q: string | undefined) {
-  return (q ?? '')
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
-    .split(/\s+/)
-    .filter((w) => w.length >= 2)
-    .slice(0, 6)
+  return [...new Set(
+    (q ?? '')
+      .toLowerCase()
+      .replace(/ё/g, 'е')
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+      .split(/\s+/)
+      .filter((w) => w.length >= 2 && !STOP_WORDS.has(w))
+      .map(stem),
+  )].slice(0, 6)
+}
+
+/**
+ * Насколько работа подходит к запросу. Слово в названии весит больше
+ * всего, в категории — меньше, где-то в описании или характеристиках —
+ * меньше всего. Работы, где нашлись все слова, всегда выше тех, где
+ * нашлась только часть.
+ */
+export function relevance(
+  words: string[],
+  item: { title: string; category?: string | null; searchText?: string | null },
+) {
+  if (!words.length) return 0
+  const title = item.title.toLowerCase().replace(/ё/g, 'е')
+  const category = (item.category ?? '').toLowerCase()
+  const text = (item.searchText ?? '').replace(/ё/g, 'е')
+  let score = 0
+  let found = 0
+  for (const w of words) {
+    const inTitle = title.includes(w)
+    const inCategory = category.includes(w)
+    const inText = text.includes(w)
+    if (inTitle || inCategory || inText) found++
+    if (inTitle) score += title.startsWith(w) ? 12 : 8
+    if (inCategory) score += 5
+    if (inText) score += 2
+  }
+  if (found === words.length) score += 100
+  return score
 }
 
 /** Сортировки каталога */

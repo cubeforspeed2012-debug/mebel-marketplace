@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { buildSearchText, parseAttributes } from '@/lib/attributes'
+import { buildAttrText, parseAttributes } from '@/lib/attributes'
 import { decide, type ProductForReview } from '@/lib/moderation'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -49,21 +49,15 @@ export async function saveProduct(_prev: FormState, formData: FormData): Promise
   const description = String(formData.get('description') ?? '').trim() || null
   const attributes = parseAttributes(formData)
 
-  // Название категории — в строку поиска: «кухня» найдёт и «Кухня «Лофт»»,
-  // и работу, у которой в названии только «Гарнитур под ваш размер»
-  let categoryName: string | null = null
-  if (categoryId) {
-    const { data: cat } = await supabase.from('categories').select('name, name_uz').eq('id', categoryId).maybeSingle()
-    categoryName = cat ? [cat.name, cat.name_uz].filter(Boolean).join(' ') : null
-  }
-
   const fields = {
     company_id: company.id,
     category_id: categoryId,
     title,
     description,
     attributes,
-    search_text: buildSearchText({ title, description, category: categoryName, attributes }),
+    // Подписи характеристик для поиска. Остальное — название, категорию,
+    // тип, мастерскую — база сама сложит в search_text при сохранении.
+    attr_text: buildAttrText(attributes),
     type: String(formData.get('type') ?? 'ready_made'),
     price: parsePrice(formData.get('price')),
     price_from: formData.get('price_from') === 'on',
