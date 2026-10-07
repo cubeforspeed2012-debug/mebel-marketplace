@@ -1,0 +1,38 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink: #080808;
+  --color-bone: #f1efe9;
+  --color-royal: #2f55ff;
+  --color-royal-deep: #1a2c8c;
+  --color-tungsten: #ffb36b;
+  --color-steel: #8b90a0;
+
+  --font-display: 'Archivo Expanded', 'Syne Variable', sans-serif;
+  --font-syne: 'Syne Variable', sans-serif;
+  --font-grotesk: 'Space Grotesk Variable', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --tracking-hair: 0.32em;
+  --tracking-micro: 0.18em;
+  --tracking-tightest: -0.045em;
+}
+
+@layer base {
+  html,
+  body {
+    background: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+}
+
+@utility extended {
+  font-stretch: 125%;
+  font-variation-settings: 'wdth' 125;
+}
