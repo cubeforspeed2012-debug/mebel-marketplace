@@ -112,13 +112,20 @@ const World: React.FC<StageProps & { width: number; height: number }> = (p) => {
   );
 };
 
+/**
+ * Follow the page's device pixel ratio: `remotion render --scale=0.5` then shades
+ * half the pixels instead of rendering full size and downsampling. Clamped so a
+ * retina Studio preview doesn't quadruple the GPU load.
+ */
+const canvasDpr = (): number => (typeof window === 'undefined' ? 1 : Math.min(2, Math.max(0.25, window.devicePixelRatio || 1)));
+
 export const Stage: React.FC<StageProps> = (props) => {
   const { width, height } = useVideoConfig();
   return (
     <ThreeCanvas
       width={width}
       height={height}
-      dpr={1}
+      dpr={canvasDpr()}
       flat
       shadows="percentage"
       gl={{ antialias: false, alpha: false, stencil: false, preserveDrawingBuffer: true, powerPreference: 'high-performance' }}
